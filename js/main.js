@@ -24,7 +24,7 @@ const OBSTACLES_DETECTION = 3;
 const POPULATION_AMOUNT = 50;
 const MUTATION_RATE = 0.4;
 const ELITISM_PERCENT = 0.2;
-const START_HIDDEN_SIZE = 4;
+const START_HIDDEN_SIZE = 30;
 
 window.onload = function() {
   runGame();

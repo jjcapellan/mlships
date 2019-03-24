@@ -141,6 +141,7 @@ class Test extends Phaser.Scene {
             1} Max Score: ${fittest.score} Top max score: ${t.iaManager.maxScore}`
         );
         t.info_txt2.setText(`Generation: ${this.iaManager.neat.generation} Score: 0`);
+        console.log(`Prev Generation: ${t.iaManager.neat.generation - 1} Max Score: ${fittest.score} Top max score: ${t.iaManager.maxScore}`);
         t.iaManager.neat.mutate();
         t.reset();
       });
