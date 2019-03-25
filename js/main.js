@@ -22,9 +22,10 @@ function runGame() {
 const DETECCTION_RADIUS = 600;
 const OBSTACLES_DETECTION = 3;
 const POPULATION_AMOUNT = 50;
-const MUTATION_RATE = 0.4;
+const MUTATION_RATE = 0.5;
 const ELITISM_PERCENT = 0.2;
-const START_HIDDEN_SIZE = 30;
+const START_HIDDEN_SIZE = 40;
+const MUTATION_AMOUNT = 2;
 
 window.onload = function() {
   runGame();

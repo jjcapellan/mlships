@@ -29,9 +29,13 @@ class IAmanager {
       ],
       popsize: POPULATION_AMOUNT,
       mutationRate: MUTATION_RATE,
+      mutationAmount: MUTATION_AMOUNT,
+      equal: true,
       elitism: Math.round(ELITISM_PERCENT * POPULATION_AMOUNT),
       network: new Architect.Random(OBSTACLES_DETECTION * 4 + 3, START_HIDDEN_SIZE, 3)
     });
+
+    
 
     this.maxScore = 0; // Max score of all generations
     this.actualMaxScore = 0; // Max score of last generation

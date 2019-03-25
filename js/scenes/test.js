@@ -116,7 +116,7 @@ class Test extends Phaser.Scene {
   collision(ship, meteor) {
     let t = this;
     let collisionTime = performance.now();
-    let shipScore = Math.round((collisionTime - this.startTime) / 1000);
+    let shipScore = Math.round(((collisionTime - this.startTime) - ship.stoppedTime) / 1000);
     if (isNaN(shipScore)) {
       shipScore = 0;
     }
