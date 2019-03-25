@@ -9,17 +9,14 @@ class Boot extends Phaser.Scene {
       // meteors params
       meteors_qty: 4, // Max quantity per type (there are 4 types)
       meteors_maxSpeed: 70, // px/sec
-      meteors_minSpeed: 50, // px/sec
+      meteors_minSpeed: 65, // px/sec
       meteors_mass: 2,      
 
       // ship
-      ship_acceleration: 300,
+      ship_speed: 120,
       ship_maxVelocity: 180, // max speed for x and y components
       ship_bounce: 0.8, // percentage of speed returned after a collision (0.8 = 80%)
-      ship_mass: 1,
-
-      // ui
-      ui_margin: 10
+      ship_mass: 1
     };
 
     this.registry.set('config',config);

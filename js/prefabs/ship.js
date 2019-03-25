@@ -9,7 +9,6 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
     // actions
     this.actions = {
-      accelerate: false,
       left: false,
       right: false
     };
@@ -18,7 +17,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
   init() {
     let bodyRadius = this.height * 0.5;
     this.setOrigin(0.5);
-    this.body.setMaxVelocity(this.scene.conf.ship_maxVelocity);
+    this.body.setMaxVelocity(this.scene.conf.ship_speed);
     this.body.setCircle(
       bodyRadius,
       -bodyRadius + 0.5 * this.width,
@@ -37,28 +36,16 @@ class Ship extends Phaser.Physics.Arcade.Image {
   }
 
   update(time, delta) {
-    if(this.body.speed < 5){
-      this.stoppedTime += delta;
-    }
+
     // Takes data
     let inputs = this.captureData();
     // Process data in the neural network
     let outputs = this.brain.activate(inputs);
     // Sets the actions
-    this.actions.accelerate = outputs[0] > 0.5;
-    this.actions.left = outputs[1] > 0.5 && outputs[1] > outputs[2];
-    this.actions.right = outputs[2] > 0.5 && outputs[2] > outputs[1];
-    // Executes the actions
-    if (this.actions.accelerate) {
-      this.scene.physics.velocityFromRotation(
-        this.rotation,
-        this.scene.conf.ship_acceleration,
-        this.body.acceleration
-      );
-    } else {
-      this.setAcceleration(0);
-    }
+    this.actions.left = outputs[0] > 0.5 && outputs[0] > outputs[1];
+    this.actions.right = outputs[1] > 0.5 && outputs[1] > outputs[0];
 
+    // Executes the actions
     if (this.actions.left) {
       this.setAngularVelocity(-300);
     } else if (this.actions.right) {
@@ -66,6 +53,13 @@ class Ship extends Phaser.Physics.Arcade.Image {
     } else {
       this.setAngularVelocity(0);
     }
+
+    // Constant velocity
+    this.scene.physics.velocityFromRotation(
+      this.rotation,
+      this.scene.conf.ship_speed,
+      this.body.velocity
+    );
 
     this.scene.physics.world.wrap(this);
   }
@@ -81,14 +75,11 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.setActive(true);
     this.setVisible(true);
     this.body.reset(newX, newY);
-    this.setDamping(true);
-    this.setDrag(0.99);
   }
 
   captureData() {
     let t = this;
     let inputs = [];
-    let shipVelocityAngle = this.body.angle;
 
     // Sorts asteroids group by distance to the ship
     this.scene.meteors.getChildren().sort(t.compare.bind(t));
@@ -97,43 +88,26 @@ class Ship extends Phaser.Physics.Arcade.Image {
     for (let i = 0; i < OBSTACLES_DETECTION; i++) {
       let asteroid = this.scene.meteors.getChildren()[i];
       let distance = Phaser.Math.Distance.Between(asteroid.x, asteroid.y, this.x, this.y);
-      if (distance > DETECCTION_RADIUS) {
-        inputs.concat([ 0, 0, 0, 0 ]);
+      if (distance > DETECTION_RADIUS) {
+        inputs.concat([ 0, 0 ]);
         continue;
       }
 
-      // Angle asteroid/ship
-      let angleA = Phaser.Math.Angle.Between(asteroid.x, asteroid.y, this.x, this.y); // (-PI to +PI)
-      let adjust = shipVelocityAngle * -1;
-      angleA += adjust;
-      angleA = this.normalizeAngle(angleA); // (0 to 1)
-      inputs.push(angleA);
+      // distanceX asteroid/ship
+      let distanceX = asteroid.x - this.x; // (-DETECCTION_RADIUS to +DETECTION_RADIUS)      
+      distanceX = this.normalizePixels(distanceX, DETECTION_RADIUS, -DETECTION_RADIUS); // (0 to 1)
+      inputs.push(distanceX);
 
-      // Angle of asteroid velocity
-      let angleB = asteroid.body.angle; // (-PI to PI)
-      angleB = this.normalizeAngle(angleB); // (0 to 1)
-      inputs.push(angleB);
-
-      // Distance
-      distance = this.normalizePixels(distance, 300); // (0 to 1)
-      inputs.push(distance);
-
-      // Magnitude of asteroid velocity
-      let asteroidSpeed = this.normalizePixels(asteroid.body.speed, 250); // (0 to 1)
-      //console.log(asteroid.body.speed);
-      inputs.push(asteroidSpeed);
+      // distanceY asteroid/ship
+      let distanceY = asteroid.y - this.y; // (-DETECCTION_RADIUS to +DETECTION_RADIUS)      
+      distanceY = this.normalizePixels(distanceY, DETECTION_RADIUS, -DETECTION_RADIUS); // (0 to 1)
+      inputs.push(distanceY);
     }
 
     // Data of the ship
-    // Velocity angle
-    shipVelocityAngle = this.normalizeAngle(shipVelocityAngle); // (0 to 1)
-    inputs.push(shipVelocityAngle);
-    // Rotation
+    // Rotation = velocity angle
     let shipRotation = this.normalizeAngle(this.rotation); // (0 to 1)
     inputs.push(shipRotation);
-    // Speed
-    let shipSpeed = this.normalizePixels(this.body.speed, 250); // (0 to 1)
-    inputs.push(shipSpeed);
 
     return inputs;
   }
@@ -155,8 +129,8 @@ class Ship extends Phaser.Physics.Arcade.Image {
     return a;
   }
 
-  normalizePixels(pixels, max) {
-    let p = pixels / max; // (value - min)/(max - min)
+  normalizePixels(pixels, max, min) {
+    let p = (pixels - min) / (max - min); // (value - min)/(max - min)
     if (p < 0) {
       p = 0;
     }

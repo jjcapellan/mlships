@@ -127,7 +127,7 @@ class Test extends Phaser.Scene {
 
     ship.setActive(false);
     ship.setVisible(false);
-    ship.body.reset(-100, -100);
+    ship.body.reset(-200, -200);
     ship.body.setEnable(false);
 
     if (this.ships.countActive() == 0) {

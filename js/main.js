@@ -19,12 +19,12 @@ function runGame() {
 }
 
 //GA GLOBALS
-const DETECCTION_RADIUS = 400;
+const DETECTION_RADIUS = 400;
 const OBSTACLES_DETECTION = 3;
-const POPULATION_AMOUNT = 50;
+const POPULATION_AMOUNT = 40;
 const MUTATION_RATE = 0.5;
 const ELITISM_PERCENT = 0.2;
-const START_HIDDEN_SIZE = 40;
+const START_HIDDEN_SIZE = 10;
 const MUTATION_AMOUNT = 2;
 
 window.onload = function() {

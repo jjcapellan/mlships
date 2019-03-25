@@ -32,7 +32,7 @@ class IAmanager {
       mutationAmount: MUTATION_AMOUNT,
       equal: true,
       elitism: Math.round(ELITISM_PERCENT * POPULATION_AMOUNT),
-      network: new Architect.Random(OBSTACLES_DETECTION * 4 + 3, START_HIDDEN_SIZE, 3)
+      network: new Architect.Random(OBSTACLES_DETECTION * 2 + 1, START_HIDDEN_SIZE, 2)
     });
 
     
