@@ -13,26 +13,26 @@ class IAmanager {
   init() {
     this.neat = new neataptic.Neat(OBSTACLES_DETECTION * 4 + 3, 3, null, {
       mutation: [
-        Methods.mutation.ADD_NODE,
+        /*Methods.mutation.ADD_NODE,
         Methods.mutation.SUB_NODE,
         Methods.mutation.ADD_CONN,
-        Methods.mutation.SUB_CONN,
+        Methods.mutation.SUB_CONN,*/
         Methods.mutation.MOD_WEIGHT,
         Methods.mutation.MOD_BIAS,
-        Methods.mutation.MOD_ACTIVATION,
+        /*Methods.mutation.MOD_ACTIVATION,
         Methods.mutation.ADD_GATE,
         Methods.mutation.SUB_GATE,
         Methods.mutation.ADD_SELF_CONN,
         Methods.mutation.SUB_SELF_CONN,
         Methods.mutation.ADD_BACK_CONN,
-        Methods.mutation.SUB_BACK_CONN
+        Methods.mutation.SUB_BACK_CONN*/
       ],
       popsize: POPULATION_AMOUNT,
       mutationRate: MUTATION_RATE,
       mutationAmount: MUTATION_AMOUNT,
       equal: true,
       elitism: Math.round(ELITISM_PERCENT * POPULATION_AMOUNT),
-      network: new Architect.Random(8, START_HIDDEN_SIZE, 2)
+      network: new Architect.Perceptron(8,10,2)//Architect.Random(8, START_HIDDEN_SIZE, 2)
     });
 
     
