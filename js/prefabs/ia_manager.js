@@ -40,12 +40,12 @@ class IAmanager {
     this.maxScore = 0; // Max score of all generations
     this.actualMaxScore = 0; // Max score of last generation
 
-    if(localStorage.getItem('generation')){      
+    /*if(localStorage.getItem('generation')){      
       this.maxScore = parseInt(localStorage.getItem('topScore'));
       this.neat.generation = parseInt(localStorage.getItem('generation'));
       let populationJSON = JSON.parse(localStorage.getItem('population'));
       this.neat.import(populationJSON);
-    }
+    }*/
   } // end init()
 
 }

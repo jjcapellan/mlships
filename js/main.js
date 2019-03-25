@@ -19,7 +19,7 @@ function runGame() {
 }
 
 //GA GLOBALS
-const DETECCTION_RADIUS = 600;
+const DETECCTION_RADIUS = 400;
 const OBSTACLES_DETECTION = 3;
 const POPULATION_AMOUNT = 50;
 const MUTATION_RATE = 0.5;

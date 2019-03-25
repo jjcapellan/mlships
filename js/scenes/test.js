@@ -155,7 +155,8 @@ class Test extends Phaser.Scene {
       ship.setBrain(this.iaManager.neat.population[i]);
     }
 
-    this.saveData();
+    // there is quota problem
+    /*this.saveData();*/
 
     // Resets timer
     this.startTime = performance.now();
