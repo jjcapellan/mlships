@@ -36,7 +36,6 @@ class Ship extends Phaser.Physics.Arcade.Image {
   }
 
   update(time, delta) {
-
     // Takes data
     let inputs = this.captureData();
     // Process data in the neural network
@@ -77,37 +76,62 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.body.reset(newX, newY);
   }
 
+  /**
+   * Makes the array with the inputs:
+   * 8 sensors. If a sensor is active, then returns 1, else 0.
+   * @return {numer[]} Inputs for the network. Array of numbers between 0 and 1.
+   * @memberof Ship
+   */
   captureData() {
     let t = this;
-    let inputs = [];
+    // Initial value of sensors
+    let inputs = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
 
     // Sorts asteroids group by distance to the ship
     this.scene.meteors.getChildren().sort(t.compare.bind(t));
+    let shipAngle = this.rotation; // In radians. Valid because in this case angle of velocity = this.rotation
 
     // Takes data of nearest asteroids
     for (let i = 0; i < OBSTACLES_DETECTION; i++) {
       let asteroid = this.scene.meteors.getChildren()[i];
       let distance = Phaser.Math.Distance.Between(asteroid.x, asteroid.y, this.x, this.y);
-      /*if (distance > DETECTION_RADIUS) {
-        inputs.concat([ 0, 0 ]);
+      if (distance > DETECTION_RADIUS) {
         continue;
-      }*/
+      }
+      let angleShipAsteroid =
+        Phaser.Math.Angle.Between(this.x, this.y, asteroid.x, asteroid.y) +
+        shipAngle * -1;
 
-      // distanceX asteroid/ship
-      let distanceX = asteroid.x - this.x; // (-DETECCTION_RADIUS to +DETECTION_RADIUS)      
-      distanceX = this.normalizePixels(distanceX, DETECTION_RADIUS, -DETECTION_RADIUS); // (0 to 1)
-      inputs.push(distanceX);
-
-      // distanceY asteroid/ship
-      let distanceY = asteroid.y - this.y; // (-DETECCTION_RADIUS to +DETECTION_RADIUS)      
-      distanceY = this.normalizePixels(distanceY, DETECTION_RADIUS, -DETECTION_RADIUS); // (0 to 1)
-      inputs.push(distanceY);
-    }
-
-    // Data of the ship
-    // Rotation = velocity angle
-    let shipRotation = this.normalizeAngle(this.rotation); // (0 to 1)
-    inputs.push(shipRotation);
+      if (angleShipAsteroid < 0) {
+        if (angleShipAsteroid < -(HALF_PI + QUARTER_PI)) {
+          // Sensor Back/Left
+          inputs[0] = 1;
+        } else if (angleShipAsteroid < -HALF_PI) {
+          // Sensor Back/Side/Left
+          inputs[1] = 1;
+        } else if (angleShipAsteroid < -QUARTER_PI) {
+          // Sensor Front/Side/Left
+          inputs[2] = 1;
+        } else {
+          // Sensor Front/Left
+          inputs[3] = 1;
+        }
+      } else {
+        if (angleShipAsteroid > HALF_PI + QUARTER_PI) {
+          // Sensor Back/Right
+          inputs[4] = 1;
+        } else if (angleShipAsteroid > HALF_PI) {
+          // Sensor Back/Side/Right
+          inputs[5] = 1;
+        } else if (angleShipAsteroid > QUARTER_PI) {
+          // Sensor Front/Side/Right
+          inputs[6] = 1;
+        } else {
+          // Sensor Front/Right
+          inputs[7] = 1;
+        }
+      }
+    } // end for
 
     return inputs;
   }
