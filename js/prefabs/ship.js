@@ -88,10 +88,10 @@ class Ship extends Phaser.Physics.Arcade.Image {
     for (let i = 0; i < OBSTACLES_DETECTION; i++) {
       let asteroid = this.scene.meteors.getChildren()[i];
       let distance = Phaser.Math.Distance.Between(asteroid.x, asteroid.y, this.x, this.y);
-      if (distance > DETECTION_RADIUS) {
+      /*if (distance > DETECTION_RADIUS) {
         inputs.concat([ 0, 0 ]);
         continue;
-      }
+      }*/
 
       // distanceX asteroid/ship
       let distanceX = asteroid.x - this.x; // (-DETECCTION_RADIUS to +DETECTION_RADIUS)      
