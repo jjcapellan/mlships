@@ -15,12 +15,13 @@ class Menu extends Phaser.Scene {
         let t = this;
 
         // Buttons
-        //this.bt_training = this.add.existing(new ButtonGenerator(this,50,110,'bmf',20,'TRAIN NETWORK','0xffffee','0xffffff')).setOrigin(0);
+        //this.bt_testBest = this.add.existing(new ButtonGenerator(this,50,110,'bmf',20,'TEST BEST NETWORK','0xffffee','0xffffff')).setOrigin(0);
         //this.bt_saveNetwork = this.add.existing(new ButtonGenerator(this,50,170,'bmf',20,'SAVE NETWORK TO FILE','0xffffee','0xffffff')).setOrigin(0);
         //this.bt_loadNetwork = this.add.existing(new ButtonGenerator(this,50,230,'bmf',20,'LOAD NETWORK FROM FILE','0xffffee','0xffffff')).setOrigin(0);
-        this.bt_test = this.add.existing(new ButtonGenerator(this,50,410,'bmf',20,'TEST','0xffffee','0xffffff')).setOrigin(0);
+        this.bt_test = this.add.existing(new ButtonGenerator(this,50,350,'bmf',20,'TEST BEST GENOME','0xffffee','0xffffff')).setOrigin(0);
+        this.bt_evolve = this.add.existing(new ButtonGenerator(this,50,410,'bmf',20,'EVOLVE NEW POPULATION','0xffffee','0xffffff')).setOrigin(0);
 
-        /*this.bt_training.on('pointerup',function(){
+        /*this.bt_testBest.on('pointerup',function(){
             this.scene.start('preTest');
         }, t);
 
@@ -33,7 +34,13 @@ class Menu extends Phaser.Scene {
         }, t);*/
 
         this.bt_test.on('pointerup',function(){
+          if(localStorage.hasOwnProperty('bestNN')){
             this.scene.start('test');
+          }
+      }, t);
+
+        this.bt_evolve.on('pointerup',function(){
+            this.scene.start('evolve');
         }, t);
     }
   

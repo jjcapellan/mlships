@@ -1,8 +1,8 @@
 class Ship extends Phaser.Physics.Arcade.Image {
-  constructor(scene, x, y, texture, frame) {
-    super(scene, x, y, texture, frame);
-    this.scene = scene;
-
+  constructor(scene, x, y,texture) {
+    super(scene, x, y, texture);
+    this.scene = scene;    
+    scene.physics.world.enable(this);
     this.x = 400;
     this.y = 300;
     this.stoppedTime = 0;
@@ -12,9 +12,11 @@ class Ship extends Phaser.Physics.Arcade.Image {
       left: false,
       right: false
     };
+
+    
   }
 
-  init() {
+  init() {    
     let bodyRadius = this.height * 0.5;
     this.setOrigin(0.5);
     this.body.setMaxVelocity(this.scene.conf.ship_speed);
@@ -46,11 +48,11 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
     // Executes the actions
     if (this.actions.left) {
-      this.setAngularVelocity(-300);
+      this.body.setAngularVelocity(-300);//this.setAngularVelocity(-300);
     } else if (this.actions.right) {
-      this.setAngularVelocity(300);
+      this.body.setAngularVelocity(300);
     } else {
-      this.setAngularVelocity(0);
+      this.body.setAngularVelocity(0);
     }
 
     // Constant velocity
@@ -86,20 +88,35 @@ class Ship extends Phaser.Physics.Arcade.Image {
     let t = this;
     // Initial value of sensors
     let inputs = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
-
-    // Sorts asteroids group by distance to the ship
-    this.scene.meteors.getChildren().sort(t.compare.bind(t));
+    
     let shipAngle = this.rotation; // In radians. Valid because in this case angle of velocity = this.rotation
 
-    // Takes data of nearest asteroids
-    for (let i = 0; i < OBSTACLES_DETECTION; i++) {
+    // Takes data of asteroids
+    for (let i = 0; i < OBSTACLES_AMOUNT; i++) {
       let asteroid = this.scene.meteors.getChildren()[i];
-      let distance = Phaser.Math.Distance.Between(asteroid.x, asteroid.y, this.x, this.y);
+      // The ship is wrapped to the screen so for each obstacle there is a "gosth obstacle"
+      // What X and Y are closest?
+      let ast_x = asteroid.x;
+      let ast_y = asteroid.y;
+      let ast_xr = (this.x > ast_x)?(this.scene.game.config.width + ast_x):(ast_x - this.scene.game.config.width);
+      let ast_yr = (this.x > ast_x)?(this.scene.game.config.height + ast_y):(ast_y - this.scene.game.config.height);
+
+      if(Math.abs(this.x - ast_x) > Math.abs(this.x - ast_xr)){
+        ast_x = ast_xr;
+      }
+      if(Math.abs(this.y - ast_y) > Math.abs(this.y - ast_yr)){
+        ast_y = ast_yr;
+      }
+
+      // Is the point near to activate some sensor?
+      let distance = Phaser.Math.Distance.Between(ast_x, ast_y, this.x, this.y);
       if (distance > DETECTION_RADIUS) {
         continue;
       }
+
+      // The angle determines which sensor is activated.
       let angleShipAsteroid =
-        Phaser.Math.Angle.Between(this.x, this.y, asteroid.x, asteroid.y) +
+        Phaser.Math.Angle.Between(this.x, this.y, ast_x, ast_y) +
         shipAngle * -1;
 
       if (angleShipAsteroid < 0) {
@@ -159,5 +176,10 @@ class Ship extends Phaser.Physics.Arcade.Image {
       p = 0;
     }
     return p;
+  }
+
+  saveNNtoStorage(){
+    let jsonNN = this.brain.toJSON();
+    localStorage.setItem('selectedNN', JSON.stringify(jsonNN));
   }
 }

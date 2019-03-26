@@ -12,7 +12,7 @@ function runGame() {
         debug: true
       }
     },
-    scene: [ Boot, Menu, Test ]
+    scene: [ Boot, Menu, Evolve, Test ]
   };
 
   var game = new Phaser.Game(config);
@@ -21,10 +21,11 @@ function runGame() {
 //GA GLOBALS
 const DETECTION_RADIUS = 350;
 const OBSTACLES_DETECTION = 4;
+const OBSTACLES_AMOUNT = 12;
 const POPULATION_AMOUNT = 40;
 const MUTATION_RATE = 0.5;
 const ELITISM_PERCENT = 0.2;
-const START_HIDDEN_SIZE = 16;
+const START_HIDDEN_SIZE = 8;
 const MUTATION_AMOUNT = 2;
 const HALF_PI = Math.PI / 2;
 const QUARTER_PI = Math.PI / 4;

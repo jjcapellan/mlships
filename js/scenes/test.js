@@ -3,10 +3,15 @@ class Test extends Phaser.Scene {
     super('test');
   }
 
-  init() {
+  init(data) {
     this.conf = this.registry.get('config');
+    this.maxScore = 0;
     // Manages neural networks
-    this.iaManager = new IAmanager(this);
+    //this.iaManager = new IAmanager(this);
+    let jsonNN = JSON.parse(localStorage.getItem('bestNN'));
+    if(jsonNN){
+    this.brain = neataptic.Network.fromJSON(jsonNN);
+    }
   }
 
   create() {
@@ -16,17 +21,13 @@ class Test extends Phaser.Scene {
       50,
       50,
       'bmf',
-      `Prev Generation: ${this.iaManager.neat.generation - 1}  Max Score: ${this.iaManager
-        .actualMaxScore}  Top max score: ${this.iaManager.maxScore}`,
+      'Actual Score: 0  Max score: 0',
       16
     );
-    this.info_txt2 = this.add.bitmapText(
-      50,
-      74,
-      'bmf',
-      `Generation: ${this.iaManager.neat.generation} Score: 0`,
-      16
-    );
+
+    if(!this.brain){
+
+    }
 
     //// Rectangles to spawn the meteors
     this.innerRectangle = new Phaser.Geom.Rectangle(
@@ -48,19 +49,13 @@ class Test extends Phaser.Scene {
       this.game.config.height - 100
     );
 
-    //// Ships
-    this.ships = this.physics.add.group();
-    this.ships.createMultiple({
-      classType: Ship,
-      key: 'ship',
-      repeat: POPULATION_AMOUNT - 1,
-      runChildUpdate: true
-    });
-    console.log(this.ships.getChildren().length);
-    for (let i = 0; i < this.ships.getChildren().length; i++) {
-      let ship = this.ships.getChildren()[i];
-      ship.init();
-      ship.setBrain(this.iaManager.neat.population[i]);
+    
+
+    //// Ship
+    if(this.brain){    
+    this.ship = this.add.existing(new Ship(t, 400, 400,'ship'));
+    this.ship.init();
+    this.ship.setBrain(this.brain);
     }
 
     //// Meteors
@@ -68,14 +63,14 @@ class Test extends Phaser.Scene {
     this.meteors.createMultiple({
       classType: Meteor,
       key: 'asteroid',
-      repeat: 12
+      repeat: OBSTACLES_AMOUNT - 1
     });
     this.meteors.children.iterate(function(meteor) {
       meteor.init(t.innerRectangle, t.outerRectangle, t.targetRectangle);
     }, t);
 
     // Collider
-    this.physics.add.collider(this.ships, this.meteors, this.collision, undefined, this);
+    this.physics.add.collider(this.ship, this.meteors, this.collision, undefined, this);
 
     // Back button
     this.bt_back = this.add
@@ -95,12 +90,7 @@ class Test extends Phaser.Scene {
   }
 
   update(time, delta) {
-    let t = this;
-    this.ships.children.iterate(function(ship) {
-      if (ship.active) {
-        ship.update(time, delta);
-      }
-    }, t);
+    this.ship.update(time, delta);
     this.checkMeteors();
   }
 
@@ -116,48 +106,22 @@ class Test extends Phaser.Scene {
   collision(ship, meteor) {
     let t = this;
     let collisionTime = performance.now();
-    let shipScore = Math.round(((collisionTime - this.startTime) - ship.stoppedTime) / 1000);
+    let shipScore = Math.round(
+      (collisionTime - this.startTime - ship.stoppedTime) / 1000
+    );
     if (isNaN(shipScore)) {
       shipScore = 0;
     }
-    ship.setScore(shipScore);
-    this.info_txt2.setText(
-      `Generation: ${this.iaManager.neat.generation} Score: ${shipScore}`
-    );
-
-    ship.setActive(false);
-    ship.setVisible(false);
-    ship.body.reset(-200, -200);
-    ship.body.setEnable(false);
-
-    if (this.ships.countActive() == 0) {
-      this.iaManager.neat.evolve().then((fittest) => {
-        t.iaManager.actualMaxScore = fittest.maxScore;
-        if (fittest.score > t.iaManager.maxScore) {
-          t.iaManager.maxScore = fittest.score;
-        }
-        t.info_txt.setText(
-          `Prev Generation: ${t.iaManager.neat.generation -
-            1} Max Score: ${fittest.score} Top max score: ${t.iaManager.maxScore}`
-        );
-        t.info_txt2.setText(`Generation: ${this.iaManager.neat.generation} Score: 0`);
-        console.log(`Prev Generation: ${t.iaManager.neat.generation - 1} Max Score: ${fittest.score} Top max score: ${t.iaManager.maxScore}`);
-        t.iaManager.neat.mutate();
-        t.reset();
-      });
+    if (shipScore > this.maxScore) {
+      this.maxScore = shipScore;
     }
+    ship.setScore(shipScore);
+    this.info_txt.setText(`Actual Score: ${shipScore}  Max score: ${this.maxScore}`);
+    console.log(`Test --> Actual Score: ${shipScore}  Max score: ${this.maxScore}`);
+    this.reset();
   } // end collision()
 
   reset() {
-    // Assigns the new envolved "brains" to the ships
-    for (let i = 0; i < this.ships.getChildren().length; i++) {
-      let ship = this.ships.getChildren()[i];
-      ship.setBrain(this.iaManager.neat.population[i]);
-    }
-
-    // there is quota problem
-    /*this.saveData();*/
-
     // Resets timer
     this.startTime = performance.now();
 
@@ -166,16 +130,7 @@ class Test extends Phaser.Scene {
       meteor.reset();
     }, this);
 
-    // Resets ships
-    this.ships.children.iterate(function(ship) {
-      ship.reset();
-    }, this);
-  }
-
-  saveData() {
-    let populationJSON = this.iaManager.neat.export();
-    localStorage.setItem('population', JSON.stringify(populationJSON));
-    localStorage.setItem('topScore', this.iaManager.maxScore);
-    localStorage.setItem('generation', this.iaManager.neat.generation);
+    // Reset ship
+    this.ship.reset();
   }
 }
