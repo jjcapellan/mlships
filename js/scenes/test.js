@@ -9,8 +9,8 @@ class Test extends Phaser.Scene {
     // Manages neural networks
     //this.iaManager = new IAmanager(this);
     let jsonNN = JSON.parse(localStorage.getItem('bestNN'));
-    if(jsonNN){
-    this.brain = neataptic.Network.fromJSON(jsonNN);
+    if (jsonNN) {
+      this.brain = neataptic.Network.fromJSON(jsonNN);
     }
   }
 
@@ -25,8 +25,15 @@ class Test extends Phaser.Scene {
       16
     );
 
-    if(!this.brain){
+    this.info_txt2 = this.add.bitmapText(
+      50,
+      74,
+      'bmf',
+      'Inputs --> F: 1  F/L: 1  F/R: 1  Outputs: L: 0  R: 0',
+      16
+    );
 
+    if (!this.brain) {
     }
 
     //// Rectangles to spawn the meteors
@@ -49,13 +56,11 @@ class Test extends Phaser.Scene {
       this.game.config.height - 100
     );
 
-    
-
     //// Ship
-    if(this.brain){    
-    this.ship = this.add.existing(new Ship(t, 400, 400,'ship'));
-    this.ship.init();
-    this.ship.setBrain(this.brain);
+    if (this.brain) {
+      this.ship = this.add.existing(new Ship(t, 400, 400, 'ship'));
+      this.ship.init();
+      this.ship.setBrain(this.brain);
     }
 
     //// Meteors
@@ -87,6 +92,10 @@ class Test extends Phaser.Scene {
     );
 
     this.startTime = performance.now();
+
+    
+    // Time event to show inputs/outputs of neural network
+    this.time.addEvent({ delay: 400, callback: t.showNN, callbackScope: t, loop: true });
   }
 
   update(time, delta) {
@@ -132,5 +141,17 @@ class Test extends Phaser.Scene {
 
     // Reset ship
     this.ship.reset();
+  }
+
+  showNN(){
+    let i1 = this.ship.inputs[1].toFixed(3);
+    let i2 = this.ship.inputs[0].toFixed(3);
+    let i3 = this.ship.inputs[2].toFixed(3);
+    let o1 = this.ship.outputs[0].toFixed(3);
+    let o2 = this.ship.outputs[1].toFixed(3);
+
+    this.info_txt2.setText(
+      `Inputs --> F: ${i1}  F/L: ${i2}  F/R: ${i3}  Outputs: L: ${o1}  R: ${o2}`
+    );
   }
 }

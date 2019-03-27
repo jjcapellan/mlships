@@ -6,6 +6,8 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.x = 400;
     this.y = 300;
     this.stoppedTime = 0;
+    this.inputs;
+    this.outputs;
 
     // actions
     this.actions = {
@@ -39,12 +41,12 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
   update(time, delta) {
     // Takes data
-    let inputs = this.captureData();
+    this.inputs = this.captureData();
     // Process data in the neural network
-    let outputs = this.brain.activate(inputs);
+    this.outputs = this.brain.activate(this.inputs);
     // Sets the actions
-    this.actions.left = outputs[0] > 0.5 && outputs[0] > outputs[1];
-    this.actions.right = outputs[1] > 0.5 && outputs[1] > outputs[0];
+    this.actions.left = this.outputs[0] > 0.5 && this.outputs[0] > this.outputs[1];
+    this.actions.right = this.outputs[1] > 0.5 && this.outputs[1] > this.outputs[0];
 
     // Executes the actions
     if (this.actions.left) {
