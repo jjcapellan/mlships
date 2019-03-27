@@ -41,20 +41,6 @@ var GLOBALS = {
   }
 };
 
-/*var DETECTION_RADIUS = 250;
-const OBSTACLES_DETECTION = 4;
-const OBSTACLES_AMOUNT = 12;
-var POPULATION_AMOUNT = 40;
-const MUTATION_RATE = 0.5;
-const ELITISM_PERCENT = 0.2;
-const PROVENANCE_PERCENT = 0.1;
-var START_HIDDEN_SIZE = 0;
-const MUTATION_AMOUNT = 1;
-const HALF_PI = Math.PI / 2;
-const QUARTER_PI = Math.PI / 4;
-const OCTAVE_PI = Math.PI / 8;
-const PI = Math.PI;*/
-
 function loadData(key, property) {
   if (localStorage.hasOwnProperty(key)) {
     GLOBALS[property] = parseInt(localStorage.getItem(key));

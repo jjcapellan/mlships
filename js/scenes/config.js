@@ -37,12 +37,27 @@ class Configuration extends Phaser.Scene {
 
     // Restore button
     this.bt_restore = this.add
-      .existing(new ButtonGenerator(this, centerX, marginTop + 8 * padding, 'RESTORE', GLOBALS.BUTTON_CONFIG))
+      .existing(new ButtonGenerator(this, centerX, marginTop + 8 * padding, 'RESTORE DEFAULTS', GLOBALS.BUTTON_CONFIG))
       .setOrigin(0.5);
     this.bt_restore.on(
       'pointerup',
       function() {
         this.restore();
+      },
+      t
+    );
+
+    // Back button
+    this.bt_back = this.add
+      .existing(new ButtonGenerator(this, centerX, marginTop + 10 * padding, 'BACK', GLOBALS.BUTTON_CONFIG))
+      .setOrigin(0.5);
+    this.bt_back.on(
+      'pointerup',
+      function() {
+        t.saveData('population_amount', 'POPULATION_AMOUNT');
+        t.saveData('detection_radius', 'DETECTION_RADIUS');
+        t.saveData('start_hidden_size', 'START_HIDDEN_SIZE');
+        t.scene.start('menu');
       },
       t
     );
@@ -115,4 +130,8 @@ class Configuration extends Phaser.Scene {
     this.lbl_detection.setText(GLOBALS.DETECTION_RADIUS);
     this.lbl_hiddenNeurons.setText(GLOBALS.START_HIDDEN_SIZE);
   } // end restore()
+
+  saveData(key, property) {
+    localStorage.setItem(key, GLOBALS[property]);
+  }
 }
