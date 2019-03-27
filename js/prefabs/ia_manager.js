@@ -5,12 +5,18 @@ var Config = neataptic.config;
 var Architect = neataptic.architect;
 
 class IAmanager {
-  constructor(scene) {
+  constructor(scene, network) {
     this.scene = scene;
+    this.network = network;
+    if(!network){
+      console.log('no network');
+      this.network = new Architect.Random(3, GLOBALS.START_HIDDEN_SIZE, 2);
+    }
     this.init();
   }
 
   init() {
+    let t = this;
     this.neat = new neataptic.Neat(3, 2, null, {
       mutation: [
         Methods.mutation.ADD_NODE,
@@ -33,7 +39,7 @@ class IAmanager {
       equal: true,
       provenance: Math.round(GLOBALS.PROVENANCE_PERCENT * GLOBALS.POPULATION_AMOUNT),
       elitism: Math.round(GLOBALS.ELITISM_PERCENT * GLOBALS.POPULATION_AMOUNT),
-      network: new Architect.Random(3, GLOBALS.START_HIDDEN_SIZE, 2)
+      network: t.network
     });
 
     

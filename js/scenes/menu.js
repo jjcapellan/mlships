@@ -17,8 +17,11 @@ class Menu extends Phaser.Scene {
     //this.bt_testBest = this.add.existing(new ButtonGenerator(this,50,110,'bmf',20,'TEST BEST NETWORK','0xffffee','0xffffff')).setOrigin(0);
     //this.bt_saveNetwork = this.add.existing(new ButtonGenerator(this,50,170,'bmf',20,'SAVE NETWORK TO FILE','0xffffee','0xffffff')).setOrigin(0);
     this.bt_config = this.add.existing(new ButtonGenerator(this, 50, 230, 'CONFIG', buttonConfig)).setOrigin(0);
-    this.bt_test = this.add.existing(new ButtonGenerator(this, 50, 350, 'TEST BEST GENOME', buttonConfig)).setOrigin(0);
-    this.bt_evolve = this.add
+    this.bt_test = this.add.existing(new ButtonGenerator(this, 50, 290, 'TEST BEST GENOME', buttonConfig)).setOrigin(0);
+    this.bt_evolveFromBest = this.add
+      .existing(new ButtonGenerator(this, 50, 350, 'EVOLVE FROM BEST GENOME', buttonConfig))
+      .setOrigin(0);
+      this.bt_evolve = this.add
       .existing(new ButtonGenerator(this, 50, 410, 'EVOLVE NEW POPULATION', buttonConfig))
       .setOrigin(0);
 
@@ -46,6 +49,22 @@ class Menu extends Phaser.Scene {
           this.clean();
           this.scene.start('test');
         }
+      },
+      t
+    );
+
+    this.bt_evolveFromBest.on(
+      'pointerup',
+      function() {
+        let NN;
+        let jsonNN = JSON.parse(localStorage.getItem('bestNN'));
+    if (jsonNN) {
+      NN = neataptic.Network.fromJSON(jsonNN);
+    } else {
+      return;
+    }
+        this.clean();
+        this.scene.start('evolve', {network: NN});
       },
       t
     );

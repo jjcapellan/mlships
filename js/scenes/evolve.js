@@ -3,10 +3,17 @@ class Evolve extends Phaser.Scene {
     super('evolve');
   }
 
-  init() {
+  init(data) {
     this.conf = this.registry.get('config');
-    // Manages neural networks
-    this.iaManager = new IAmanager(this);
+    if(data.network){
+      console.log('data');
+      this.iaManager = new IAmanager(this, data.network);
+    } else {
+      this.iaManager = new IAmanager(this);
+    }
+    if(localStorage.hasOwnProperty('maxScore')){
+    this.iaManager.maxScore = parseInt(localStorage.getItem('maxScore'));
+    }
   }
 
   create() {
@@ -131,6 +138,7 @@ class Evolve extends Phaser.Scene {
         t.iaManager.actualMaxScore = fittest.maxScore;
         if (fittest.score > t.iaManager.maxScore) {
           t.iaManager.maxScore = fittest.score;
+          localStorage.setItem('maxScore', JSON.stringify(fittest.score));
           t.saveNN(fittest);
         }
         t.info_txt.setText(
