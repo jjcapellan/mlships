@@ -13,13 +13,19 @@ class Menu extends Phaser.Scene {
   
     create() {
         let t = this;
+        const buttonConfig = {
+          fontKey: 'bmf',
+          fontSize: 20,
+          textColor: '0xffffee',
+          buttonColor: '0xffffff'
+        }
 
         // Buttons
         //this.bt_testBest = this.add.existing(new ButtonGenerator(this,50,110,'bmf',20,'TEST BEST NETWORK','0xffffee','0xffffff')).setOrigin(0);
         //this.bt_saveNetwork = this.add.existing(new ButtonGenerator(this,50,170,'bmf',20,'SAVE NETWORK TO FILE','0xffffee','0xffffff')).setOrigin(0);
-        this.bt_config = this.add.existing(new ButtonGenerator(this,50,230,'bmf',20,'CONFIG','0xffffee','0xffffff')).setOrigin(0);
-        this.bt_test = this.add.existing(new ButtonGenerator(this,50,350,'bmf',20,'TEST BEST GENOME','0xffffee','0xffffff')).setOrigin(0);
-        this.bt_evolve = this.add.existing(new ButtonGenerator(this,50,410,'bmf',20,'EVOLVE NEW POPULATION','0xffffee','0xffffff')).setOrigin(0);
+        this.bt_config = this.add.existing(new ButtonGenerator(this,50,230,'CONFIG',buttonConfig)).setOrigin(0);
+        this.bt_test = this.add.existing(new ButtonGenerator(this,50,350,'TEST BEST GENOME',buttonConfig)).setOrigin(0);
+        this.bt_evolve = this.add.existing(new ButtonGenerator(this,50,410,'EVOLVE NEW POPULATION',buttonConfig)).setOrigin(0);
 
         /*this.bt_testBest.on('pointerup',function(){
             this.scene.start('preTest');
