@@ -77,11 +77,7 @@ class Evolve extends Phaser.Scene {
     this.physics.add.collider(this.ships, this.meteors, this.collision, undefined, this);
 
     // Back button
-    this.bt_back = this.add
-      .existing(
-        new ButtonGenerator(this, 720, 50, 'bmf', 10, 'BACK', '0xffffee', '0xffffff')
-      )
-      .setOrigin(0);
+    this.bt_back = this.add.existing(new ButtonGenerator(this, 700, 40, 'BACK', GLOBALS.BUTTON_CONFIG)).setOrigin(0);
     this.bt_back.on(
       'pointerup',
       function() {
