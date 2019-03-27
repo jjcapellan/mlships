@@ -24,7 +24,6 @@ class ButtonGenerator extends Phaser.GameObjects.Image {
     this.fontSize = fontSize;
     this.textColor = textColor;
     this.buttonColor = buttonColor;
-    console.log(arguments);
 
     this.control = control; // "increase" or "decrease"
     this.step = step ? step : 1;

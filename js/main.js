@@ -32,7 +32,13 @@ var GLOBALS = {
   HALF_PI: Math.PI / 2,
   QUARTER_PI: Math.PI / 4,
   OCTAVE_PI: Math.PI / 8,
-  PI: Math.PI
+  PI: Math.PI,
+  BUTTON_CONFIG: {
+    fontKey: 'bmf',
+    fontSize: 20,
+    textColor: '0xffffee',
+    buttonColor: '0xffffff'
+  }
 };
 
 /*var DETECTION_RADIUS = 250;
@@ -49,8 +55,7 @@ const QUARTER_PI = Math.PI / 4;
 const OCTAVE_PI = Math.PI / 8;
 const PI = Math.PI;*/
 
-
-function loadData(key, property){
+function loadData(key, property) {
   if (localStorage.hasOwnProperty(key)) {
     GLOBALS[property] = parseInt(localStorage.getItem(key));
   } else {

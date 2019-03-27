@@ -13,12 +13,7 @@ class Menu extends Phaser.Scene {
   
     create() {
         let t = this;
-        const buttonConfig = {
-          fontKey: 'bmf',
-          fontSize: 20,
-          textColor: '0xffffee',
-          buttonColor: '0xffffff'
-        }
+        const buttonConfig = GLOBALS.BUTTON_CONFIG;
 
         // Buttons
         //this.bt_testBest = this.add.existing(new ButtonGenerator(this,50,110,'bmf',20,'TEST BEST NETWORK','0xffffee','0xffffff')).setOrigin(0);
