@@ -43,8 +43,8 @@ class Ship extends Phaser.Physics.Arcade.Image {
     // Process data in the neural network
     let outputs = this.brain.activate(inputs);
     // Sets the actions
-    this.actions.left = outputs[0] > 0.3 && outputs[0] > outputs[1];
-    this.actions.right = outputs[1] > 0.3 && outputs[1] > outputs[0];
+    this.actions.left = outputs[0] > 0.5 && outputs[0] > outputs[1];
+    this.actions.right = outputs[1] > 0.5 && outputs[1] > outputs[0];
 
     // Executes the actions
     if (this.actions.left) {
@@ -80,14 +80,15 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
   /**
    * Makes the array with the inputs:
-   * 8 sensors. If a sensor is active, then returns 1, else 0.
+   * 3 sensors: front/left, front, front/right
+   * If a sensor is active, then returns the normalized distance to the obstacle, else 1 (DETECTION_RADIUS normalized).
    * @return {numer[]} Inputs for the network. Array of numbers between 0 and 1.
    * @memberof Ship
    */
   captureData() {
     let t = this;
     // Initial value of sensors
-    let inputs = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
+    let inputs = [ 1, 1, 1];
     
     let shipAngle = this.rotation; // In radians. Valid because in this case angle of velocity = this.rotation
 
@@ -119,7 +120,27 @@ class Ship extends Phaser.Physics.Arcade.Image {
         Phaser.Math.Angle.Between(this.x, this.y, ast_x, ast_y) +
         shipAngle * -1;
 
-      if (angleShipAsteroid < 0) {
+        distance = this.normalizePixels(distance, DETECTION_RADIUS, 0);
+
+        if (Math.abs(angleShipAsteroid) < PI) {
+          if (angleShipAsteroid < -OCTAVE_PI) {
+            // Sensor Front/Left
+            if(distance < inputs[0]){
+            inputs[0] = distance;
+            }
+          } else if (angleShipAsteroid < OCTAVE_PI) {
+            // Sensor Front
+            if(distance < inputs[1]){
+            inputs[1] = distance;
+            }
+          } else {
+            // Sensor Front/Right
+            if(distance < inputs[2]){
+            inputs[2] = distance;
+            }
+          }
+
+        /*if (angleShipAsteroid < 0) {
         if (angleShipAsteroid < -(HALF_PI + QUARTER_PI)) {
           // Sensor Back/Left
           inputs[0] = 1;
@@ -146,7 +167,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
         } else {
           // Sensor Front/Right
           inputs[7] = 1;
-        }
+        }*/
       }
     } // end for
 

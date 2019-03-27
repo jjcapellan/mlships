@@ -11,7 +11,7 @@ class IAmanager {
   }
 
   init() {
-    this.neat = new neataptic.Neat(8, 2, null, {
+    this.neat = new neataptic.Neat(3, 2, null, {
       mutation: [
         Methods.mutation.ADD_NODE,
         Methods.mutation.SUB_NODE,
@@ -31,8 +31,9 @@ class IAmanager {
       mutationRate: MUTATION_RATE,
       mutationAmount: MUTATION_AMOUNT,
       equal: true,
+      provenance: Math.round(PROVENANCE_PERCENT * POPULATION_AMOUNT),
       elitism: Math.round(ELITISM_PERCENT * POPULATION_AMOUNT),
-      network: new Architect.Random(8, START_HIDDEN_SIZE, 2)
+      network: new Architect.Random(3, START_HIDDEN_SIZE, 2)
     });
 
     
