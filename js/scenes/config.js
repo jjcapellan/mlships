@@ -54,10 +54,11 @@ class Configuration extends Phaser.Scene {
     this.bt_back.on(
       'pointerup',
       function() {
-        t.saveData('population_amount', 'POPULATION_AMOUNT');
-        t.saveData('detection_radius', 'DETECTION_RADIUS');
-        t.saveData('start_hidden_size', 'START_HIDDEN_SIZE');
-        t.scene.start('menu');
+        this.saveData('population_amount', 'POPULATION_AMOUNT');
+        this.saveData('detection_radius', 'DETECTION_RADIUS');
+        this.saveData('start_hidden_size', 'START_HIDDEN_SIZE');
+        this.clean(); // Clean all custom buttons
+        this.scene.start('menu');
       },
       t
     );
@@ -134,4 +135,13 @@ class Configuration extends Phaser.Scene {
   saveData(key, property) {
     localStorage.setItem(key, GLOBALS[property]);
   }
+
+  clean(){
+      for(let i=0,j=this.children.length;i<j;i++){
+          if(this.children.list[i] instanceof ButtonGenerator){
+              this.children.list[i].clean();
+          }
+      }
+  }
+
 }

@@ -1,28 +1,28 @@
 class Menu extends Phaser.Scene {
-    constructor() {
-      super('menu');
-    }
-  
-    init() {
+  constructor() {
+    super('menu');
+  }
 
-        this.conf = this.registry.get('config');
-        this.el_inputFile = document.getElementById('inputFile');
-        this.el_inputFile.addEventListener('change', this.loadNetwork.bind(this), false);
-  
-    }
-  
-    create() {
-        let t = this;
-        const buttonConfig = GLOBALS.BUTTON_CONFIG;
+  init() {
+    this.conf = this.registry.get('config');
+    this.el_inputFile = document.getElementById('inputFile');
+    this.el_inputFile.addEventListener('change', this.loadNetwork.bind(this), false);
+  }
 
-        // Buttons
-        //this.bt_testBest = this.add.existing(new ButtonGenerator(this,50,110,'bmf',20,'TEST BEST NETWORK','0xffffee','0xffffff')).setOrigin(0);
-        //this.bt_saveNetwork = this.add.existing(new ButtonGenerator(this,50,170,'bmf',20,'SAVE NETWORK TO FILE','0xffffee','0xffffff')).setOrigin(0);
-        this.bt_config = this.add.existing(new ButtonGenerator(this,50,230,'CONFIG',buttonConfig)).setOrigin(0);
-        this.bt_test = this.add.existing(new ButtonGenerator(this,50,350,'TEST BEST GENOME',buttonConfig)).setOrigin(0);
-        this.bt_evolve = this.add.existing(new ButtonGenerator(this,50,410,'EVOLVE NEW POPULATION',buttonConfig)).setOrigin(0);
+  create() {
+    let t = this;
+    const buttonConfig = GLOBALS.BUTTON_CONFIG;
 
-        /*this.bt_testBest.on('pointerup',function(){
+    // Buttons
+    //this.bt_testBest = this.add.existing(new ButtonGenerator(this,50,110,'bmf',20,'TEST BEST NETWORK','0xffffee','0xffffff')).setOrigin(0);
+    //this.bt_saveNetwork = this.add.existing(new ButtonGenerator(this,50,170,'bmf',20,'SAVE NETWORK TO FILE','0xffffee','0xffffff')).setOrigin(0);
+    this.bt_config = this.add.existing(new ButtonGenerator(this, 50, 230, 'CONFIG', buttonConfig)).setOrigin(0);
+    this.bt_test = this.add.existing(new ButtonGenerator(this, 50, 350, 'TEST BEST GENOME', buttonConfig)).setOrigin(0);
+    this.bt_evolve = this.add
+      .existing(new ButtonGenerator(this, 50, 410, 'EVOLVE NEW POPULATION', buttonConfig))
+      .setOrigin(0);
+
+    /*this.bt_testBest.on('pointerup',function(){
             this.scene.start('preTest');
         }, t);
 
@@ -30,73 +30,87 @@ class Menu extends Phaser.Scene {
             this.saveNetwork();
         }, t);*/
 
-        this.bt_config.on('pointerup',function(){
-            this.scene.start('configuration');
-        }, t);
+    this.bt_config.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.scene.start('configuration');
+      },
+      t
+    );
 
-        this.bt_test.on('pointerup',function(){
-          if(localStorage.hasOwnProperty('bestNN')){
-            this.scene.start('test');
-          }
-      }, t);
+    this.bt_test.on(
+      'pointerup',
+      function() {
+        if (localStorage.hasOwnProperty('bestNN')) {
+          this.clean();
+          this.scene.start('test');
+        }
+      },
+      t
+    );
 
-        this.bt_evolve.on('pointerup',function(){
-            this.scene.start('evolve');
-        }, t);
-    }
-  
-
-  saveNetwork(){
-
-        const nnJSON = shipBrain.toJSON();
-
-        const blob = new Blob([JSON.stringify(nnJSON)], {
-          type: 'text/plain'
-        });
-
-        let anchor = document.createElement('a');
-        anchor.download = 'neuralNetwork.JSON';
-        anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
-        anchor.dataset.downloadurl = ['text/plain', anchor.download, anchor.href].join(':');
-        anchor.click();
-        
+    this.bt_evolve.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.scene.start('evolve');
+      },
+      t
+    );
   }
 
-  saveData(){
-    const blob = new Blob([JSON.stringify(shipRawData)], {
-        type: 'text/plain'
-      });
+  saveNetwork() {
+    const nnJSON = shipBrain.toJSON();
 
-      let anchor = document.createElement('a');
-      anchor.download = 'datacapturedV2.JSON';
-      anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
-      anchor.dataset.downloadurl = ['text/plain', anchor.download, anchor.href].join(':');
-      anchor.click();
+    const blob = new Blob([ JSON.stringify(nnJSON) ], {
+      type: 'text/plain'
+    });
+
+    let anchor = document.createElement('a');
+    anchor.download = 'neuralNetwork.JSON';
+    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
+    anchor.dataset.downloadurl = [ 'text/plain', anchor.download, anchor.href ].join(':');
+    anchor.click();
   }
 
-  
+  saveData() {
+    const blob = new Blob([ JSON.stringify(shipRawData) ], {
+      type: 'text/plain'
+    });
 
-  loadNetwork(event){
+    let anchor = document.createElement('a');
+    anchor.download = 'datacapturedV2.JSON';
+    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
+    anchor.dataset.downloadurl = [ 'text/plain', anchor.download, anchor.href ].join(':');
+    anchor.click();
+  }
 
+  loadNetwork(event) {
     const files = event.target.files;
     const reader = new FileReader();
     reader.onload = function() {
-        const txtNetwork = this.result;
-        const JSONnetwork = JSON.parse(txtNetwork);
-        shipBrain.fromJSON(JSONnetwork);
-    }
+      const txtNetwork = this.result;
+      const JSONnetwork = JSON.parse(txtNetwork);
+      shipBrain.fromJSON(JSONnetwork);
+    };
     reader.readAsText(files[0]);
   }
 
-  loadData(event){
-
+  loadData(event) {
     const files = event.target.files;
     const reader = new FileReader();
     reader.onload = function() {
-        shipRawData = JSON.parse(this.result);
-    }
+      shipRawData = JSON.parse(this.result);
+    };
     reader.readAsText(files[0]);
-
   }
 
+  clean() {
+    for (let i = 0, j = this.children.length; i < j; i++) {
+      if (this.children.list[i] instanceof ButtonGenerator) {
+        this.children.list[i].clean();
+      }
+    }
+  }
 }
