@@ -126,7 +126,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
         distance = this.normalizePixels(distance, GLOBALS.DETECTION_RADIUS, 0);
 
-        if (Math.abs(angleShipAsteroid) < PI) {
+        if (Math.abs(angleShipAsteroid) < GLOBALS.PI) {
           if (angleShipAsteroid < -GLOBALS.OCTAVE_PI) {
             // Sensor Front/Left
             if(distance < inputs[0]){
