@@ -45,7 +45,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
     // Process data in the neural network
     this.outputs = this.brain.activate(this.inputs);
     // Sets the actions
-    this.actions.left = this.outputs[0] > 0.5 && this.outputs[0] > this.outputs[1];
+    this.actions.left = this.outputs[0] > 0.5 && this.outputs[0] >= this.outputs[1];
     this.actions.right = this.outputs[1] > 0.5 && this.outputs[1] > this.outputs[0];
 
     // Executes the actions
