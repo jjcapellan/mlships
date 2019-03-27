@@ -5,11 +5,13 @@ class Ship extends Phaser.Physics.Arcade.Image {
     scene.physics.world.enable(this);
     this.x = 400;
     this.y = 300;
+    // collision timeStamp
     this.stoppedTime = 0;
+    // inputs and outputs of the neural network
     this.inputs;
     this.outputs;
 
-    // actions
+    // possible actions
     this.actions = {
       left: false,
       right: false
@@ -95,7 +97,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
     let shipAngle = this.rotation; // In radians. Valid because in this case angle of velocity = this.rotation
 
     // Takes data of asteroids
-    for (let i = 0; i < OBSTACLES_AMOUNT; i++) {
+    for (let i = 0; i < GLOBALS.OBSTACLES_AMOUNT; i++) {
       let asteroid = this.scene.meteors.getChildren()[i];
       // The ship is wrapped to the screen so for each obstacle there is a "gosth obstacle"
       // What X and Y are closest?
@@ -113,7 +115,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
       // Is the point near to activate some sensor?
       let distance = Phaser.Math.Distance.Between(ast_x, ast_y, this.x, this.y);
-      if (distance > DETECTION_RADIUS) {
+      if (distance > GLOBALS.DETECTION_RADIUS) {
         continue;
       }
 
@@ -122,15 +124,15 @@ class Ship extends Phaser.Physics.Arcade.Image {
         Phaser.Math.Angle.Between(this.x, this.y, ast_x, ast_y) +
         shipAngle * -1;
 
-        distance = this.normalizePixels(distance, DETECTION_RADIUS, 0);
+        distance = this.normalizePixels(distance, GLOBALS.DETECTION_RADIUS, 0);
 
         if (Math.abs(angleShipAsteroid) < PI) {
-          if (angleShipAsteroid < -OCTAVE_PI) {
+          if (angleShipAsteroid < -GLOBALS.OCTAVE_PI) {
             // Sensor Front/Left
             if(distance < inputs[0]){
             inputs[0] = distance;
             }
-          } else if (angleShipAsteroid < OCTAVE_PI) {
+          } else if (angleShipAsteroid < GLOBALS.OCTAVE_PI) {
             // Sensor Front
             if(distance < inputs[1]){
             inputs[1] = distance;
@@ -141,35 +143,6 @@ class Ship extends Phaser.Physics.Arcade.Image {
             inputs[2] = distance;
             }
           }
-
-        /*if (angleShipAsteroid < 0) {
-        if (angleShipAsteroid < -(HALF_PI + QUARTER_PI)) {
-          // Sensor Back/Left
-          inputs[0] = 1;
-        } else if (angleShipAsteroid < -HALF_PI) {
-          // Sensor Back/Side/Left
-          inputs[1] = 1;
-        } else if (angleShipAsteroid < -QUARTER_PI) {
-          // Sensor Front/Side/Left
-          inputs[2] = 1;
-        } else {
-          // Sensor Front/Left
-          inputs[3] = 1;
-        }
-      } else {
-        if (angleShipAsteroid > HALF_PI + QUARTER_PI) {
-          // Sensor Back/Right
-          inputs[4] = 1;
-        } else if (angleShipAsteroid > HALF_PI) {
-          // Sensor Back/Side/Right
-          inputs[5] = 1;
-        } else if (angleShipAsteroid > QUARTER_PI) {
-          // Sensor Front/Side/Right
-          inputs[6] = 1;
-        } else {
-          // Sensor Front/Right
-          inputs[7] = 1;
-        }*/
       }
     } // end for
 

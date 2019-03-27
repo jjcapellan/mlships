@@ -53,10 +53,9 @@ class Evolve extends Phaser.Scene {
     this.ships.createMultiple({
       classType: Ship,
       key: 'ship',
-      repeat: POPULATION_AMOUNT - 1,
+      repeat: GLOBALS.POPULATION_AMOUNT - 1,
       runChildUpdate: true
     });
-    console.log(this.ships.getChildren().length);
     for (let i = 0; i < this.ships.getChildren().length; i++) {
       let ship = this.ships.getChildren()[i];
       ship.init();
@@ -68,7 +67,7 @@ class Evolve extends Phaser.Scene {
     this.meteors.createMultiple({
       classType: Meteor,
       key: 'asteroid',
-      repeat: OBSTACLES_AMOUNT - 1
+      repeat: GLOBALS.OBSTACLES_AMOUNT - 1
     });
     this.meteors.children.iterate(function(meteor) {
       meteor.init(t.innerRectangle, t.outerRectangle, t.targetRectangle);
@@ -91,6 +90,7 @@ class Evolve extends Phaser.Scene {
       t
     );
 
+    // Start evaluation timestamp
     this.startTime = performance.now();
   }
 
@@ -150,7 +150,7 @@ class Evolve extends Phaser.Scene {
   } // end collision()
 
   reset() {
-    // Assigns the new envolved "brains" to the ships
+    // Assigns the new evolved "brains" to the ships
     for (let i = 0; i < this.ships.getChildren().length; i++) {
       let ship = this.ships.getChildren()[i];
       ship.setBrain(this.iaManager.neat.population[i]);
@@ -176,12 +176,5 @@ class Evolve extends Phaser.Scene {
   saveNN(network){
     let jsonNN = network.toJSON();
     localStorage.setItem('bestNN', JSON.stringify(jsonNN));
-  }
-
-  saveData() {
-    let populationJSON = this.iaManager.neat.export();
-    localStorage.setItem('population', JSON.stringify(populationJSON));
-    localStorage.setItem('topScore', this.iaManager.maxScore);
-    localStorage.setItem('generation', this.iaManager.neat.generation);
   }
 }

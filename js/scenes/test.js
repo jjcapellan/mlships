@@ -33,9 +33,6 @@ class Test extends Phaser.Scene {
       16
     );
 
-    if (!this.brain) {
-    }
-
     //// Rectangles to spawn the meteors
     this.innerRectangle = new Phaser.Geom.Rectangle(
       0,
@@ -68,7 +65,7 @@ class Test extends Phaser.Scene {
     this.meteors.createMultiple({
       classType: Meteor,
       key: 'asteroid',
-      repeat: OBSTACLES_AMOUNT - 1
+      repeat: GLOBALS.OBSTACLES_AMOUNT - 1
     });
     this.meteors.children.iterate(function(meteor) {
       meteor.init(t.innerRectangle, t.outerRectangle, t.targetRectangle);
@@ -91,10 +88,11 @@ class Test extends Phaser.Scene {
       t
     );
 
+    // Start evaluation timestamp
     this.startTime = performance.now();
 
     
-    // Time event to show inputs/outputs of neural network
+    // Time event to show inputs/outputs of this neural network
     this.time.addEvent({ delay: 400, callback: t.showNN, callbackScope: t, loop: true });
   }
 

@@ -27,26 +27,19 @@ class IAmanager {
         Methods.mutation.ADD_BACK_CONN,
         Methods.mutation.SUB_BACK_CONN
       ],
-      popsize: POPULATION_AMOUNT,
-      mutationRate: MUTATION_RATE,
-      mutationAmount: MUTATION_AMOUNT,
+      popsize: GLOBALS.POPULATION_AMOUNT,
+      mutationRate: GLOBALS.MUTATION_RATE,
+      mutationAmount: GLOBALS.MUTATION_AMOUNT,
       equal: true,
-      provenance: Math.round(PROVENANCE_PERCENT * POPULATION_AMOUNT),
-      elitism: Math.round(ELITISM_PERCENT * POPULATION_AMOUNT),
-      network: new Architect.Random(3, START_HIDDEN_SIZE, 2)
+      provenance: Math.round(GLOBALS.PROVENANCE_PERCENT * GLOBALS.POPULATION_AMOUNT),
+      elitism: Math.round(GLOBALS.ELITISM_PERCENT * GLOBALS.POPULATION_AMOUNT),
+      network: new Architect.Random(3, GLOBALS.START_HIDDEN_SIZE, 2)
     });
 
     
 
     this.maxScore = 0; // Max score of all generations
     this.actualMaxScore = 0; // Max score of last generation
-
-    /*if(localStorage.getItem('generation')){      
-      this.maxScore = parseInt(localStorage.getItem('topScore'));
-      this.neat.generation = parseInt(localStorage.getItem('generation'));
-      let populationJSON = JSON.parse(localStorage.getItem('population'));
-      this.neat.import(populationJSON);
-    }*/
   } // end init()
 
 }
