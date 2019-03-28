@@ -1,10 +1,12 @@
 class Ship extends Phaser.Physics.Arcade.Image {
-  constructor(scene, x, y,texture) {
+  constructor(scene, x, y, texture) {
     super(scene, x, y, texture);
-    this.scene = scene;    
+    this.scene = scene;
     scene.physics.world.enable(this);
     this.x = 400;
     this.y = 300;
+    this.realSpeed = GLOBALS.SHIP_SPEED * GLOBALS.SIMULATION_SPEED;
+    this.realAngularSpeed = GLOBALS.SHIP_ANGULAR_SP * GLOBALS.SIMULATION_SPEED;
     // collision timeStamp
     this.stoppedTime = 0;
     // inputs and outputs of the neural network
@@ -16,19 +18,13 @@ class Ship extends Phaser.Physics.Arcade.Image {
       left: false,
       right: false
     };
-
-    
   }
 
-  init() {    
+  init() {
     let bodyRadius = this.height * 0.5;
     this.setOrigin(0.5);
-    this.body.setMaxVelocity(this.scene.conf.ship_speed);
-    this.body.setCircle(
-      bodyRadius,
-      -bodyRadius + 0.5 * this.width,
-      -bodyRadius + 0.5 * this.height
-    );
+    this.body.setMaxVelocity(this.realSpeed);
+    this.body.setCircle(bodyRadius, -bodyRadius + 0.5 * this.width, -bodyRadius + 0.5 * this.height);
     this.reset();
   }
 
@@ -52,19 +48,15 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
     // Executes the actions
     if (this.actions.left) {
-      this.body.setAngularVelocity(-300);//this.setAngularVelocity(-300);
+      this.body.setAngularVelocity(-this.realAngularSpeed);
     } else if (this.actions.right) {
-      this.body.setAngularVelocity(300);
+      this.body.setAngularVelocity(this.realAngularSpeed);
     } else {
       this.body.setAngularVelocity(0);
     }
 
     // Constant velocity
-    this.scene.physics.velocityFromRotation(
-      this.rotation,
-      this.scene.conf.ship_speed,
-      this.body.velocity
-    );
+    this.scene.physics.velocityFromRotation(this.rotation, this.realSpeed, this.body.velocity);
 
     this.scene.physics.world.wrap(this);
   }
@@ -92,8 +84,8 @@ class Ship extends Phaser.Physics.Arcade.Image {
   captureData() {
     let t = this;
     // Initial value of sensors
-    let inputs = [ 1, 1, 1];
-    
+    let inputs = [ 1, 1, 1 ];
+
     let shipAngle = this.rotation; // In radians. Valid because in this case angle of velocity = this.rotation
 
     // Takes data of asteroids
@@ -103,13 +95,13 @@ class Ship extends Phaser.Physics.Arcade.Image {
       // What X and Y are closest?
       let ast_x = asteroid.x;
       let ast_y = asteroid.y;
-      let ast_xr = (this.x > ast_x)?(this.scene.game.config.width + ast_x):(ast_x - this.scene.game.config.width);
-      let ast_yr = (this.x > ast_x)?(this.scene.game.config.height + ast_y):(ast_y - this.scene.game.config.height);
+      let ast_xr = this.x > ast_x ? this.scene.game.config.width + ast_x : ast_x - this.scene.game.config.width;
+      let ast_yr = this.x > ast_x ? this.scene.game.config.height + ast_y : ast_y - this.scene.game.config.height;
 
-      if(Math.abs(this.x - ast_x) > Math.abs(this.x - ast_xr)){
+      if (Math.abs(this.x - ast_x) > Math.abs(this.x - ast_xr)) {
         ast_x = ast_xr;
       }
-      if(Math.abs(this.y - ast_y) > Math.abs(this.y - ast_yr)){
+      if (Math.abs(this.y - ast_y) > Math.abs(this.y - ast_yr)) {
         ast_y = ast_yr;
       }
 
@@ -120,33 +112,30 @@ class Ship extends Phaser.Physics.Arcade.Image {
       }
 
       // The angle determines which sensor is activated.
-      let angleShipAsteroid =
-        Phaser.Math.Angle.Between(this.x, this.y, ast_x, ast_y) +
-        shipAngle * -1;
+      let angleShipAsteroid = Phaser.Math.Angle.Between(this.x, this.y, ast_x, ast_y) + shipAngle * -1;
 
-        if(angleShipAsteroid < 0){
-          angleShipAsteroid += Phaser.Math.PI2;
+      if (angleShipAsteroid < 0) {
+        angleShipAsteroid += Phaser.Math.PI2;
+      }
+
+      distance = this.normalizePixels(distance, GLOBALS.DETECTION_RADIUS, 0);
+
+      if (angleShipAsteroid < GLOBALS.OCTAVE_PI || angleShipAsteroid > Phaser.Math.PI2 - GLOBALS.OCTAVE_PI) {
+        // Sensor Front
+        if (distance < inputs[0]) {
+          inputs[0] = distance;
         }
-
-        distance = this.normalizePixels(distance, GLOBALS.DETECTION_RADIUS, 0);
-
-        
-          if (angleShipAsteroid < GLOBALS.OCTAVE_PI || angleShipAsteroid > (Phaser.Math.PI2 - GLOBALS.OCTAVE_PI)) {
-            // Sensor Front
-            if(distance < inputs[0]){
-            inputs[0] = distance;
-            }
-          } else if(angleShipAsteroid < GLOBALS.PI) {
-            // Sensor Front/Right
-            if(distance < inputs[1]){
-            inputs[1] = distance;
-            }
-          } else if(angleShipAsteroid > (Phaser.Math.PI2 - GLOBALS.HALF_PI)){
-            // Sensor Front/Left
-            if(distance < inputs[2]){
-            inputs[2] = distance;
-            }
-          }
+      } else if (angleShipAsteroid < GLOBALS.PI) {
+        // Sensor Front/Right
+        if (distance < inputs[1]) {
+          inputs[1] = distance;
+        }
+      } else if (angleShipAsteroid > Phaser.Math.PI2 - GLOBALS.HALF_PI) {
+        // Sensor Front/Left
+        if (distance < inputs[2]) {
+          inputs[2] = distance;
+        }
+      }
     } // end for
 
     return inputs;
@@ -177,7 +166,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
     return p;
   }
 
-  saveNNtoStorage(){
+  saveNNtoStorage() {
     let jsonNN = this.brain.toJSON();
     localStorage.setItem('selectedNN', JSON.stringify(jsonNN));
   }

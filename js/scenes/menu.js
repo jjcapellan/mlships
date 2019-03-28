@@ -4,9 +4,9 @@ class Menu extends Phaser.Scene {
   }
 
   init() {
-    this.conf = this.registry.get('config');
     this.el_inputFile = document.getElementById('inputFile');
     this.el_inputFile.addEventListener('change', this.loadNetwork.bind(this), false);
+    this.physics.world.setFPS(60);
   }
 
   create() {
@@ -14,25 +14,16 @@ class Menu extends Phaser.Scene {
     const buttonConfig = GLOBALS.BUTTON_CONFIG;
 
     // Buttons
-    //this.bt_testBest = this.add.existing(new ButtonGenerator(this,50,110,'bmf',20,'TEST BEST NETWORK','0xffffee','0xffffff')).setOrigin(0);
-    //this.bt_saveNetwork = this.add.existing(new ButtonGenerator(this,50,170,'bmf',20,'SAVE NETWORK TO FILE','0xffffee','0xffffff')).setOrigin(0);
     this.bt_config = this.add.existing(new ButtonGenerator(this, 50, 230, 'CONFIG', buttonConfig)).setOrigin(0);
     this.bt_test = this.add.existing(new ButtonGenerator(this, 50, 290, 'TEST BEST GENOME', buttonConfig)).setOrigin(0);
     this.bt_evolveFromBest = this.add
       .existing(new ButtonGenerator(this, 50, 350, 'EVOLVE FROM BEST GENOME', buttonConfig))
       .setOrigin(0);
-      this.bt_evolve = this.add
+    this.bt_evolve = this.add
       .existing(new ButtonGenerator(this, 50, 410, 'EVOLVE NEW POPULATION', buttonConfig))
       .setOrigin(0);
 
-    /*this.bt_testBest.on('pointerup',function(){
-            this.scene.start('preTest');
-        }, t);
-
-        this.bt_saveNetwork.on('pointerup',function(){
-            this.saveNetwork();
-        }, t);*/
-
+    // Buttons events
     this.bt_config.on(
       'pointerup',
       function() {
@@ -58,13 +49,13 @@ class Menu extends Phaser.Scene {
       function() {
         let NN;
         let jsonNN = JSON.parse(localStorage.getItem('bestNN'));
-    if (jsonNN) {
-      NN = neataptic.Network.fromJSON(jsonNN);
-    } else {
-      return;
-    }
+        if (jsonNN) {
+          NN = neataptic.Network.fromJSON(jsonNN);
+        } else {
+          return;
+        }
         this.clean();
-        this.scene.start('evolve', {network: NN});
+        this.scene.start('evolve', { network: NN });
       },
       t
     );

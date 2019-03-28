@@ -9,7 +9,7 @@ function runGame() {
       default: 'arcade',
       arcade: {
         fps: 60,
-        debug: true
+        debug: false
       }
     },
     scene: [ Boot, Menu, Evolve, Test, Configuration ]
@@ -17,42 +17,6 @@ function runGame() {
 
   var game = new Phaser.Game(config);
 }
-
-// GLOBALS OBJECT
-var GLOBALS = {
-  DETECTION_RADIUS: 250,
-  OBSTACLES_DETECTION: 4,
-  OBSTACLES_AMOUNT: 12,
-  POPULATION_AMOUNT: 40,
-  MUTATION_RATE: 0.5,
-  ELITISM_PERCENT: 0.2,
-  PROVENANCE_PERCENT: 0.1,
-  START_HIDDEN_SIZE: 0,
-  MUTATION_AMOUNT: 1,
-  HALF_PI: Math.PI / 2,
-  QUARTER_PI: Math.PI / 4,
-  OCTAVE_PI: Math.PI / 8,
-  PI: Math.PI,
-  SIMULATION_SPEED: 1, // 1X 2X 3X 4X times faster
-  BUTTON_CONFIG: {
-    fontKey: 'bmf',
-    fontSize: 20,
-    textColor: '0xffffee',
-    buttonColor: '0xffffff'
-  }
-};
-
-function loadData(key, property) {
-  if (localStorage.hasOwnProperty(key)) {
-    GLOBALS[property] = parseInt(localStorage.getItem(key));
-  } else {
-    localStorage.setItem(key, GLOBALS[property]);
-  }
-}
-
-loadData('population_amount', 'POPULATION_AMOUNT');
-loadData('detection_radius', 'DETECTION_RADIUS');
-loadData('start_hidden_size', 'START_HIDDEN_SIZE');
 
 window.onload = function() {
   runGame();

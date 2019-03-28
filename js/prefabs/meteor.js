@@ -1,36 +1,28 @@
 class Meteor extends Phaser.Physics.Arcade.Image {
-  constructor(scene, x , y, texture,frame) {
-    super(scene, x, y, texture,frame);
+  constructor(scene, x, y, texture, frame) {
+    super(scene, x, y, texture, frame);
     this.scene = scene;
-    
+    this.realSpeed = GLOBALS.ASTEROID_SPEED * GLOBALS.SIMULATION_SPEED;
+
     this.x = 0;
     this.y = 0;
   }
 
-  init(innerRect, outerRect, targetRect) { 
+  init(innerRect, outerRect, targetRect) {
     this.innerRectangle = innerRect;
     this.outerRectangle = outerRect;
-    this.targetRectangle = targetRect;   
+    this.targetRectangle = targetRect;
     this.body.setCircle(this.width / 2);
     this.body.setImmovable(true);
-    this.body.mass = this.scene.conf.meteors_mass;
+    this.body.mass = 2;
     this.reset();
   }
 
-  reset() {    
+  reset() {
     let t = this;
     let direction = t.getDirection();
-    t.body.reset(direction.fromX, direction.fromY);    
-    t.scene.physics.moveTo(
-      t,
-      direction.toX,
-      direction.toY,
-      Phaser.Math.RND.between(
-        t.scene.conf.meteors_minSpeed,
-        t.scene.conf.meteors_maxSpeed
-      )
-    );
-    t.body.setAngularVelocity(Phaser.Math.RND.between(-200, 200));
+    t.body.reset(direction.fromX, direction.fromY);
+    t.scene.physics.moveTo(t, direction.toX, direction.toY, this.realSpeed);
   }
 
   getDirection() {
@@ -45,5 +37,4 @@ class Meteor extends Phaser.Physics.Arcade.Image {
     };
     return direction;
   }
-  
 }

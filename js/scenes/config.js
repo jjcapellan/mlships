@@ -63,6 +63,7 @@ class Configuration extends Phaser.Scene {
         this.saveData('population_amount', 'POPULATION_AMOUNT');
         this.saveData('detection_radius', 'DETECTION_RADIUS');
         this.saveData('start_hidden_size', 'START_HIDDEN_SIZE');
+        this.saveData('simulation_speed', 'SIMULATION_SPEED');
         this.clean(); // Clean all custom buttons
         this.scene.start('menu');
       },
@@ -108,31 +109,9 @@ class Configuration extends Phaser.Scene {
     }.bind(this);
   }
 
-  restore() {
-    let DEFAULTS = {
-      DETECTION_RADIUS: 250,
-      OBSTACLES_DETECTION: 4,
-      OBSTACLES_AMOUNT: 12,
-      POPULATION_AMOUNT: 40,
-      MUTATION_RATE: 0.5,
-      ELITISM_PERCENT: 0.2,
-      PROVENANCE_PERCENT: 0.1,
-      START_HIDDEN_SIZE: 0,
-      MUTATION_AMOUNT: 1,
-      HALF_PI: Math.PI / 2,
-      QUARTER_PI: Math.PI / 4,
-      OCTAVE_PI: Math.PI / 8,
-      PI: Math.PI,
-      SIMULATION_SPEED: 1,
-      BUTTON_CONFIG: {
-        fontKey: 'bmf',
-        fontSize: 20,
-        textColor: '0xffffee',
-        buttonColor: '0xffffff'
-      }
-    };
+  restore() {    
 
-    GLOBALS = DEFAULTS;
+    GLOBALS = JSON.parse(JSON.stringify(GLOBALS_BACKUP));
 
     this.lbl_population.setText(GLOBALS.POPULATION_AMOUNT);
     this.lbl_detection.setText(GLOBALS.DETECTION_RADIUS);

@@ -4,15 +4,14 @@ class Test extends Phaser.Scene {
   }
 
   init(data) {
-    this.conf = this.registry.get('config');
     this.maxScore = 0;
     // Manages neural networks
-    //this.iaManager = new IAmanager(this);
     let jsonNN = JSON.parse(localStorage.getItem('bestNN'));
     if (jsonNN) {
       this.brain = neataptic.Network.fromJSON(jsonNN);
     }
-    
+    // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
+    this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
   }
 
   create() {
@@ -22,25 +21,14 @@ class Test extends Phaser.Scene {
       50,
       50,
       'bmf',
-      'Actual Score: 0  Max score: 0',
+      `Actual Score: 0  Max score: 0 Time speed: ${GLOBALS.SIMULATION_SPEED}X`,
       16
     );
 
-    this.info_txt2 = this.add.bitmapText(
-      50,
-      74,
-      'bmf',
-      'Inputs --> F: 1  F/L: 1  F/R: 1  Outputs: L: 0  R: 0',
-      16
-    );
+    this.info_txt2 = this.add.bitmapText(50, 74, 'bmf', 'Inputs --> F: 1  F/L: 1  F/R: 1  Outputs: L: 0  R: 0', 16);
 
     //// Rectangles to spawn the meteors
-    this.innerRectangle = new Phaser.Geom.Rectangle(
-      0,
-      0,
-      this.game.config.width,
-      this.game.config.height
-    );
+    this.innerRectangle = new Phaser.Geom.Rectangle(0, 0, this.game.config.width, this.game.config.height);
     this.outerRectangle = new Phaser.Geom.Rectangle(
       -100,
       -100,
@@ -88,7 +76,6 @@ class Test extends Phaser.Scene {
     // Start evaluation timestamp
     this.startTime = performance.now();
 
-    
     // Time event to show inputs/outputs of this neural network
     this.time.addEvent({ delay: 400, callback: t.showNN, callbackScope: t, loop: true });
   }
@@ -110,9 +97,7 @@ class Test extends Phaser.Scene {
   collision(ship, meteor) {
     let t = this;
     let collisionTime = performance.now();
-    let shipScore = Math.round(
-      (collisionTime - this.startTime - ship.stoppedTime) / 1000
-    );
+    let shipScore = Math.round((collisionTime - this.startTime - ship.stoppedTime) / 1000) * GLOBALS.SIMULATION_SPEED;
     if (isNaN(shipScore)) {
       shipScore = 0;
     }
@@ -120,7 +105,9 @@ class Test extends Phaser.Scene {
       this.maxScore = shipScore;
     }
     ship.setScore(shipScore);
-    this.info_txt.setText(`Actual Score: ${shipScore}  Max score: ${this.maxScore}`);
+    this.info_txt.setText(
+      `Actual Score: ${shipScore}  Max score: ${this.maxScore} Time speed: ${GLOBALS.SIMULATION_SPEED}X`
+    );
     console.log(`Test --> Actual Score: ${shipScore}  Max score: ${this.maxScore}`);
     this.reset();
   } // end collision()
@@ -138,15 +125,13 @@ class Test extends Phaser.Scene {
     this.ship.reset();
   }
 
-  showNN(){
+  showNN() {
     let i1 = this.ship.inputs[1].toFixed(3);
     let i2 = this.ship.inputs[0].toFixed(3);
     let i3 = this.ship.inputs[2].toFixed(3);
     let o1 = this.ship.outputs[0].toFixed(3);
     let o2 = this.ship.outputs[1].toFixed(3);
 
-    this.info_txt2.setText(
-      `Inputs --> F: ${i1}  F/L: ${i2}  F/R: ${i3}  Outputs: L: ${o1}  R: ${o2}`
-    );
+    this.info_txt2.setText(`Inputs --> F: ${i1}  F/L: ${i2}  F/R: ${i3}  Outputs: L: ${o1}  R: ${o2}`);
   }
 }
