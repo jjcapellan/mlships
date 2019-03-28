@@ -33,6 +33,7 @@ var GLOBALS = {
   QUARTER_PI: Math.PI / 4,
   OCTAVE_PI: Math.PI / 8,
   PI: Math.PI,
+  SIMULATION_SPEED: 1, // 1X 2X 3X 4X times faster
   BUTTON_CONFIG: {
     fontKey: 'bmf',
     fontSize: 20,

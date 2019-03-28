@@ -6,13 +6,14 @@ class Configuration extends Phaser.Scene {
   create() {
     let t = this;
     let centerX = this.game.config.width / 2;
-    let marginTop = 135;
+    let marginTop = 100;
     let padding = 35;
 
     // Labels
     this.add.bitmapText(centerX, marginTop, 'bmf', 'POPULATION', 20).setOrigin(0.5);
     this.add.bitmapText(centerX, marginTop + 2 * padding, 'bmf', 'DETECTION RADIUS', 20).setOrigin(0.5);
     this.add.bitmapText(centerX, marginTop + 4 * padding, 'bmf', 'START HIDDEN NEURONS', 20).setOrigin(0.5);
+    this.add.bitmapText(centerX, marginTop + 6 * padding, 'bmf', 'SIMULATION SPEED', 20).setOrigin(0.5);
 
     // Data labels
     this.lbl_population = this.add
@@ -24,20 +25,25 @@ class Configuration extends Phaser.Scene {
     this.lbl_hiddenNeurons = this.add
       .bitmapText(centerX, marginTop + 5 * padding, 'bmf', `${GLOBALS.START_HIDDEN_SIZE}`, 20)
       .setOrigin(0.5);
+      this.lbl_simulationSpeed = this.add
+      .bitmapText(centerX, marginTop + 7 * padding, 'bmf', `${GLOBALS.SIMULATION_SPEED}`, 20)
+      .setOrigin(0.5);
 
     // Minus buttons
     this.addMinusButton(centerX - 200, marginTop + padding, 5, 5, 'POPULATION_AMOUNT', this.lbl_population);
     this.addMinusButton(centerX - 200, marginTop + 3 * padding, 10, 80, 'DETECTION_RADIUS', this.lbl_detection);
     this.addMinusButton(centerX - 200, marginTop + 5 * padding, 1, 0, 'START_HIDDEN_SIZE', this.lbl_hiddenNeurons);
+    this.addMinusButton(centerX - 200, marginTop + 7 * padding, 1, 1, 'SIMULATION_SPEED', this.lbl_simulationSpeed);
 
     // Plus buttons
     this.addPlusButton(centerX + 200, marginTop + padding, 5, 10000, 'POPULATION_AMOUNT', this.lbl_population);
     this.addPlusButton(centerX + 200, marginTop + 3 * padding, 10, 8000, 'DETECTION_RADIUS', this.lbl_detection);
     this.addPlusButton(centerX + 200, marginTop + 5 * padding, 1, 10000, 'START_HIDDEN_SIZE', this.lbl_hiddenNeurons);
+    this.addPlusButton(centerX + 200, marginTop + 7 * padding, 1, 4, 'SIMULATION_SPEED', this.lbl_simulationSpeed);
 
     // Restore button
     this.bt_restore = this.add
-      .existing(new ButtonGenerator(this, centerX, marginTop + 8 * padding, 'RESTORE DEFAULTS', GLOBALS.BUTTON_CONFIG))
+      .existing(new ButtonGenerator(this, centerX, marginTop + 10 * padding, 'RESTORE DEFAULTS', GLOBALS.BUTTON_CONFIG))
       .setOrigin(0.5);
     this.bt_restore.on(
       'pointerup',
@@ -49,7 +55,7 @@ class Configuration extends Phaser.Scene {
 
     // Back button
     this.bt_back = this.add
-      .existing(new ButtonGenerator(this, centerX, marginTop + 10 * padding, 'BACK', GLOBALS.BUTTON_CONFIG))
+      .existing(new ButtonGenerator(this, centerX, marginTop + 12 * padding, 'BACK', GLOBALS.BUTTON_CONFIG))
       .setOrigin(0.5);
     this.bt_back.on(
       'pointerup',
@@ -117,6 +123,7 @@ class Configuration extends Phaser.Scene {
       QUARTER_PI: Math.PI / 4,
       OCTAVE_PI: Math.PI / 8,
       PI: Math.PI,
+      SIMULATION_SPEED: 1,
       BUTTON_CONFIG: {
         fontKey: 'bmf',
         fontSize: 20,
@@ -130,6 +137,7 @@ class Configuration extends Phaser.Scene {
     this.lbl_population.setText(GLOBALS.POPULATION_AMOUNT);
     this.lbl_detection.setText(GLOBALS.DETECTION_RADIUS);
     this.lbl_hiddenNeurons.setText(GLOBALS.START_HIDDEN_SIZE);
+    this.lbl_simulationSpeed.setText(GLOBALS.SIMULATION_SPEED);
   } // end restore()
 
   saveData(key, property) {
