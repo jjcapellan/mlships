@@ -84,7 +84,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
   /**
    * Makes the array with the inputs:
-   * 3 sensors: front/left, front, front/right
+   * 3 sensors: front, front/right, front/left
    * If a sensor is active, then returns the normalized distance to the obstacle, else 1 (DETECTION_RADIUS normalized).
    * @return {numer[]} Inputs for the network. Array of numbers between 0 and 1.
    * @memberof Ship
@@ -124,26 +124,29 @@ class Ship extends Phaser.Physics.Arcade.Image {
         Phaser.Math.Angle.Between(this.x, this.y, ast_x, ast_y) +
         shipAngle * -1;
 
+        if(angleShipAsteroid < 0){
+          angleShipAsteroid += Phaser.Math.PI2;
+        }
+
         distance = this.normalizePixels(distance, GLOBALS.DETECTION_RADIUS, 0);
 
-        if (Math.abs(angleShipAsteroid) < GLOBALS.PI) {
-          if (angleShipAsteroid < -GLOBALS.OCTAVE_PI) {
-            // Sensor Front/Left
+        
+          if (angleShipAsteroid < GLOBALS.OCTAVE_PI || angleShipAsteroid > (Phaser.Math.PI2 - GLOBALS.OCTAVE_PI)) {
+            // Sensor Front
             if(distance < inputs[0]){
             inputs[0] = distance;
             }
-          } else if (angleShipAsteroid < GLOBALS.OCTAVE_PI) {
-            // Sensor Front
+          } else if(angleShipAsteroid < GLOBALS.PI) {
+            // Sensor Front/Right
             if(distance < inputs[1]){
             inputs[1] = distance;
             }
-          } else {
-            // Sensor Front/Right
+          } else if(angleShipAsteroid > (Phaser.Math.PI2 - GLOBALS.HALF_PI)){
+            // Sensor Front/Left
             if(distance < inputs[2]){
             inputs[2] = distance;
             }
           }
-      }
     } // end for
 
     return inputs;

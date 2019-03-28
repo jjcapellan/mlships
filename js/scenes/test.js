@@ -12,6 +12,7 @@ class Test extends Phaser.Scene {
     if (jsonNN) {
       this.brain = neataptic.Network.fromJSON(jsonNN);
     }
+    
   }
 
   create() {
