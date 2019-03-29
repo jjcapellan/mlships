@@ -25,7 +25,7 @@ class Test extends Phaser.Scene {
       16
     );
 
-    this.info_txt2 = this.add.bitmapText(50, 74, 'bmf', 'Inputs --> F: 1  F/L: 1  F/R: 1  Outputs: L: 0  R: 0', 16);
+    this.info_txt2 = this.add.bitmapText(50, 74, 'bmf', 'Inputs-> F: 1  F/L: 1  F/R: 1  B: 1  B/L: 1  B/R: 1\nOutputs-> L: 0  R: 0', 16);
 
     //// Rectangles to spawn the meteors
     this.innerRectangle = new Phaser.Geom.Rectangle(0, 0, this.game.config.width, this.game.config.height);
@@ -126,12 +126,15 @@ class Test extends Phaser.Scene {
   }
 
   showNN() {
-    let i1 = this.ship.inputs[1].toFixed(3);
-    let i2 = this.ship.inputs[0].toFixed(3);
+    let i1 = this.ship.inputs[0].toFixed(3);
+    let i2 = this.ship.inputs[1].toFixed(3);
     let i3 = this.ship.inputs[2].toFixed(3);
+    let i4 = this.ship.inputs[3].toFixed(3);
+    let i5 = this.ship.inputs[4].toFixed(3);
+    let i6 = this.ship.inputs[5].toFixed(3);
     let o1 = this.ship.outputs[0].toFixed(3);
     let o2 = this.ship.outputs[1].toFixed(3);
 
-    this.info_txt2.setText(`Inputs --> F: ${i1}  F/L: ${i2}  F/R: ${i3}  Outputs: L: ${o1}  R: ${o2}`);
+    this.info_txt2.setText(`Inputs-> F: ${i1}  F/L: ${i3}  F/R: ${i2}  B: ${i4}  B/L: ${i6}  B/R: ${i5}\nOutputs-> L: ${o1}  R: ${o2}`);
   }
 }
