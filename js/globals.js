@@ -12,9 +12,13 @@ var GLOBALS = {
   OBSTACLES_AMOUNT: 12,
   // Mathematical constants
   HALF_PI: Math.PI / 2,
+  HALF_PI3: (Math.PI/2) * 3,
+  SIXTH_PI: Math.PI / 6,
+  SIXTH_PI5: 5 * (Math.PI / 6),
+  SIXTH_PI7: 7 * (Math.PI / 6),
+  SIXTH_PI11: 11 * (Math.PI / 6),
   QUARTER_PI: Math.PI / 4,
   OCTAVE_PI: Math.PI / 8,
-  PI: Math.PI,
   // Phaser
   ASTEROID_SPEED: 70, // px/sec
   SHIP_SPEED: 120, // px/sec
