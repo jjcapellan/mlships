@@ -76,7 +76,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
   /**
    * Makes the array with the inputs:
-   * 3 sensors: front, front/right, front/left
+   * 6 sensors: front, front/right, front/left, back, back/right, back/left
    * If a sensor is active, then returns the normalized distance to the obstacle, else 1 (DETECTION_RADIUS normalized).
    * @return {numer[]} Inputs for the network. Array of numbers between 0 and 1.
    * @memberof Ship
@@ -84,7 +84,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
   captureData() {
     let t = this;
     // Initial value of sensors
-    let inputs = [ 1, 1, 1 ];
+    let inputs = [ 1, 1, 1, 1, 1, 1 ];
 
     let shipAngle = this.rotation; // In radians. Valid because in this case angle of velocity = this.rotation
 
@@ -120,22 +120,64 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
       distance = this.normalizePixels(distance, GLOBALS.DETECTION_RADIUS, 0);
 
-      if (angleShipAsteroid < GLOBALS.OCTAVE_PI || angleShipAsteroid > Phaser.Math.PI2 - GLOBALS.OCTAVE_PI) {
-        // Sensor Front
+      if (angleShipAsteroid < Math.PI) {
+        // F - F/R
+        if(angleShipAsteroid < GLOBALS.HALF_PI){
+          if(angleShipAsteroid < GLOBALS.SIXTH_PI){
+            // Sensor Front
         if (distance < inputs[0]) {
           inputs[0] = distance;
         }
-      } else if (angleShipAsteroid < GLOBALS.PI) {
-        // Sensor Front/Right
+          } else {
+            // Sensor Front/Right
         if (distance < inputs[1]) {
           inputs[1] = distance;
         }
-      } else if (angleShipAsteroid > Phaser.Math.PI2 - GLOBALS.HALF_PI) {
-        // Sensor Front/Left
+          }
+          // B - B/R
+        } else {
+          if(angleShipAsteroid < GLOBALS.SIXTH_PI5){
+            // Sensor Back/Right
+            if (distance < inputs[4]) {
+              inputs[4] = distance;
+            }
+          } else {
+            // Sensor Back
+            if (distance < inputs[3]) {
+              inputs[3] = distance;
+            }
+          }
+        } // end if else (angleShipAsteroid < GLOBALS.HALF_PI)
+        
+      } else {
+        // B - B/L
+        if(angleShipAsteroid < GLOBALS.HALF_PI3){
+          if(angleShipAsteroid < GLOBALS.SIXTH_PI7){
+            // Sensor Back
+            if (distance < inputs[3]) {
+              inputs[3] = distance;
+            }
+          } else {
+            // Sensor Back/Left
+            if (distance < inputs[5]) {
+              inputs[5] = distance;
+            }
+          }
+          // F - F/L
+        } else {
+          if(angleShipAsteroid < GLOBALS.SIXTH_PI11){
+            // Sensor Front/Left
         if (distance < inputs[2]) {
           inputs[2] = distance;
         }
-      }
+          } else {
+            // Sensor Front
+        if (distance < inputs[0]) {
+          inputs[0] = distance;
+        }
+          }
+        } // end if else (angleShipAsteroid < GLOBALS.HALF_PI3)
+      } // end if else (angleShipAsteroid < Math.PI)
     } // end for
 
     return inputs;
