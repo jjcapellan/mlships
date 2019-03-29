@@ -45,6 +45,7 @@ function loadData(key, property) {
   }
 }
 
+// Deletes incompatible neural networks
 function cleanObsoleteData(){
   let nnVersion = localStorage.getItem('nn_version');
   if(nnVersion != GLOBALS.NN_VERSION){
