@@ -172,6 +172,6 @@ class Evolve extends Phaser.Scene {
 
   saveNN(network) {
     let jsonNN = network.toJSON();
-    localStorage.setItem('bestNN', JSON.stringify(jsonNN));
+    localStorage.setItem(GLOBALS.BEST_GEN_STORE_NAME, JSON.stringify(jsonNN));
   }
 }

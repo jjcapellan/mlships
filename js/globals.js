@@ -10,6 +10,7 @@ var GLOBALS = {
   SIMULATION_SPEED: 1, // 1X 2X 3X 4X times faster
   DETECTION_RADIUS: 250,
   OBSTACLES_AMOUNT: 12,
+  BEST_GEN_STORE_NAME: 'bestNN6I',
   // Mathematical constants
   HALF_PI: Math.PI / 2,
   HALF_PI3: (Math.PI/2) * 3,

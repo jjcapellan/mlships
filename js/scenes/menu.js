@@ -36,7 +36,7 @@ class Menu extends Phaser.Scene {
     this.bt_test.on(
       'pointerup',
       function() {
-        if (localStorage.hasOwnProperty('bestNN')) {
+        if (localStorage.hasOwnProperty(GLOBALS.BEST_GEN_STORE_NAME)) {
           this.clean();
           this.scene.start('test');
         }
@@ -48,7 +48,7 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         let NN;
-        let jsonNN = JSON.parse(localStorage.getItem('bestNN'));
+        let jsonNN = JSON.parse(localStorage.getItem(GLOBALS.BEST_GEN_STORE_NAME));
         if (jsonNN) {
           NN = neataptic.Network.fromJSON(jsonNN);
         } else {
