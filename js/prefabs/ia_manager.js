@@ -10,14 +10,14 @@ class IAmanager {
     this.network = network;
     if(!network){
       console.log('no network');
-      this.network = new Architect.Random(3, GLOBALS.START_HIDDEN_SIZE, 2);
+      this.network = new Architect.Random(6, GLOBALS.START_HIDDEN_SIZE, 2);
     }
     this.init();
   }
 
   init() {
     let t = this;
-    this.neat = new neataptic.Neat(3, 2, null, {
+    this.neat = new neataptic.Neat(6, 2, null, {
       mutation: [
         Methods.mutation.ADD_NODE,
         Methods.mutation.SUB_NODE,
