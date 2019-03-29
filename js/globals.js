@@ -10,7 +10,7 @@ var GLOBALS = {
   SIMULATION_SPEED: 1, // 1X 2X 3X 4X times faster
   DETECTION_RADIUS: 250,
   OBSTACLES_AMOUNT: 12,
-  BEST_GEN_STORE_NAME: 'bestNN6I',
+  BEST_GEN_STORE_NAME: 'bestNN',
   // Mathematical constants
   HALF_PI: Math.PI / 2,
   HALF_PI3: (Math.PI/2) * 3,
@@ -30,7 +30,9 @@ var GLOBALS = {
     fontSize: 20,
     textColor: '0xffffee',
     buttonColor: '0xffffff'
-  }
+  },
+  // INFO
+  NN_VERSION: '1' // Must change if network number of inputs or outputs changes. 
 };
 
 var GLOBALS_BACKUP = JSON.parse(JSON.stringify(GLOBALS));
@@ -43,7 +45,20 @@ function loadData(key, property) {
   }
 }
 
+function cleanObsoleteData(){
+  let nnVersion = localStorage.getItem('nn_version');
+  if(nnVersion != GLOBALS.NN_VERSION){
+    localStorage.setItem('nn_version', GLOBALS.NN_VERSION);
+    localStorage.removeItem('bestNN');
+    localStorage.removeItem('maxScore');
+  }
+}
+
 loadData('population_amount', 'POPULATION_AMOUNT');
 loadData('detection_radius', 'DETECTION_RADIUS');
 loadData('start_hidden_size', 'START_HIDDEN_SIZE');
 loadData('simulation_speed', 'SIMULATION_SPEED');
+
+cleanObsoleteData();
+
+
