@@ -12,6 +12,8 @@ class Test extends Phaser.Scene {
     }
     // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
     this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
+
+    this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
   }
 
   create() {
@@ -25,15 +27,21 @@ class Test extends Phaser.Scene {
       16
     );
 
-    this.info_txt2 = this.add.bitmapText(50, 74, 'bmf', 'Inputs-> F: 1  F/L: 1  F/R: 1  B: 1  B/L: 1  B/R: 1\nOutputs-> L: 0  R: 0', 16);
+    this.info_txt2 = this.add.bitmapText(
+      50,
+      74,
+      'bmf',
+      'Inputs-> F: 1  F/L: 1  F/R: 1  B: 1  B/L: 1  B/R: 1\nOutputs-> L: 0  R: 0',
+      16
+    );
 
     //// Rectangles to spawn the meteors
     this.innerRectangle = new Phaser.Geom.Rectangle(0, 0, this.game.config.width, this.game.config.height);
     this.outerRectangle = new Phaser.Geom.Rectangle(
-      -100,
-      -100,
-      this.game.config.width + 200,
-      this.game.config.height + 200
+      -this.spawn_margin,
+      -this.spawn_margin,
+      this.game.config.width + this.spawn_margin * 2,
+      this.game.config.height + this.spawn_margin * 2
     );
     this.targetRectangle = new Phaser.Geom.Rectangle(
       50,
@@ -135,6 +143,8 @@ class Test extends Phaser.Scene {
     let o1 = this.ship.outputs[0].toFixed(3);
     let o2 = this.ship.outputs[1].toFixed(3);
 
-    this.info_txt2.setText(`Inputs-> F: ${i1}  F/L: ${i3}  F/R: ${i2}  B: ${i4}  B/L: ${i6}  B/R: ${i5}\nOutputs-> L: ${o1}  R: ${o2}`);
+    this.info_txt2.setText(
+      `Inputs-> F: ${i1}  F/L: ${i3}  F/R: ${i2}  B: ${i4}  B/L: ${i6}  B/R: ${i5}\nOutputs-> L: ${o1}  R: ${o2}`
+    );
   }
 }

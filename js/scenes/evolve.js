@@ -17,6 +17,8 @@ class Evolve extends Phaser.Scene {
     }
     // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
     this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
+
+    this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
   }
 
   create() {
@@ -35,10 +37,10 @@ class Evolve extends Phaser.Scene {
     //// Rectangles to spawn the meteors
     this.innerRectangle = new Phaser.Geom.Rectangle(0, 0, this.game.config.width, this.game.config.height);
     this.outerRectangle = new Phaser.Geom.Rectangle(
-      -100,
-      -100,
-      this.game.config.width + 200,
-      this.game.config.height + 200
+      -this.spawn_margin,
+      -this.spawn_margin,
+      this.game.config.width + this.spawn_margin * 2,
+      this.game.config.height + this.spawn_margin * 2
     );
     this.targetRectangle = new Phaser.Geom.Rectangle(
       50,
