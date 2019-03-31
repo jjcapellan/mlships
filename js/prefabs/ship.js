@@ -106,7 +106,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
       }
 
       // Is the point near to activate some sensor?
-      let distance = Phaser.Math.Distance.Between(ast_x, ast_y, this.x, this.y);
+      let distance = Phaser.Math.Distance.Between(ast_x, ast_y, this.x, this.y) - asteroid.body.halfWidth;
       if (distance > GLOBALS.DETECTION_RADIUS) {
         continue;
       }
