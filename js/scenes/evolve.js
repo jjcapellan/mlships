@@ -6,9 +6,13 @@ class Evolve extends Phaser.Scene {
   init(data) {
     // Checks existing network template
     if (data.network) {
-      console.log('data');
+      console.log('Using loaded network');
       this.iaManager = new IAmanager(this, data.network);
+    } else if(data.population){
+      console.log('Using loaded population');
+      this.iaManager = new IAmanager(this, null, data.population);
     } else {
+      console.log('Using new random population');
       this.iaManager = new IAmanager(this);
     }
     // Checks max score
@@ -57,7 +61,7 @@ class Evolve extends Phaser.Scene {
     this.ships.createMultiple({
       classType: Ship,
       key: 'ship',
-      repeat: GLOBALS.POPULATION_AMOUNT - 1,
+      repeat: this.iaManager.neat.population.length - 1,
       runChildUpdate: true
     });
     for (let i = 0; i < this.ships.getChildren().length; i++) {

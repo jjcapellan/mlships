@@ -5,7 +5,7 @@ class Menu extends Phaser.Scene {
 
   init() {
     this.el_inputFile = document.getElementById('inputFile');
-    this.el_inputFile.addEventListener('change', this.loadNetwork.bind(this), false);
+    this.el_inputFile.addEventListener('change', this.loadPopulation.bind(this), false);
     this.physics.world.setFPS(60);
   }
 
@@ -22,6 +22,7 @@ class Menu extends Phaser.Scene {
     this.bt_evolve = this.add
       .existing(new ButtonGenerator(this, 50, 410, 'EVOLVE NEW POPULATION', buttonConfig))
       .setOrigin(0);
+      this.bt_load = this.add.existing(new ButtonGenerator(this, 50, 470, 'LOAD POPULATION', buttonConfig)).setOrigin(0);
 
     // Buttons events
     this.bt_config.on(
@@ -68,50 +69,27 @@ class Menu extends Phaser.Scene {
       },
       t
     );
+
+    this.bt_load.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.el_inputFile.click();
+      },
+      t
+    );
   }
 
-  saveNetwork() {
-    const nnJSON = shipBrain.toJSON();
 
-    const blob = new Blob([ JSON.stringify(nnJSON) ], {
-      type: 'text/plain'
-    });
-
-    let anchor = document.createElement('a');
-    anchor.download = 'neuralNetwork.JSON';
-    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
-    anchor.dataset.downloadurl = [ 'text/plain', anchor.download, anchor.href ].join(':');
-    anchor.click();
-  }
-
-  saveData() {
-    const blob = new Blob([ JSON.stringify(shipRawData) ], {
-      type: 'text/plain'
-    });
-
-    let anchor = document.createElement('a');
-    anchor.download = 'datacapturedV2.JSON';
-    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
-    anchor.dataset.downloadurl = [ 'text/plain', anchor.download, anchor.href ].join(':');
-    anchor.click();
-  }
-
-  loadNetwork(event) {
+  loadPopulation(event) {
+    const t = this;
     const files = event.target.files;
     const reader = new FileReader();
     reader.onload = function() {
-      const txtNetwork = this.result;
-      const JSONnetwork = JSON.parse(txtNetwork);
-      shipBrain.fromJSON(JSONnetwork);
-    };
-    reader.readAsText(files[0]);
-  }
+      const txtPopulation = this.result;
+      const JSONpopulation = JSON.parse(txtPopulation); //array --> [Ngeneration, neuralNetwork[]]
+      t.scene.start('evolve', {population: JSONpopulation});
 
-  loadData(event) {
-    const files = event.target.files;
-    const reader = new FileReader();
-    reader.onload = function() {
-      shipRawData = JSON.parse(this.result);
     };
     reader.readAsText(files[0]);
   }
