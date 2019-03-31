@@ -46,11 +46,13 @@ class ButtonGenerator extends Phaser.GameObjects.Image {
     this.createBitmapText();
     this.createRectangle();
     this.createTexture();
-    this.setInteractive(
+    /*this.setInteractive(
       new Phaser.Geom.Rectangle(0, 0, this.width, this.height),
       Phaser.Geom.Rectangle.Contains
-    );
+    );*/
+    
     this.setTexture('rt_button');
+    this.enable();
     this.setBehaviors();
     this.clean();
   }
@@ -92,6 +94,18 @@ class ButtonGenerator extends Phaser.GameObjects.Image {
     texture.draw(this.bitmapText, this.padding, this.padding);
 
     texture.saveTexture('rt_button');
+  }
+
+  disable(){
+    this.disableInteractive();
+    this.setTint(0xff0000);
+    this.setAlpha(0.5);
+  }
+
+  enable(){
+    this.setInteractive();
+    this.clearTint();
+    this.clearAlpha();
   }
 
   setBehaviors() {
