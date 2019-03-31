@@ -7,22 +7,41 @@ class Menu extends Phaser.Scene {
     this.el_inputFile = document.getElementById('inputFile');
     this.el_inputFile.addEventListener('change', this.loadPopulation.bind(this), false);
     this.physics.world.setFPS(60);
+    // Format
+    this.marginX = 50;
+    this.marginY = 60;
+    this.paddingY = 16;
   }
 
   create() {
-    let t = this;
+    const t = this;
     const buttonConfig = GLOBALS.BUTTON_CONFIG;
 
     // Buttons
-    this.bt_config = this.add.existing(new ButtonGenerator(this, 50, 230, 'CONFIG', buttonConfig)).setOrigin(0);
-    this.bt_test = this.add.existing(new ButtonGenerator(this, 50, 290, 'TEST BEST GENOME', buttonConfig)).setOrigin(0);
-    this.bt_evolveFromBest = this.add
+    this.bt_config = this.add
+      .existing(new ButtonGenerator(this, t.marginX, t.marginY, 'CONFIG', buttonConfig))
+      .setOrigin(0);
+    let lineHeight = this.bt_config.height + this.paddingY;
+    /*this.bt_test = this.add.existing(new ButtonGenerator(this, t.marginX, 290, 'TEST BEST GENOME', buttonConfig)).setOrigin(0);*/
+    /*this.bt_evolveFromBest = this.add
       .existing(new ButtonGenerator(this, 50, 350, 'EVOLVE FROM BEST GENOME', buttonConfig))
-      .setOrigin(0);
+      .setOrigin(0);*/
     this.bt_evolve = this.add
-      .existing(new ButtonGenerator(this, 50, 410, 'EVOLVE NEW POPULATION', buttonConfig))
+      .existing(new ButtonGenerator(this, t.marginX, t.marginY + lineHeight, 'EVOLVE NEW POPULATION', buttonConfig))
       .setOrigin(0);
-      this.bt_load = this.add.existing(new ButtonGenerator(this, 50, 470, 'LOAD POPULATION', buttonConfig)).setOrigin(0);
+    this.bt_load = this.add
+      .existing(new ButtonGenerator(this, this.marginX, t.marginY + 2 * lineHeight, 'LOAD POPULATION', buttonConfig))
+      .setOrigin(0);
+
+    // Lines
+    const g = this.add.graphics();
+    g.lineStyle(2, 0xffffff, 0.9);
+    g.lineBetween(t.marginX, t.marginY + 3 * lineHeight, t.game.config.width - t.marginX, t.marginY + 3 * lineHeight);
+
+    // Labels
+    const text1 = 'POPULATION\n' + 'Number of genomes \n' + 'Current generation \n' + 'Max Score ';
+    const text2 = 'BEST GENOME\n' + 'Hidden neurons \n' + 'Score ';
+    this.setLabels(t.marginX, t.marginY + 3 * lineHeight + t.paddingY, text1, text2, g);
 
     // Buttons events
     this.bt_config.on(
@@ -34,7 +53,7 @@ class Menu extends Phaser.Scene {
       t
     );
 
-    this.bt_test.on(
+    /*this.bt_test.on(
       'pointerup',
       function() {
         if (localStorage.hasOwnProperty(GLOBALS.BEST_GEN_STORE_NAME)) {
@@ -43,9 +62,9 @@ class Menu extends Phaser.Scene {
         }
       },
       t
-    );
+    );*/
 
-    this.bt_evolveFromBest.on(
+    /*this.bt_evolveFromBest.on(
       'pointerup',
       function() {
         let NN;
@@ -59,7 +78,7 @@ class Menu extends Phaser.Scene {
         this.scene.start('evolve', { network: NN });
       },
       t
-    );
+    );*/
 
     this.bt_evolve.on(
       'pointerup',
@@ -80,6 +99,12 @@ class Menu extends Phaser.Scene {
     );
   }
 
+  setLabels(originX, originY, text1, text2, graphics) {
+    let bmt1 = this.add.bitmapText(originX, originY, 'bmf', text1, 20);
+    this.add.bitmapText(originX, originY + bmt1.height + 2 * this.paddingY, 'bmf', text2, 20);
+    let lineY = originY + this.paddingY + bmt1.height;
+    graphics.lineBetween(this.marginX, lineY, this.game.config.width - this.marginX, lineY);
+  }
 
   loadPopulation(event) {
     const t = this;
@@ -88,8 +113,7 @@ class Menu extends Phaser.Scene {
     reader.onload = function() {
       const txtPopulation = this.result;
       const JSONpopulation = JSON.parse(txtPopulation); //array --> [Ngeneration, neuralNetwork[]]
-      t.scene.start('evolve', {population: JSONpopulation});
-
+      t.scene.start('evolve', { population: JSONpopulation });
     };
     reader.readAsText(files[0]);
   }
