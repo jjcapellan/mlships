@@ -192,14 +192,25 @@ class Evolve extends Phaser.Scene {
   savePopulation(){
 
     let savedPopulation = [];
+    
+
+    // Best Genome
+    let BestGenomeJSON = JSON.parse(localStorage.getItem(GLOBALS.BEST_GEN_STORE_NAME));
+
     // Networks array 
     let populationJSON = this.iaManager.neat.export();
+
     // Generation
     let generation = this.iaManager.neat.generation;
+
+    // Max Score
+    let maxScore = this.iaManager.maxScore;
 
 
     savedPopulation.push(generation);
     savedPopulation.push(populationJSON);
+    savedPopulation.push(maxScore);
+    savedPopulation.push(BestGenomeJSON);
 
 
     const blob = new Blob([ JSON.stringify(savedPopulation) ], {
