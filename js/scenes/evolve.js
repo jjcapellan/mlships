@@ -18,6 +18,9 @@ class Evolve extends Phaser.Scene {
     // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
     this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
 
+    // DOM element to save population
+    this.el_inputFile = document.getElementById('inputFile');
+
     this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
   }
 
@@ -83,6 +86,16 @@ class Evolve extends Phaser.Scene {
       'pointerup',
       function() {
         this.scene.start('menu');
+      },
+      t
+    );
+
+    // Save button
+    this.bt_back = this.add.existing(new ButtonGenerator(this, 700, 560, 'SAVE', GLOBALS.BUTTON_CONFIG)).setOrigin(0,1);
+    this.bt_back.on(
+      'pointerup',
+      function() {
+        this.savePopulation();
       },
       t
     );
@@ -170,6 +183,30 @@ class Evolve extends Phaser.Scene {
     this.ships.children.iterate(function(ship) {
       ship.reset();
     }, this);
+  }
+
+  savePopulation(){
+
+    let savedPopulation = [];
+    // Networks array 
+    let populationJSON = this.iaManager.neat.export();
+    // Generation
+    let generation = this.iaManager.neat.generation;
+
+
+    savedPopulation.push(generation);
+    savedPopulation.push(populationJSON);
+
+
+    const blob = new Blob([ JSON.stringify(savedPopulation) ], {
+      type: 'text/plain'
+    });
+
+    let anchor = document.createElement('a');
+    anchor.download = 'population.JSON';
+    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
+    anchor.dataset.downloadurl = [ 'text/plain', anchor.download, anchor.href ].join(':');
+    anchor.click();
   }
 
   saveNN(network) {
