@@ -83,7 +83,7 @@ class Menu extends Phaser.Scene {
     let bmt2 = this.add.bitmapText(originX, originY + bmt1.height + 2 * this.paddingY, 'bmf', text2, 20);
     let lineY = originY + this.paddingY + bmt1.height;
     const padding3Y = 30;
-    
+
     graphics.lineBetween(this.marginX, lineY, this.game.config.width - this.marginX, lineY);
 
     this.data1X = originX + bmt1.width + this.paddingY;
@@ -364,9 +364,11 @@ class Menu extends Phaser.Scene {
       function() {
         LOADED_POPULATION[2] = 0;
         localStorage.removeItem('maxScore');
+        localStorage.removeItem(GLOBALS.BEST_GEN_STORE_NAME);
         t.showPopulationData();
         t.bt_test.disable();
         t.bt_evolveFromBest.disable();
+        t.bt_saveBest.disable();
       },
       t
     );
@@ -413,7 +415,9 @@ class Menu extends Phaser.Scene {
 
     this.bt_evolveLoaded.enable();
     this.bt_save.enable();
+    if(localStorage.hasOwnProperty(GLOBALS.BEST_GEN_STORE_NAME)){
     this.bt_saveBest.enable();
+    }
     this.bt_saveCurrentGenome.enable();
 
     if (LOADED_POPULATION[2]) {
