@@ -6,11 +6,12 @@ class Test extends Phaser.Scene {
   init(data) {
     this.maxScore = 0;
     // Manages neural networks
-    let jsonNN = JSON.parse(localStorage.getItem(GLOBALS.BEST_GEN_STORE_NAME));
+    /*let jsonNN = JSON.parse(localStorage.getItem(GLOBALS.BEST_GEN_STORE_NAME));
     if (jsonNN) {
       this.brain = neataptic.Network.fromJSON(jsonNN);
       console.log(this.brain);
-    }
+    }*/
+    this.brain = neataptic.Network.fromJSON(data.network);
     // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
     this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
 
