@@ -1,9 +1,11 @@
 var GLOBALS = {
   // NEAT algorithm parameters
+  INPUTS_SIZE: 6,
+  OUTPUTS_SIZE: 2,
   POPULATION_AMOUNT: 40,
   MUTATION_RATE: 0.5,
   ELITISM_PERCENT: 0.2,
-  PROVENANCE_PERCENT: 0.1,
+  PROVENANCE_PERCENT: 0,
   START_HIDDEN_SIZE: 0,
   MUTATION_AMOUNT: 1,
   // Simulation options
@@ -36,6 +38,8 @@ var GLOBALS = {
 };
 
 var GLOBALS_BACKUP = JSON.parse(JSON.stringify(GLOBALS));
+
+var LOADED_POPULATION = null;
 
 function loadData(key, property) {
   if (localStorage.hasOwnProperty(key)) {
