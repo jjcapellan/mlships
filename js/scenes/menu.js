@@ -71,6 +71,8 @@ class Menu extends Phaser.Scene {
       this.bt_evolveFromBest.disable();
       this.bt_test.disable();
       this.bt_save.disable();
+      this.bt_saveBest.disable();
+      this.bt_saveCurrentGenome.disable();
       this.bt_resetGenome.disable();
       this.bt_evolveCurrentGenome.disable();
       this.bt_testCurrent.disable();
@@ -248,34 +250,50 @@ class Menu extends Phaser.Scene {
       t
     );
 
+    // Test buttons
+
     this.bt_test.on(
       'pointerup',
       function() {
-        /*if (localStorage.hasOwnProperty(GLOBALS.BEST_GEN_STORE_NAME)) {
-          this.clean();
-          this.scene.start('test');
-        }*/
         this.clean();
         this.scene.start('test', { network: LOADED_POPULATION[3] });
       },
       t
     );
 
-    /*this.bt_evolveFromBest.on(
+    this.bt_testCurrent.on(
       'pointerup',
       function() {
-        let NN;
-        let jsonNN = JSON.parse(localStorage.getItem(GLOBALS.BEST_GEN_STORE_NAME));
-        if (jsonNN) {
-          NN = neataptic.Network.fromJSON(jsonNN);
-        } else {
-          return;
-        }
+        this.clean();
+        localStorage.setItem('selectedIndex', t.selectedGenome);
+        this.scene.start('test', { network: LOADED_POPULATION[1][t.selectedGenome - 1] });
+      },
+      t
+    );
+
+    // Evolve buttons
+
+    this.bt_evolveFromBest.on(
+      'pointerup',
+      function() {
+        let NN = neataptic.Network.fromJSON(LOADED_POPULATION[3]);
+        LOADED_POPULATION = null;
         this.clean();
         this.scene.start('evolve', { network: NN });
       },
       t
-    );*/
+    );
+
+    this.bt_evolveCurrentGenome.on(
+      'pointerup',
+      function() {
+        let NN = neataptic.Network.fromJSON(LOADED_POPULATION[1][t.selectedGenome - 1]);
+        LOADED_POPULATION = null;
+        this.clean();
+        this.scene.start('evolve', { network: NN });
+      },
+      t
+    );
 
     this.bt_evolve.on(
       'pointerup',
@@ -296,26 +314,7 @@ class Menu extends Phaser.Scene {
       t
     );
 
-    this.bt_load.on(
-      'pointerup',
-      function() {
-        this.clean();
-        this.el_inputFile.click();
-      },
-      t
-    );
-
-    this.bt_resetGenome.on(
-      'pointerup',
-      function() {
-        LOADED_POPULATION[2] = 0;
-        localStorage.removeItem('maxScore');
-        t.showPopulationData();
-        t.bt_test.disable();
-        t.bt_evolveFromBest.disable();
-      },
-      t
-    );
+    // Save buttons
 
     this.bt_save.on(
       'pointerup',
@@ -324,17 +323,7 @@ class Menu extends Phaser.Scene {
         this.saveElement(LOADED_POPULATION, 'population.JSON');
       },
       t
-    );
-
-    this.bt_testCurrent.on(
-      'pointerup',
-      function() {
-        this.clean();
-        localStorage.setItem('selectedIndex', t.selectedGenome);
-        this.scene.start('test', { network: LOADED_POPULATION[1][t.selectedGenome - 1] });
-      },
-      t
-    );
+    );   
 
     this.bt_saveCurrentGenome.on(
       'pointerup',
@@ -353,7 +342,31 @@ class Menu extends Phaser.Scene {
       },
       t
     );
-  }
+
+    // Load button
+    this.bt_load.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.el_inputFile.click();
+      },
+      t
+    );
+
+    // Reset best genome button
+    this.bt_resetGenome.on(
+      'pointerup',
+      function() {
+        LOADED_POPULATION[2] = 0;
+        localStorage.removeItem('maxScore');
+        t.showPopulationData();
+        t.bt_test.disable();
+        t.bt_evolveFromBest.disable();
+      },
+      t
+    );
+    
+  } // end setButtonsEvents()
 
   loadPopulation(event) {
     const t = this;
@@ -396,6 +409,9 @@ class Menu extends Phaser.Scene {
 
     this.bt_evolveLoaded.enable();
     this.bt_save.enable();
+    this.bt_saveBest.enable();
+    this.bt_saveCurrentGenome.enable();
+    
     if (LOADED_POPULATION[2]) {
       this.bt_evolveFromBest.enable();
       this.bt_test.enable();
