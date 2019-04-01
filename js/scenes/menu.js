@@ -9,7 +9,7 @@ class Menu extends Phaser.Scene {
     this.physics.world.setFPS(60);
     // Format
     this.marginX = 50;
-    this.marginY = 60;
+    this.marginY = 50;
     this.paddingY = 16;
     this.data1X = 0;
     this.data2X = 0;
@@ -37,9 +37,9 @@ class Menu extends Phaser.Scene {
     g.lineStyle(2, 0xffffff, 0.9);
     g.lineBetween(
       t.marginX,
-      t.marginY + 3 * t.lineHeight,
+      t.marginY + 2 * t.lineHeight,
       t.game.config.width - t.marginX,
-      t.marginY + 3 * t.lineHeight
+      t.marginY + 2 * t.lineHeight
     );
 
     // Labels
@@ -49,7 +49,7 @@ class Menu extends Phaser.Scene {
     const initialDataTxt1 = '\n' + '0\n' + '0\n' + '0';
     const initialDataTxt2 = '\n' + '0\n' + '0';
     const initialDataTxt3 = '\n' + '0\n';
-    this.secondLineY = this.setLabels(t.marginX, t.marginY + 3 * t.lineHeight + t.paddingY, text1, text2, text3, g);
+    this.secondLineY = this.setLabels(t.marginX, t.marginY + 2 * t.lineHeight + t.paddingY, text1, text2, text3, g);
     // Data labels
     this.data_txt1 = this.add.bitmapText(t.data1X, t.data1Y, 'bmf', initialDataTxt1, 20);
     this.data_txt2 = this.add.bitmapText(t.data2X, t.data2Y, 'bmf', initialDataTxt2, 20);
@@ -65,7 +65,7 @@ class Menu extends Phaser.Scene {
       this.showPopulationData();
     } else {
       this.bt_evolveLoaded.disable();
-      this.bt_evolveFromGenome.disable();
+      this.bt_evolveFromBest.disable();
       this.bt_test.disable();
       this.bt_save.disable();
       this.bt_resetGenome.disable();
@@ -78,18 +78,19 @@ class Menu extends Phaser.Scene {
     let bmt1 = this.add.bitmapText(originX, originY, 'bmf', text1, 20);
     let bmt2 = this.add.bitmapText(originX, originY + bmt1.height + 2 * this.paddingY, 'bmf', text2, 20);
     let lineY = originY + this.paddingY + bmt1.height;
+    const padding3Y = 30;
     graphics.lineBetween(this.marginX, lineY, this.game.config.width - this.marginX, lineY);
 
     this.data1X = originX + bmt1.width + this.paddingY;
     this.data2X = this.data1X;
     this.data1Y = originY;
     this.data2Y = originY + bmt1.height + 2 * this.paddingY;
-    this.data3Y = this.data2Y + bmt2.height + 2 * this.paddingY;
+    this.data3Y = this.data2Y + bmt2.height + 2 * this.paddingY + padding3Y;
 
     let lineY2 = this.data3Y - this.paddingY;
     graphics.lineBetween(this.marginX, lineY2, this.game.config.width - this.marginX, lineY2);
 
-    let bmt3 = this.add.bitmapText(originX, this.data3Y, 'bmf', text3, 20);
+    this.add.bitmapText(originX, this.data3Y, 'bmf', text3, 20);
 
     return lineY;
   }
@@ -128,7 +129,7 @@ class Menu extends Phaser.Scene {
 
     //// Best genome buttons /////////////////////
     // Button: Evolve Best Genome
-    this.bt_evolveFromGenome = this.add
+    this.bt_evolveFromBest = this.add
       .existing(
         new ButtonGenerator(t, t.game.config.width - t.marginX, t.data2Y, 'EVOLVE', buttonConfig)
       )
@@ -139,7 +140,7 @@ class Menu extends Phaser.Scene {
       .existing(
         new ButtonGenerator(
           t,
-          t.bt_evolveFromGenome.x - t.bt_evolveFromGenome.width - t.paddingY,
+          t.bt_evolveFromBest.x - t.bt_evolveFromBest.width - t.paddingY,
           t.data2Y,
           'TEST',
           buttonConfig
@@ -159,7 +160,13 @@ class Menu extends Phaser.Scene {
         )
       )
       .setOrigin(1, 0);
+      this.bt_saveBest = this.add
+      .existing(
+        new ButtonGenerator(t, t.game.config.width - t.marginX, t.bt_evolveFromBest.y + t.bt_evolveFromBest.height + t.paddingY, 'SAVE', buttonConfig)
+      )
+      .setOrigin(1, 0);
 
+      //// Genomes buttons //////////////////////////////
     // Button: Evolve Current Genome
     this.bt_evolveCurrentGenome = this.add
       .existing(new ButtonGenerator(t, t.game.config.width - t.marginX, t.data3Y, 'EVOLVE', buttonConfig))
@@ -170,12 +177,17 @@ class Menu extends Phaser.Scene {
       .existing(
         new ButtonGenerator(
           t,
-          t.game.config.width - t.marginX - t.bt_evolveFromGenome.width - t.paddingY,
+          t.game.config.width - t.marginX - t.bt_evolveFromBest.width - t.paddingY,
           t.data3Y,
           'TEST',
           buttonConfig
         )
       )
+      .setOrigin(1, 0);
+
+      // Button: Save current Genome
+      this.bt_saveCurrentGenome = this.add
+      .existing(new ButtonGenerator(t, t.game.config.width - t.marginX, t.bt_evolveCurrentGenome.height + t.data3Y + t.paddingY, 'SAVE', buttonConfig))
       .setOrigin(1, 0);
 
     this.makeAddButton(
@@ -297,7 +309,7 @@ class Menu extends Phaser.Scene {
         localStorage.removeItem('maxScore');
         t.showPopulationData();
         t.bt_test.disable();
-        t.bt_evolveFromGenome.disable();
+        t.bt_evolveFromBest.disable();
       },
       t
     );
@@ -354,7 +366,7 @@ class Menu extends Phaser.Scene {
     this.bt_evolveLoaded.enable();
     this.bt_save.enable();
     if (LOADED_POPULATION[2]) {
-      this.bt_evolveFromGenome.enable();
+      this.bt_evolveFromBest.enable();
       this.bt_test.enable();
       this.bt_resetGenome.enable();
     }
