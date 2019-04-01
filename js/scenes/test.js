@@ -5,12 +5,7 @@ class Test extends Phaser.Scene {
 
   init(data) {
     this.maxScore = 0;
-    // Manages neural networks
-    /*let jsonNN = JSON.parse(localStorage.getItem(GLOBALS.BEST_GEN_STORE_NAME));
-    if (jsonNN) {
-      this.brain = neataptic.Network.fromJSON(jsonNN);
-      console.log(this.brain);
-    }*/
+    // Imports the neural network    
     this.brain = neataptic.Network.fromJSON(data.network);
     // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
     this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
@@ -18,22 +13,27 @@ class Test extends Phaser.Scene {
     this.score = 0;
 
     this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
+
+    // Format
+    this.marginX = 50;
+    this.marginY = 40;
+    this.padding = 26;
+    this.paddingY = 6;
+    this.dataMargins;
   }
 
   create() {
     let t = this;
 
+    // Labels
+    this.dataMargins = this.setLabels();
+    this.score_txt = this.add.bitmapText(t.dataMargins.scoreX, t.dataMargins.dataLabelsY, 'bmf', `0`, 16).setOrigin(0.5,0);
+    this.timeScale_txt = this.add.bitmapText(t.dataMargins.timeX, t.dataMargins.dataLabelsY, 'bmf', `${GLOBALS.SIMULATION_SPEED}X`, 16).setOrigin(0.5,0);
+    this.maxScore_txt = this.add.bitmapText(t.dataMargins.maxX, t.dataMargins.dataLabelsY, 'bmf', `${this.maxScore}`, 16).setOrigin(0.5,0);
+
     this.info_txt = this.add.bitmapText(
       50,
-      50,
-      'bmf',
-      `Actual Score: 0  Max score: 0 Time speed: ${GLOBALS.SIMULATION_SPEED}X`,
-      16
-    );
-
-    this.info_txt2 = this.add.bitmapText(
-      50,
-      74,
+      t.game.config.height - 50,
       'bmf',
       'Inputs-> F: 1  F/L: 1  F/R: 1  B: 1  B/L: 1  B/R: 1\nOutputs-> L: 0  R: 0',
       16
@@ -85,11 +85,13 @@ class Test extends Phaser.Scene {
       t
     );
 
+    
+
     // Start evaluation timestamp
     this.startTime = performance.now();
 
     // Time event to show inputs/outputs of this neural network
-    this.time.addEvent({ delay: 400, callback: t.showNN, callbackScope: t, loop: true });
+    this.time.addEvent({ delay: 1000, callback: t.showNN, callbackScope: t, loop: true });
 
     // Time event to update score
     this.time.addEvent({ delay: 2000, callback: t.updateScore, callbackScope: t, loop: true });
@@ -109,31 +111,43 @@ class Test extends Phaser.Scene {
     });
   }
 
+  setLabels(){
+    const t = this;
+    let bmt1 = this.add.bitmapText(this.marginX, this.marginY,'bmf',`SCORE`,16).setOrigin(0.5,0);
+    bmt1.x = bmt1.x + bmt1.width / 2;
+    let bmt2 = this.add.bitmapText( (bmt1.x + bmt1.width/2) + this.padding, this.marginY,'bmf',`TIME SCALE`,16).setOrigin(0.5,0);
+    bmt2.x = bmt2.x + bmt2.width / 2;
+    let bmt3 = this.add.bitmapText( (bmt2.x + bmt2.width/2) + this.padding, this.marginY,'bmf',`MAX SCORE`,16).setOrigin(0.5,0);
+    bmt3.x = bmt3.x + bmt3.width / 2;
+    let dataLabelsY = bmt1.y + bmt1.height + this.paddingY;
+
+    return {scoreX: bmt1.x, timeX: bmt2.x, maxX: bmt3.x, dataLabelsY: dataLabelsY};
+  }
+
   collision(ship, meteor) {
     let t = this;
     let collisionTime = performance.now();
-    let shipScore = Math.round((collisionTime - this.startTime - ship.stoppedTime) / 1000) * GLOBALS.SIMULATION_SPEED;
+    let shipScore = Math.round((collisionTime - this.startTime) / 1000) * GLOBALS.SIMULATION_SPEED;
     if (isNaN(shipScore)) {
       shipScore = 0;
     }
     if (shipScore > this.maxScore) {
       this.maxScore = shipScore;
+      this.maxScore_txt.setText(`${this.maxScore}`);
     }
     ship.setScore(shipScore);
-    /*this.info_txt.setText(
-      `Actual Score: ${shipScore}  Max score: ${this.maxScore} Time speed: ${GLOBALS.SIMULATION_SPEED}X`
-    );*/
     console.log(`Test --> Actual Score: ${shipScore}  Max score: ${this.maxScore}`);
     this.reset();
   } // end collision()
 
   updateScore(){
     this.score += GLOBALS.SIMULATION_SPEED * 2; // timer updates each 2 seconds
-    this.info_txt.setText(`Actual Score: ${this.score}  Max score: ${this.maxScore} Time speed: ${GLOBALS.SIMULATION_SPEED}X`);
+    this.score_txt.setText(`${this.score}`);
   }
 
   reset() {
     this.score = 0;
+    this.score_txt.setText(`${this.score}`);
     // Resets timer
     this.startTime = performance.now();
 
@@ -156,7 +170,7 @@ class Test extends Phaser.Scene {
     let o1 = this.ship.outputs[0].toFixed(3);
     let o2 = this.ship.outputs[1].toFixed(3);
 
-    this.info_txt2.setText(
+    this.info_txt.setText(
       `Inputs-> F: ${i1}  F/L: ${i3}  F/R: ${i2}  B: ${i4}  B/L: ${i6}  B/R: ${i5}\nOutputs-> L: ${o1}  R: ${o2}`
     );
   }

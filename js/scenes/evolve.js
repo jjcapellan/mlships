@@ -28,20 +28,17 @@ class Evolve extends Phaser.Scene {
     this.el_inputFile = document.getElementById('inputFile');
 
     this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
+
+    // Format
+    this.marginX = 50;
+    this.marginY = 40;
+    this.padding = 26;
+    this.paddingY = 6;
+    this.dataMargins;
   }
 
   create() {
     let t = this;
-
-    this.info_txt = this.add.bitmapText(
-      50,
-      50,
-      'bmf',
-      `Prev Generation: ${this.iaManager.neat.generation - 1}  Max Score: ${this.iaManager
-        .actualMaxScore}  Top max score: ${this.iaManager.maxScore}  Time speed: ${GLOBALS.SIMULATION_SPEED}X`,
-      16
-    );
-    this.info_txt2 = this.add.bitmapText(50, 74, 'bmf', `Generation: ${this.iaManager.neat.generation} Score: 0`, 16);
 
     //// Rectangles to spawn the meteors
     this.innerRectangle = new Phaser.Geom.Rectangle(0, 0, this.game.config.width, this.game.config.height);
@@ -96,6 +93,13 @@ class Evolve extends Phaser.Scene {
       t
     );
 
+    // Labels
+    this.dataMargins = this.setLabels();
+    this.gen_txt = this.add.bitmapText(t.dataMargins.genX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.neat.generation}`, 16).setOrigin(0.5,0);
+    this.score_txt = this.add.bitmapText(t.dataMargins.scoreX, t.dataMargins.dataLabelsY, 'bmf', `0`, 16).setOrigin(0.5,0);
+    this.timeScale_txt = this.add.bitmapText(t.dataMargins.timeX, t.dataMargins.dataLabelsY, 'bmf', `${GLOBALS.SIMULATION_SPEED}X`, 16).setOrigin(0.5,0);
+    this.maxScore_txt = this.add.bitmapText(t.dataMargins.maxX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.maxScore}`, 16).setOrigin(0.5,0);
+
     // Time event to update score
     this.time.addEvent({ delay: 2000, callback: t.updateScore, callbackScope: t, loop: true });
 
@@ -123,6 +127,21 @@ class Evolve extends Phaser.Scene {
     });
   }
 
+  setLabels(){
+    const t = this;
+    let bmt1 = this.add.bitmapText(this.marginX, this.marginY,'bmf',`GENERATION`,16).setOrigin(0.5,0);
+    bmt1.x = bmt1.x + bmt1.width / 2;
+    let bmt2 = this.add.bitmapText( (bmt1.x + bmt1.width/2) + this.padding, this.marginY,'bmf',`SCORE`,16).setOrigin(0.5,0);
+    bmt2.x = bmt2.x + bmt2.width / 2;
+    let bmt4 = this.add.bitmapText( (bmt2.x + bmt2.width/2) + this.padding, this.marginY,'bmf',`TIME SCALE`,16).setOrigin(0.5,0);
+    bmt4.x = bmt4.x + bmt4.width / 2;
+    let bmt3 = this.add.bitmapText((bmt4.x + bmt4.width/2) + this.padding, this.marginY,'bmf',`MAX SCORE`,16).setOrigin(0.5,0);
+    bmt3.x = bmt3.x + bmt3.width / 2;
+    let dataLabelsY = bmt1.y + bmt1.height + this.paddingY;
+
+    return {genX: bmt1.x, scoreX: bmt2.x, timeX: bmt4.x, maxX: bmt3.x, dataLabelsY: dataLabelsY};
+  }
+
   collision(ship, meteor) {
     let t = this;
     let collisionTime = performance.now();
@@ -131,7 +150,7 @@ class Evolve extends Phaser.Scene {
       shipScore = 0;
     }
     ship.setScore(shipScore);
-    /*this.info_txt2.setText(`Generation: ${this.iaManager.neat.generation} Score: ${shipScore}`);*/
+    
 
     ship.setActive(false);
     ship.setVisible(false);
@@ -147,11 +166,9 @@ class Evolve extends Phaser.Scene {
           localStorage.setItem('maxScore', JSON.stringify(fittest.score));
           t.saveNN(fittest);
         }
-        t.info_txt.setText(
-          `Prev Generation: ${t.iaManager.neat.generation - 1} Max Score: ${fittest.score} Top max score: ${t.iaManager
-            .maxScore} Time speed: ${GLOBALS.SIMULATION_SPEED}X`
-        );
-        t.info_txt2.setText(`Generation: ${this.iaManager.neat.generation} Score: 0`);
+
+        t.maxScore_txt.setText(`${t.iaManager.maxScore}`);        
+
         console.log(
           `Prev Generation: ${t.iaManager.neat.generation - 1} Max Score: ${fittest.score} Top max score: ${t.iaManager
             .maxScore}`
@@ -165,7 +182,7 @@ class Evolve extends Phaser.Scene {
 
   updateScore(){
     this.score += GLOBALS.SIMULATION_SPEED * 2; // timer updates each 2 seconds
-    this.info_txt2.setText(`Generation: ${this.iaManager.neat.generation} Score: ${this.score}`);
+    this.score_txt.setText(`${this.score}`);
   }
 
   reset() {
@@ -175,8 +192,8 @@ class Evolve extends Phaser.Scene {
       ship.setBrain(this.iaManager.neat.population[i]);
     }
 
-    // there is quota problem
-    /*this.saveData();*/
+    // Resets score
+    this.score_txt.setText('0');
 
     // Resets timer
     this.startTime = performance.now();
@@ -190,6 +207,9 @@ class Evolve extends Phaser.Scene {
     this.ships.children.iterate(function(ship) {
       ship.reset();
     }, this);
+
+    // Displays new generation
+    this.gen_txt.setText(`${this.iaManager.neat.generation}`);
   }
 
   updatePopulation(){
