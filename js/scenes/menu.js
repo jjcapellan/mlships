@@ -67,6 +67,7 @@ class Menu extends Phaser.Scene {
       this.bt_evolveLoaded.disable();
       this.bt_evolveFromGenome.disable();
       this.bt_test.disable();
+      this.bt_resetGenome.disable();
       this.bt_evolveCurrentGenome.disable();
       this.bt_testCurrent.disable();
     }
@@ -129,9 +130,22 @@ class Menu extends Phaser.Scene {
       .existing(
         new ButtonGenerator(
           t,
-          t.game.config.width - t.marginX - this.bt_evolveFromGenome.width - this.paddingY,
+          this.bt_evolveFromGenome.x - this.bt_evolveFromGenome.width - this.paddingY,
           t.secondLineY + t.paddingY,
           'TEST',
+          buttonConfig
+        )
+      )
+      .setOrigin(1, 0);
+
+    // Button: Reset Genome
+    this.bt_resetGenome = this.add
+      .existing(
+        new ButtonGenerator(
+          t,
+          this.bt_test.x - this.bt_test.width - this.paddingY,
+          t.secondLineY + t.paddingY,
+          'RESET',
           buttonConfig
         )
       )
@@ -243,7 +257,6 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        LOADED_POPULATION = null;
         this.scene.start('evolve');
       },
       t
@@ -263,6 +276,18 @@ class Menu extends Phaser.Scene {
       function() {
         this.clean();
         this.el_inputFile.click();
+      },
+      t
+    );
+
+    this.bt_resetGenome.on(
+      'pointerup',
+      function() {
+        LOADED_POPULATION[2] = 0;
+        localStorage.removeItem('maxScore');
+        t.showPopulationData();
+        t.bt_test.disable();
+        t.bt_evolveFromGenome.disable();
       },
       t
     );
@@ -302,8 +327,11 @@ class Menu extends Phaser.Scene {
     this.data_ranking.setText('\n\n1');
 
     this.bt_evolveLoaded.enable();
+    if(LOADED_POPULATION[2]){
     this.bt_evolveFromGenome.enable();
     this.bt_test.enable();
+    this.bt_resetGenome.enable();
+    }
     this.bt_evolveCurrentGenome.enable();
     this.bt_testCurrent.enable();
   }
