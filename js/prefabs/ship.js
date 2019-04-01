@@ -7,8 +7,6 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.y = 300;
     this.realSpeed = GLOBALS.SHIP_SPEED * GLOBALS.SIMULATION_SPEED;
     this.realAngularSpeed = GLOBALS.SHIP_ANGULAR_SP * GLOBALS.SIMULATION_SPEED;
-    // collision timeStamp
-    this.stoppedTime = 0;
     // inputs and outputs of the neural network
     this.inputs;
     this.outputs;
@@ -67,7 +65,6 @@ class Ship extends Phaser.Physics.Arcade.Image {
     if (this.brain) {
       this.setScore(0);
     }
-    this.stoppedTime = 0;
     this.body.setEnable(true);
     this.setActive(true);
     this.setVisible(true);

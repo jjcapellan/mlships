@@ -14,6 +14,8 @@ class Test extends Phaser.Scene {
     this.brain = neataptic.Network.fromJSON(data.network);
     // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
     this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
+    // Sets score
+    this.score = 0;
 
     this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
   }
@@ -88,6 +90,9 @@ class Test extends Phaser.Scene {
 
     // Time event to show inputs/outputs of this neural network
     this.time.addEvent({ delay: 400, callback: t.showNN, callbackScope: t, loop: true });
+
+    // Time event to update score
+    this.time.addEvent({ delay: 2000, callback: t.updateScore, callbackScope: t, loop: true });
   }
 
   update(time, delta) {
@@ -115,14 +120,20 @@ class Test extends Phaser.Scene {
       this.maxScore = shipScore;
     }
     ship.setScore(shipScore);
-    this.info_txt.setText(
+    /*this.info_txt.setText(
       `Actual Score: ${shipScore}  Max score: ${this.maxScore} Time speed: ${GLOBALS.SIMULATION_SPEED}X`
-    );
+    );*/
     console.log(`Test --> Actual Score: ${shipScore}  Max score: ${this.maxScore}`);
     this.reset();
   } // end collision()
 
+  updateScore(){
+    this.score += GLOBALS.SIMULATION_SPEED * 2; // timer updates each 2 seconds
+    this.info_txt.setText(`Actual Score: ${this.score}  Max score: ${this.maxScore} Time speed: ${GLOBALS.SIMULATION_SPEED}X`);
+  }
+
   reset() {
+    this.score = 0;
     // Resets timer
     this.startTime = performance.now();
 

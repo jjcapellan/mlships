@@ -19,6 +19,8 @@ class Evolve extends Phaser.Scene {
     if(LOADED_POPULATION){
       this.iaManager.maxScore = parseInt(LOADED_POPULATION[2]);
     }
+    // Sets score
+    this.score = 0;
     // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
     this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
 
@@ -94,6 +96,10 @@ class Evolve extends Phaser.Scene {
       t
     );
 
+    // Time event to update score
+    this.time.addEvent({ delay: 2000, callback: t.updateScore, callbackScope: t, loop: true });
+
+
     // Start evaluation timestamp
     this.startTime = performance.now();
   }
@@ -120,12 +126,12 @@ class Evolve extends Phaser.Scene {
   collision(ship, meteor) {
     let t = this;
     let collisionTime = performance.now();
-    let shipScore = Math.round((collisionTime - this.startTime - ship.stoppedTime) / 1000) * GLOBALS.SIMULATION_SPEED;
+    let shipScore = Math.round((collisionTime - this.startTime) / 1000) * GLOBALS.SIMULATION_SPEED;
     if (isNaN(shipScore)) {
       shipScore = 0;
     }
     ship.setScore(shipScore);
-    this.info_txt2.setText(`Generation: ${this.iaManager.neat.generation} Score: ${shipScore}`);
+    /*this.info_txt2.setText(`Generation: ${this.iaManager.neat.generation} Score: ${shipScore}`);*/
 
     ship.setActive(false);
     ship.setVisible(false);
@@ -133,6 +139,7 @@ class Evolve extends Phaser.Scene {
     ship.body.setEnable(false);
 
     if (this.ships.countActive() == 0) {
+      this.score = 0;
       this.iaManager.neat.evolve().then((fittest) => {
         t.iaManager.actualMaxScore = fittest.maxScore;
         if (fittest.score > t.iaManager.maxScore) {
@@ -155,6 +162,11 @@ class Evolve extends Phaser.Scene {
       });
     }
   } // end collision()
+
+  updateScore(){
+    this.score += GLOBALS.SIMULATION_SPEED * 2; // timer updates each 2 seconds
+    this.info_txt2.setText(`Generation: ${this.iaManager.neat.generation} Score: ${this.score}`);
+  }
 
   reset() {
     // Assigns the new evolved "brains" to the ships
