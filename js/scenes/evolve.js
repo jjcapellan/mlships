@@ -89,6 +89,7 @@ class Evolve extends Phaser.Scene {
     this.bt_back.on(
       'pointerup',
       function() {
+        this.updatePopulation();
         this.scene.start('menu');
       },
       t
@@ -189,11 +190,8 @@ class Evolve extends Phaser.Scene {
     }, this);
   }
 
-  savePopulation(){
-
-    let savedPopulation = [];
-    
-
+  updatePopulation(){
+    LOADED_POPULATION = [];
     // Best Genome
     let BestGenomeJSON = JSON.parse(localStorage.getItem(GLOBALS.BEST_GEN_STORE_NAME));
 
@@ -206,14 +204,18 @@ class Evolve extends Phaser.Scene {
     // Max Score
     let maxScore = this.iaManager.maxScore;
 
+    LOADED_POPULATION.push(generation);
+    LOADED_POPULATION.push(populationJSON);
+    LOADED_POPULATION.push(maxScore);
+    LOADED_POPULATION.push(BestGenomeJSON);
 
-    savedPopulation.push(generation);
-    savedPopulation.push(populationJSON);
-    savedPopulation.push(maxScore);
-    savedPopulation.push(BestGenomeJSON);
+  }
 
+  savePopulation(){
 
-    const blob = new Blob([ JSON.stringify(savedPopulation) ], {
+    this.updatePopulation();
+
+    const blob = new Blob([ JSON.stringify(LOADED_POPULATION) ], {
       type: 'text/plain'
     });
 
