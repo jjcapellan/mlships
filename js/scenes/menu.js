@@ -67,6 +67,7 @@ class Menu extends Phaser.Scene {
       this.bt_evolveLoaded.disable();
       this.bt_evolveFromGenome.disable();
       this.bt_test.disable();
+      this.bt_save.disable();
       this.bt_resetGenome.disable();
       this.bt_evolveCurrentGenome.disable();
       this.bt_testCurrent.disable();
@@ -99,29 +100,37 @@ class Menu extends Phaser.Scene {
 
     // Button: Evolve New Population
     this.bt_evolve = this.add
-      .existing(new ButtonGenerator(this, t.marginX, t.marginY + t.lineHeight, 'EVOLVE NEW POPULATION', buttonConfig))
+      .existing(new ButtonGenerator(t, t.marginX, t.marginY + t.lineHeight, 'EVOLVE NEW POPULATION', buttonConfig))
       .setOrigin(0);
-    // Button: Load Population
-    this.bt_load = this.add
-      .existing(new ButtonGenerator(this, this.marginX, t.marginY + 2 * t.lineHeight, 'LOAD POPULATION', buttonConfig))
-      .setOrigin(0);
+
+    //// Population buttons /////////////////////
     // Button: Evolve Loaded Population
     this.bt_evolveLoaded = this.add
+      .existing(new ButtonGenerator(t, t.game.config.width - t.marginX, t.data1Y, 'EVOLVE', buttonConfig))
+      .setOrigin(1, 0);
+
+    // Button: Save Population
+    this.bt_save = this.add
       .existing(
         new ButtonGenerator(
           t,
-          t.game.config.width - t.marginX,
-          t.marginY + 3 * t.lineHeight + t.paddingY,
-          'EVOLVE',
+          t.bt_evolveLoaded.x - t.bt_evolveLoaded.width - t.paddingY,
+          t.data1Y,
+          'SAVE',
           buttonConfig
         )
       )
       .setOrigin(1, 0);
+    // Button: Load Population
+    this.bt_load = this.add
+      .existing(new ButtonGenerator(t, t.bt_save.x - t.bt_save.width - t.paddingY, t.data1Y, 'LOAD', buttonConfig))
+      .setOrigin(1, 0);
 
+    //// Best genome buttons /////////////////////
     // Button: Evolve Best Genome
     this.bt_evolveFromGenome = this.add
       .existing(
-        new ButtonGenerator(t, t.game.config.width - t.marginX, t.secondLineY + t.paddingY, 'EVOLVE', buttonConfig)
+        new ButtonGenerator(t, t.game.config.width - t.marginX, t.data2Y, 'EVOLVE', buttonConfig)
       )
       .setOrigin(1, 0);
 
@@ -130,8 +139,8 @@ class Menu extends Phaser.Scene {
       .existing(
         new ButtonGenerator(
           t,
-          this.bt_evolveFromGenome.x - this.bt_evolveFromGenome.width - this.paddingY,
-          t.secondLineY + t.paddingY,
+          t.bt_evolveFromGenome.x - t.bt_evolveFromGenome.width - t.paddingY,
+          t.data2Y,
           'TEST',
           buttonConfig
         )
@@ -143,8 +152,8 @@ class Menu extends Phaser.Scene {
       .existing(
         new ButtonGenerator(
           t,
-          this.bt_test.x - this.bt_test.width - this.paddingY,
-          t.secondLineY + t.paddingY,
+          t.bt_test.x - t.bt_test.width - t.paddingY,
+          t.data2Y,
           'RESET',
           buttonConfig
         )
@@ -161,7 +170,7 @@ class Menu extends Phaser.Scene {
       .existing(
         new ButtonGenerator(
           t,
-          t.game.config.width - t.marginX - this.bt_evolveFromGenome.width - this.paddingY,
+          t.game.config.width - t.marginX - t.bt_evolveFromGenome.width - t.paddingY,
           t.data3Y,
           'TEST',
           buttonConfig
@@ -257,6 +266,7 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
+        LOADED_POPULATION = null;
         this.scene.start('evolve');
       },
       t
@@ -291,6 +301,15 @@ class Menu extends Phaser.Scene {
       },
       t
     );
+
+    this.bt_save.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.savePopulation();
+      },
+      t
+    );
   }
 
   loadPopulation(event) {
@@ -303,9 +322,20 @@ class Menu extends Phaser.Scene {
       LOADED_POPULATION = JSON.parse(txtPopulation);
       t.selectedGenome = 1;
       t.showPopulationData();
-      /*t.scene.start('evolve', { population: JSONpopulation });*/
     };
     reader.readAsText(files[0]);
+  }
+
+  savePopulation(){
+    const blob = new Blob([ JSON.stringify(LOADED_POPULATION) ], {
+      type: 'text/plain'
+    });
+
+    let anchor = document.createElement('a');
+    anchor.download = 'population.JSON';
+    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
+    anchor.dataset.downloadurl = [ 'text/plain', anchor.download, anchor.href ].join(':');
+    anchor.click();
   }
 
   showPopulationData() {
@@ -316,21 +346,17 @@ class Menu extends Phaser.Scene {
 
     let bestHiddenNeurons = LOADED_POPULATION[3].nodes.length - GLOBALS.INPUTS_SIZE;
     let selectedHiddenNeurons = LOADED_POPULATION[1][this.selectedGenome - 1].nodes.length - GLOBALS.INPUTS_SIZE;
-    /*let jsonNN = LOADED_POPULATION[3];
-    if (jsonNN) {
-      let nn = neataptic.Network.fromJSON(jsonNN);
-      hiddenNeurons = nn.nodes.length - GLOBALS.INPUTS_SIZE;
-    }*/
 
     this.data_txt2.setText(`\n${bestHiddenNeurons}\n${maxScore}`);
     this.data_txt3.setText(`\n${selectedHiddenNeurons}`);
     this.data_ranking.setText('\n\n1');
 
     this.bt_evolveLoaded.enable();
-    if(LOADED_POPULATION[2]){
-    this.bt_evolveFromGenome.enable();
-    this.bt_test.enable();
-    this.bt_resetGenome.enable();
+    this.bt_save.enable();
+    if (LOADED_POPULATION[2]) {
+      this.bt_evolveFromGenome.enable();
+      this.bt_test.enable();
+      this.bt_resetGenome.enable();
     }
     this.bt_evolveCurrentGenome.enable();
     this.bt_testCurrent.enable();
