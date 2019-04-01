@@ -19,7 +19,10 @@ class Menu extends Phaser.Scene {
     this.lineHeight = 0;
 
     // Ranking position of the selected genome of current generation
-    this.selectedGenome = 1;
+    this.selectedGenome = parseInt(localStorage.getItem('selectedIndex'));
+    if(!this.selectedGenome){
+      this.selectedGenome = 1;
+    }
   }
 
   create() {
@@ -318,7 +321,35 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        this.savePopulation();
+        this.saveElement(LOADED_POPULATION, 'population.JSON');
+      },
+      t
+    );
+
+    this.bt_testCurrent.on(
+      'pointerup',
+      function() {
+        this.clean();
+        localStorage.setItem('selectedIndex', t.selectedGenome);
+        this.scene.start('test', { network: LOADED_POPULATION[1][t.selectedGenome - 1] });
+      },
+      t
+    );
+
+    this.bt_saveCurrentGenome.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.saveElement(LOADED_POPULATION[1][t.selectedGenome - 1], 'genome.JSON');
+      },
+      t
+    );
+
+    this.bt_saveBest.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.saveElement(LOADED_POPULATION[3], 'bestGenome.JSON');
       },
       t
     );
@@ -338,13 +369,13 @@ class Menu extends Phaser.Scene {
     reader.readAsText(files[0]);
   }
 
-  savePopulation(){
-    const blob = new Blob([ JSON.stringify(LOADED_POPULATION) ], {
+  saveElement(element, fileName){
+    const blob = new Blob([ JSON.stringify(element) ], {
       type: 'text/plain'
     });
 
     let anchor = document.createElement('a');
-    anchor.download = 'population.JSON';
+    anchor.download = fileName;
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
     anchor.dataset.downloadurl = [ 'text/plain', anchor.download, anchor.href ].join(':');
     anchor.click();
@@ -361,7 +392,7 @@ class Menu extends Phaser.Scene {
 
     this.data_txt2.setText(`\n${bestHiddenNeurons}\n${maxScore}`);
     this.data_txt3.setText(`\n${selectedHiddenNeurons}`);
-    this.data_ranking.setText('\n\n1');
+    this.data_ranking.setText(`\n\n${this.selectedGenome}`);
 
     this.bt_evolveLoaded.enable();
     this.bt_save.enable();
