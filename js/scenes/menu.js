@@ -234,6 +234,7 @@ class Menu extends Phaser.Scene {
     bt_genome_plus.property = property;
     bt_genome_plus.callback = function(value) {
       label.setText(`\n\n${value}`);
+      localStorage.setItem('selectedIndex', value);
     }.bind(this);
   }
 
