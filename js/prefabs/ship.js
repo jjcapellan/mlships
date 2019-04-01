@@ -3,14 +3,14 @@ class Ship extends Phaser.Physics.Arcade.Image {
     super(scene, x, y, texture);
     this.scene = scene;
     scene.physics.world.enable(this);
-    this.x = 400;
-    this.y = 300;
+    this.x = this.scene.game.config.width / 2;
+    this.y = this.scene.game.config.height / 2;
+    // physics properties adjusted to the time scale
     this.realSpeed = GLOBALS.SHIP_SPEED * GLOBALS.SIMULATION_SPEED;
     this.realAngularSpeed = GLOBALS.SHIP_ANGULAR_SP * GLOBALS.SIMULATION_SPEED;
     // inputs and outputs of the neural network
     this.inputs;
     this.outputs;
-
     // possible actions
     this.actions = {
       left: false,
@@ -25,8 +25,9 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.body.setCircle(bodyRadius, -bodyRadius + 0.5 * this.width, -bodyRadius + 0.5 * this.height);
     this.reset();
   }
-
+  
   setBrain(brain) {
+    // neural network
     this.brain = brain;
     this.brain.score = 0;
   }
@@ -35,7 +36,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.brain.score = score;
   }
 
-  update(time, delta) {
+  update() {
     // Takes data
     this.inputs = this.captureData();
     // Process data in the neural network
@@ -43,7 +44,6 @@ class Ship extends Phaser.Physics.Arcade.Image {
     // Sets the actions
     this.actions.left = this.outputs[0] > 0.5 && this.outputs[0] >= this.outputs[1];
     this.actions.right = this.outputs[1] > 0.5 && this.outputs[1] > this.outputs[0];
-
     // Executes the actions
     if (this.actions.left) {
       this.body.setAngularVelocity(-this.realAngularSpeed);
@@ -87,7 +87,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
     // Takes data of asteroids
     for (let i = 0; i < GLOBALS.OBSTACLES_AMOUNT; i++) {
-      let asteroid = this.scene.meteors.getChildren()[i];
+      let asteroid = this.scene.asteroids.getChildren()[i];
       // The ship is wrapped to the screen so for each obstacle there is a "gosth obstacle"
       // What X and Y are closest?
       let ast_x = asteroid.x;

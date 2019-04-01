@@ -40,7 +40,7 @@ class Evolve extends Phaser.Scene {
   create() {
     let t = this;
 
-    //// Rectangles to spawn the meteors
+    //// Rectangles to spawn the asteroids
     this.innerRectangle = new Phaser.Geom.Rectangle(0, 0, this.game.config.width, this.game.config.height);
     this.outerRectangle = new Phaser.Geom.Rectangle(
       -this.spawn_margin,
@@ -69,19 +69,19 @@ class Evolve extends Phaser.Scene {
       ship.setBrain(this.iaManager.neat.population[i]);
     }
 
-    //// Meteors
-    this.meteors = this.physics.add.group();
-    this.meteors.createMultiple({
-      classType: Meteor,
+    //// Asteorids
+    this.asteroids = this.physics.add.group();
+    this.asteroids.createMultiple({
+      classType: Asteroid,
       key: 'asteroid',
       repeat: GLOBALS.OBSTACLES_AMOUNT - 1
     });
-    this.meteors.children.iterate(function(meteor) {
-      meteor.init(t.innerRectangle, t.outerRectangle, t.targetRectangle);
+    this.asteroids.children.iterate(function(asteroid) {
+      asteroid.init(t.innerRectangle, t.outerRectangle, t.targetRectangle);
     }, t);
 
     // Collider
-    this.physics.add.collider(this.ships, this.meteors, this.collision, undefined, this);
+    this.physics.add.collider(this.ships, this.asteroids, this.collision, undefined, this);
 
     // Back button
     this.bt_back = this.add.existing(new ButtonGenerator(this, 700, 40, 'BACK', GLOBALS.BUTTON_CONFIG)).setOrigin(0);
@@ -115,14 +115,14 @@ class Evolve extends Phaser.Scene {
         ship.update(time, delta);
       }
     }, t);
-    this.checkMeteors();
+    this.checkAsteroids();
   }
 
-  checkMeteors() {
+  checkAsteroids() {
     let t = this;
-    this.meteors.children.iterate(function(meteor) {
-      if (!Phaser.Geom.Rectangle.ContainsPoint(t.outerRectangle, meteor.body.position)) {
-        meteor.reset();
+    this.asteroids.children.iterate(function(asteroid) {
+      if (!Phaser.Geom.Rectangle.ContainsPoint(t.outerRectangle, asteroid.body.position)) {
+        asteroid.reset();
       }
     });
   }
@@ -142,7 +142,7 @@ class Evolve extends Phaser.Scene {
     return {genX: bmt1.x, scoreX: bmt2.x, timeX: bmt4.x, maxX: bmt3.x, dataLabelsY: dataLabelsY};
   }
 
-  collision(ship, meteor) {
+  collision(ship, asteroid) {
     let t = this;
     let collisionTime = performance.now();
     let shipScore = Math.round((collisionTime - this.startTime) / 1000) * GLOBALS.SIMULATION_SPEED;
@@ -198,9 +198,9 @@ class Evolve extends Phaser.Scene {
     // Resets timer
     this.startTime = performance.now();
 
-    // Resets meteors
-    this.meteors.children.iterate(function(meteor) {
-      meteor.reset();
+    // Resets asteroids
+    this.asteroids.children.iterate(function(asteroid) {
+      asteroid.reset();
     }, this);
 
     // Resets ships

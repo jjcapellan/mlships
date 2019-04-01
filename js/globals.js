@@ -1,5 +1,5 @@
 var GLOBALS = {
-  // NEAT algorithm parameters
+  // NEAT algorithm default parameters
   INPUTS_SIZE: 6,
   OUTPUTS_SIZE: 2,
   POPULATION_AMOUNT: 40,
@@ -22,7 +22,7 @@ var GLOBALS = {
   SIXTH_PI11: 11 * (Math.PI / 6),
   QUARTER_PI: Math.PI / 4,
   OCTAVE_PI: Math.PI / 8,
-  // Phaser
+  // Phaser physics
   ASTEROID_SPEED: 70, // px/sec
   SHIP_SPEED: 120, // px/sec
   SHIP_ANGULAR_SP: 300, // turning speed
@@ -49,21 +49,9 @@ function loadData(key, property) {
   }
 }
 
-// Deletes incompatible neural networks
-function cleanObsoleteData(){
-  let nnVersion = localStorage.getItem('nn_version');
-  if(nnVersion != GLOBALS.NN_VERSION){
-    localStorage.setItem('nn_version', GLOBALS.NN_VERSION);
-    localStorage.removeItem('bestNN');
-    localStorage.removeItem('maxScore');
-  }
-}
-
 loadData('population_amount', 'POPULATION_AMOUNT');
 loadData('detection_radius', 'DETECTION_RADIUS');
 loadData('start_hidden_size', 'START_HIDDEN_SIZE');
 loadData('simulation_speed', 'SIMULATION_SPEED');
-
-cleanObsoleteData();
 
 

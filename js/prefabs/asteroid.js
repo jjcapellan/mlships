@@ -1,4 +1,4 @@
-class Meteor extends Phaser.Physics.Arcade.Image {
+class Asteroid extends Phaser.Physics.Arcade.Image {
   constructor(scene, x, y, texture, frame) {
     super(scene, x, y, texture, frame);
     this.scene = scene;
