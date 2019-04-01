@@ -89,7 +89,6 @@ class Evolve extends Phaser.Scene {
     this.bt_back.on(
       'pointerup',
       function() {
-        this.updatePopulation();
         this.scene.start('menu');
       },
       t
@@ -150,6 +149,7 @@ class Evolve extends Phaser.Scene {
           `Prev Generation: ${t.iaManager.neat.generation - 1} Max Score: ${fittest.score} Top max score: ${t.iaManager
             .maxScore}`
         );
+        updatePopulation();
         t.iaManager.neat.mutate();
         t.reset();
       });
