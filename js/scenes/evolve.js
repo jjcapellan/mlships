@@ -16,8 +16,8 @@ class Evolve extends Phaser.Scene {
       this.iaManager = new IAmanager(this);
     }
     // Checks max score
-    if (localStorage.hasOwnProperty('maxScore')) {
-      this.iaManager.maxScore = parseInt(localStorage.getItem('maxScore'));
+    if(LOADED_POPULATION){
+      this.iaManager.maxScore = parseInt(LOADED_POPULATION[2]);
     }
     // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
     this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
@@ -91,16 +91,6 @@ class Evolve extends Phaser.Scene {
       function() {
         this.updatePopulation();
         this.scene.start('menu');
-      },
-      t
-    );
-
-    // Save button
-    this.bt_back = this.add.existing(new ButtonGenerator(this, 700, 560, 'SAVE', GLOBALS.BUTTON_CONFIG)).setOrigin(0,1);
-    this.bt_back.on(
-      'pointerup',
-      function() {
-        this.savePopulation();
       },
       t
     );
@@ -209,22 +199,7 @@ class Evolve extends Phaser.Scene {
     LOADED_POPULATION.push(maxScore);
     LOADED_POPULATION.push(BestGenomeJSON);
 
-  }
-
-  savePopulation(){
-
-    this.updatePopulation();
-
-    const blob = new Blob([ JSON.stringify(LOADED_POPULATION) ], {
-      type: 'text/plain'
-    });
-
-    let anchor = document.createElement('a');
-    anchor.download = 'population.JSON';
-    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
-    anchor.dataset.downloadurl = [ 'text/plain', anchor.download, anchor.href ].join(':');
-    anchor.click();
-  }
+  }  
 
   saveNN(network) {
     let jsonNN = network.toJSON();
