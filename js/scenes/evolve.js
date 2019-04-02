@@ -159,18 +159,19 @@ class Evolve extends Phaser.Scene {
 
     if (this.ships.countActive() == 0) {
       this.score = 0;
+      // Checks for new Top Max Score
+      if(shipScore > t.iaManager.maxScore){ // latest is the best (score == seconds active)
+        t.iaManager.maxScore = shipScore;
+        localStorage.setItem('maxScore', shipScore);
+        t.saveNN(ship.brain);
+        t.maxScore_txt.setText(`${t.iaManager.maxScore}`); 
+      }
+      // Evolve population
       this.iaManager.neat.evolve().then((fittest) => {
-        t.iaManager.actualMaxScore = fittest.maxScore;
-        if (fittest.score > t.iaManager.maxScore) {
-          t.iaManager.maxScore = fittest.score;
-          localStorage.setItem('maxScore', JSON.stringify(fittest.score));
-          t.saveNN(fittest);
-        }
-
-        t.maxScore_txt.setText(`${t.iaManager.maxScore}`);        
+        t.iaManager.actualMaxScore = shipScore;    
 
         console.log(
-          `Prev Generation: ${t.iaManager.neat.generation - 1} Max Score: ${fittest.score} Top max score: ${t.iaManager
+          `Prev Generation: ${t.iaManager.neat.generation - 1} Max Score: ${shipScore} Top max score: ${t.iaManager
             .maxScore}`
         );
         t.updatePopulation();
