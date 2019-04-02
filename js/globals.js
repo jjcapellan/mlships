@@ -49,9 +49,17 @@ function loadData(key, property) {
   }
 }
 
+function loadFloatData(key,property){
+  if (localStorage.hasOwnProperty(key)) {
+    GLOBALS[property] = parseFloat(localStorage.getItem(key));
+  } else {
+    localStorage.setItem(key, GLOBALS[property]);
+  }
+}
+
 loadData('population_amount', 'POPULATION_AMOUNT');
-loadData('mutation_rate','MUTATION_RATE');
-loadData('elitism_percent','ELITISM_PERCENT');
+loadFloatData('mutation_rate','MUTATION_RATE');
+loadFloatData('elitism_percent','ELITISM_PERCENT');
 loadData('detection_radius', 'DETECTION_RADIUS');
 loadData('start_hidden_size', 'START_HIDDEN_SIZE');
 loadData('simulation_speed', 'SIMULATION_SPEED');
