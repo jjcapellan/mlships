@@ -3,72 +3,65 @@ class Configuration extends Phaser.Scene {
     super('configuration');
   }
 
-  create() {
-    let t = this;
-    let centerX = this.game.config.width / 2;
-    let marginTop = 100;
-    let padding = 35;
+  init(){
+    this.marginX = 50;
+    this.marginY = 50;
+    this.paddingY = 16;
+    this.centerX = this.game.config.width / 2; 
+  }
 
-    // Labels
-    this.add.bitmapText(centerX, marginTop, 'bmf', 'POPULATION', 20).setOrigin(0.5);
-    this.add.bitmapText(centerX, marginTop + 2 * padding, 'bmf', 'DETECTION RADIUS', 20).setOrigin(0.5);
-    this.add.bitmapText(centerX, marginTop + 4 * padding, 'bmf', 'START HIDDEN NEURONS', 20).setOrigin(0.5);
-    this.add.bitmapText(centerX, marginTop + 6 * padding, 'bmf', 'SIMULATION SPEED', 20).setOrigin(0.5);
+  create() { 
+    const g = this.add.graphics(); 
+    g.lineStyle(2, 0xffffff, 0.9);
 
-    // Data labels
-    this.lbl_population = this.add
-      .bitmapText(centerX, marginTop + padding, 'bmf', `${GLOBALS.POPULATION_AMOUNT}`, 20)
-      .setOrigin(0.5);
-    this.lbl_detection = this.add
-      .bitmapText(centerX, marginTop + 3 * padding, 'bmf', `${GLOBALS.DETECTION_RADIUS}`, 20)
-      .setOrigin(0.5);
-    this.lbl_hiddenNeurons = this.add
-      .bitmapText(centerX, marginTop + 5 * padding, 'bmf', `${GLOBALS.START_HIDDEN_SIZE}`, 20)
-      .setOrigin(0.5);
-      this.lbl_simulationSpeed = this.add
-      .bitmapText(centerX, marginTop + 7 * padding, 'bmf', `${GLOBALS.SIMULATION_SPEED}`, 20)
-      .setOrigin(0.5);
+    let marginX = this.marginX;
+    let gameWidth = this.game.config.width;
+    let marginTop = this.marginY;
+    
 
-    // Minus buttons
-    this.addMinusButton(centerX - 200, marginTop + padding, 5, 5, 'POPULATION_AMOUNT', this.lbl_population);
-    this.addMinusButton(centerX - 200, marginTop + 3 * padding, 10, 80, 'DETECTION_RADIUS', this.lbl_detection);
-    this.addMinusButton(centerX - 200, marginTop + 5 * padding, 1, 0, 'START_HIDDEN_SIZE', this.lbl_hiddenNeurons);
-    this.addMinusButton(centerX - 200, marginTop + 7 * padding, 1, 1, 'SIMULATION_SPEED', this.lbl_simulationSpeed);
+    let content = {
+      population: 'Number of genomes to evaluate in each generation.',
+      radius: 'Maximum distance perceived by each individual.',
+      hidden: 'More does not allways means better results.',
+      time: '(1x - 10x) High values could affect performance.',
+      mutation: '% of the population that will randomly mutate.',
+      elitism: '% of best genomes that will be preserved to next generation.',
+      obstacles: 'Number of obstacles'
+    }
 
-    // Plus buttons
-    this.addPlusButton(centerX + 200, marginTop + padding, 5, 10000, 'POPULATION_AMOUNT', this.lbl_population);
-    this.addPlusButton(centerX + 200, marginTop + 3 * padding, 10, 8000, 'DETECTION_RADIUS', this.lbl_detection);
-    this.addPlusButton(centerX + 200, marginTop + 5 * padding, 1, 10000, 'START_HIDDEN_SIZE', this.lbl_hiddenNeurons);
-    this.addPlusButton(centerX + 200, marginTop + 7 * padding, 1, 4, 'SIMULATION_SPEED', this.lbl_simulationSpeed);
+    let bmf = this.add.bitmapText(0,0,'bmf','A',20);
+    this.letterWidth = bmf.width;
+    bmf.destroy();
+    
+    //// First Row 1
+    // Title
+    let pop_txt = this.add.bitmapText(marginX, marginTop, 'bmf', 'POPULATION', 20);
+    // Observations
+    let popObs_txt = this.add.bitmapText(marginX, pop_txt.y + pop_txt.height, 'bmf', content.population, 16);
+    // Line
+    g.lineBetween(marginX,popObs_txt.y + popObs_txt.height, gameWidth - marginX, popObs_txt.y + popObs_txt.height);
+    // Dta label
+    let popLabel = this.add.bitmapText(this.game.config.width - marginX, popObs_txt.y + popObs_txt.height - 4, 'bmf', `${GLOBALS.POPULATION_AMOUNT}`, 20)
+      .setOrigin(1,1);
+    // Minus button
+    this.addMinusButton(this.game.config.width - marginX - 8 * this.letterWidth,popLabel.y, 5, 5, 'POPULATION_AMOUNT', popLabel).setOrigin(1);
+    // Plus button
+    this.addPlusButton(this.game.config.width - marginX - 5 * this.letterWidth,popLabel.y, 5, 10000, 'POPULATION_AMOUNT', popLabel).setOrigin(1);
+    // Height of first row
+    this.rowHeight = popObs_txt.y + popObs_txt.height - pop_txt.y + this.paddingY;
 
-    // Restore button
-    this.bt_restore = this.add
-      .existing(new ButtonGenerator(this, centerX, marginTop + 10 * padding, 'RESTORE DEFAULTS', GLOBALS.BUTTON_CONFIG))
-      .setOrigin(0.5);
-    this.bt_restore.on(
-      'pointerup',
-      function() {
-        this.restore();
-      },
-      t
-    );
+    ///// Next rows
+    this.addRow(2, 'MUTATION RATE', content.mutation, GLOBALS.MUTATION_RATE,0.05,0.05,1,'MUTATION_RATE', g);
+    this.addRow(3,'ELITISM',content.elitism, GLOBALS.ELITISM_PERCENT, 0.05,0.05,0.95,'ELITISM_PERCENT',g);
+    this.addRow(4,'START HIDDEN NEURONS',content.hidden, GLOBALS.START_HIDDEN_SIZE,1,0,1000,'START_HIDDEN_SIZE',g);
+    this.addRow(5,'TIME SCALE',content.time,GLOBALS.SIMULATION_SPEED,1,1,10,'SIMULATION_SPEED',g);
+    this.addRow(6,'RADIUS DETECTION',content.radius, GLOBALS.DETECTION_RADIUS,10,80,8000,'DETECTION_RADIUS',g);
+    this.addRow(7,'OBSTACLES',content.radius, GLOBALS.OBSTACLES_AMOUNT,1,1,500, 'OBSTACLES_AMOUNT',g);
 
-    // Back button
-    this.bt_back = this.add
-      .existing(new ButtonGenerator(this, centerX, marginTop + 12 * padding, 'BACK', GLOBALS.BUTTON_CONFIG))
-      .setOrigin(0.5);
-    this.bt_back.on(
-      'pointerup',
-      function() {
-        this.saveData('population_amount', 'POPULATION_AMOUNT');
-        this.saveData('detection_radius', 'DETECTION_RADIUS');
-        this.saveData('start_hidden_size', 'START_HIDDEN_SIZE');
-        this.saveData('simulation_speed', 'SIMULATION_SPEED');
-        this.clean(); // Clean all custom buttons
-        this.scene.start('menu');
-      },
-      t
-    );
+    //// Add footer buttons
+    this.setButtons();
+
+    
   }
 
   addPlusButton(x, y, step, limit, property, label) {
@@ -81,13 +74,14 @@ class Configuration extends Phaser.Scene {
       object: GLOBALS
     };
 
-    let bt_hidden_plus = this.add.existing(new ButtonGenerator(this, x, y, '+', plusButtonConfig)).setOrigin(0, 0.5);
-    bt_hidden_plus.step = step;
-    bt_hidden_plus.limit = limit;
-    bt_hidden_plus.property = property;
-    bt_hidden_plus.callback = function(value) {
+    let button = this.add.existing(new ButtonGenerator(this, x, y, '>', plusButtonConfig)).setOrigin(0, 0.5);
+    button.step = step;
+    button.limit = limit;
+    button.property = property;
+    button.callback = function(value) {
       label.setText(value);
     }.bind(this);
+    return button;
   }
 
   addMinusButton(x, y, step, limit, property, label) {
@@ -100,24 +94,86 @@ class Configuration extends Phaser.Scene {
       object: GLOBALS
     };
 
-    let bt_hidden_plus = this.add.existing(new ButtonGenerator(this, x, y, '-', minusButtonConfig)).setOrigin(0, 0.5);
-    bt_hidden_plus.step = step;
-    bt_hidden_plus.limit = limit;
-    bt_hidden_plus.property = property;
-    bt_hidden_plus.callback = function(value) {
+    let button = this.add.existing(new ButtonGenerator(this, x, y, '<', minusButtonConfig)).setOrigin(0, 0.5);
+    button.step = step;
+    button.limit = limit;
+    button.property = property;
+    button.callback = function(value) {
       label.setText(value);
     }.bind(this);
+    return button;
+  }
+
+  addRow(rowNumber, title, content, label, step, min, max, property, g){
+    const t = this;
+    let x = this.marginX;
+    // Header    
+    let bmf1 = this.add.bitmapText(x, (rowNumber - 1)*this.rowHeight + this.marginY, 'bmf', title, 20);
+    // Observations
+    let bmf2 = this.add.bitmapText(x, bmf1.height + bmf1.y, 'bmf', content, 16);
+    // Line
+    g.lineBetween(x,bmf2.height + bmf2.y, this.game.config.width - x, bmf2.height + bmf2.y);
+    // Data label
+    let dataLabel = this.add.bitmapText(this.game.config.width - x, bmf2.height + bmf2.y - 6, 'bmf', label, 20)
+      .setOrigin(1,1);
+    // Minus button
+    this.addMinusButton(this.game.config.width - x - 8 * this.letterWidth, dataLabel.y, step, min, property, dataLabel).setOrigin(1,1);
+    // Plus button
+    this.addPlusButton(this.game.config.width - x - 5 * this.letterWidth, dataLabel.y, step, max, property, dataLabel).setOrigin(1,1);
+  }
+
+  setButtons(){
+    const t = this;
+    // Restore button
+    this.bt_restore = this.add
+      .existing(new ButtonGenerator(this, this.marginX, this.game.config.height - this.marginY, 'DEFAULTS', GLOBALS.BUTTON_CONFIG))
+      .setOrigin(0.5);
+    this.bt_restore.on(
+      'pointerup',
+      function() {
+        this.restore();
+      },
+      t
+    ).setOrigin(0,1);
+
+    // Back button
+    this.bt_back = this.add
+      .existing(new ButtonGenerator(this, this.game.config.width - this.marginX, this.game.config.height - this.marginY, 'BACK', GLOBALS.BUTTON_CONFIG))
+      .setOrigin(0.5);
+    this.bt_back.on(
+      'pointerup',
+      function() {
+        this.scene.start('menu');
+      },
+      t
+    ).setOrigin(1,1);
+
+    // Save button
+    this.bt_save = this.add
+      .existing(new ButtonGenerator(this, this.centerX, this.game.config.height - this.marginY, 'SAVE', GLOBALS.BUTTON_CONFIG))
+      .setOrigin(0.5);
+    this.bt_save.on(
+      'pointerup',
+      function() {
+        this.saveData('population_amount', 'POPULATION_AMOUNT');
+        this.saveData('mutation_rate','MUTATION_RATE');
+        this.saveData('elitism_percent','ELITISM_PERCENT');
+        this.saveData('detection_radius', 'DETECTION_RADIUS');
+        this.saveData('start_hidden_size', 'START_HIDDEN_SIZE');
+        this.saveData('simulation_speed', 'SIMULATION_SPEED');
+        this.saveData('obstacles_amount', 'OBSTACLES_AMOUNT');
+        this.clean(); // Clean all custom buttons
+        this.scene.start('menu');
+      },
+      t
+    ).setOrigin(0.5,1);
   }
 
   restore() {    
 
     GLOBALS = JSON.parse(JSON.stringify(GLOBALS_BACKUP));
-
-    this.lbl_population.setText(GLOBALS.POPULATION_AMOUNT);
-    this.lbl_detection.setText(GLOBALS.DETECTION_RADIUS);
-    this.lbl_hiddenNeurons.setText(GLOBALS.START_HIDDEN_SIZE);
-    this.lbl_simulationSpeed.setText(GLOBALS.SIMULATION_SPEED);
-  } // end restore()
+    this.scene.restart();
+  }
 
   saveData(key, property) {
     localStorage.setItem(key, GLOBALS[property]);
