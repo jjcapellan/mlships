@@ -29,6 +29,8 @@ class Evolve extends Phaser.Scene {
 
     this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
 
+    this.popSize = this.iaManager.neat.population.length;
+
     // Format
     this.marginX = 50;
     this.marginY = 40;
@@ -166,12 +168,14 @@ class Evolve extends Phaser.Scene {
         t.saveNN(ship.brain);
         t.maxScore_txt.setText(`${t.iaManager.maxScore}`); 
       }
+      // Gets average score
+      let averageScore = this.getAverage();
       // Evolve population
       this.iaManager.neat.evolve().then((fittest) => {
         t.iaManager.actualMaxScore = shipScore;    
 
         console.log(
-          `Prev Generation: ${t.iaManager.neat.generation - 1} Max Score: ${shipScore} Top max score: ${t.iaManager
+          `Prev Generation: ${t.iaManager.neat.generation - 1} Average: ${averageScore} Max: ${shipScore} Top max: ${t.iaManager
             .maxScore}`
         );
         t.updatePopulation();
@@ -184,6 +188,16 @@ class Evolve extends Phaser.Scene {
   updateScore(){
     this.score += GLOBALS.SIMULATION_SPEED * 2; // timer updates each 2 seconds
     this.score_txt.setText(`${this.score}`);
+  }
+
+  getAverage(){
+    let scoreSum = 0;
+
+    this.ships.children.iterate(function(ship){
+      scoreSum += ship.brain.score;
+    },this);
+
+    return Math.round(scoreSum / this.popSize);
   }
 
   reset() {
