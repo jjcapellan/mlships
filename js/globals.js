@@ -2,15 +2,15 @@ var GLOBALS = {
   // NEAT algorithm default parameters
   INPUTS_SIZE: 6,
   OUTPUTS_SIZE: 2,
-  POPULATION_AMOUNT: 40,
-  MUTATION_RATE: 0.1,
+  POPULATION_AMOUNT: 50,
+  MUTATION_RATE: 0.2,
   ELITISM_PERCENT: 0.1,
   PROVENANCE_PERCENT: 0,
-  START_HIDDEN_SIZE: 0,
+  START_HIDDEN_SIZE: 2,
   MUTATION_AMOUNT: 1,
   // Simulation options
-  SIMULATION_SPEED: 1, // 1X 2X 3X 4X times faster
-  DETECTION_RADIUS: 250,
+  SIMULATION_SPEED: 1, // 1X 2X 3X 4X 5X ... 10X times faster
+  DETECTION_RADIUS: 300,
   OBSTACLES_AMOUNT: 12,
   BEST_GEN_STORE_NAME: 'bestNN',
   // Mathematical constants
@@ -50,8 +50,11 @@ function loadData(key, property) {
 }
 
 loadData('population_amount', 'POPULATION_AMOUNT');
+loadData('mutation_rate','MUTATION_RATE');
+loadData('elitism_percent','ELITISM_PERCENT');
 loadData('detection_radius', 'DETECTION_RADIUS');
 loadData('start_hidden_size', 'START_HIDDEN_SIZE');
 loadData('simulation_speed', 'SIMULATION_SPEED');
+loadData('obstacles_amount', 'OBSTACLES_AMOUNT');
 
 
