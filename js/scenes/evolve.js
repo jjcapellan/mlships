@@ -103,11 +103,7 @@ class Evolve extends Phaser.Scene {
     this.maxScore_txt = this.add.bitmapText(t.dataMargins.maxX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.maxScore}`, 16).setOrigin(0.5,0);
 
     // Time event to update score
-    this.time.addEvent({ delay: 2000, callback: t.updateScore, callbackScope: t, loop: true });
-
-
-    // Start evaluation timestamp
-    this.startTime = performance.now();
+    this.time.addEvent({ delay: 1000, callback: t.updateScore, callbackScope: t, loop: true });
   }
 
   update(time, delta) {
@@ -146,8 +142,7 @@ class Evolve extends Phaser.Scene {
 
   collision(ship, asteroid) {
     let t = this;
-    let collisionTime = performance.now();
-    let shipScore = Math.round((collisionTime - this.startTime) / 1000) * GLOBALS.SIMULATION_SPEED;
+    let shipScore = this.score * GLOBALS.SIMULATION_SPEED;
     if (isNaN(shipScore)) {
       shipScore = 0;
     }
@@ -160,7 +155,6 @@ class Evolve extends Phaser.Scene {
     ship.body.setEnable(false);
 
     if (this.ships.countActive() == 0) {
-      this.score = 0;
       // Checks for new Top Max Score
       if(shipScore > t.iaManager.maxScore){ // latest is the best (score == seconds active)
         t.iaManager.maxScore = shipScore;
@@ -186,8 +180,8 @@ class Evolve extends Phaser.Scene {
   } // end collision()
 
   updateScore(){
-    this.score += GLOBALS.SIMULATION_SPEED * 2; // timer updates each 2 seconds
-    this.score_txt.setText(`${this.score}`);
+    this.score++; 
+    this.score_txt.setText(`${this.score * GLOBALS.SIMULATION_SPEED}`);
   }
 
   getAverage(){
@@ -208,10 +202,8 @@ class Evolve extends Phaser.Scene {
     }
 
     // Resets score
+    this.score = 0;
     this.score_txt.setText('0');
-
-    // Resets timer
-    this.startTime = performance.now();
 
     // Resets asteroids
     this.asteroids.children.iterate(function(asteroid) {
