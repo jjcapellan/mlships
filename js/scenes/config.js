@@ -23,7 +23,7 @@ class Configuration extends Phaser.Scene {
       population: 'Number of genomes to evaluate in each generation.',
       radius: 'Maximum distance perceived by each individual.',
       hidden: 'More does not allways means better results.',
-      time: '(1x - 20x) High values could affect performance.',
+      time: '(1x - 5x) High values could affect performance.',
       mutation: '% of the population that will randomly mutate.',
       elitism: '% of best genomes that will be preserved to next generation.',
       obstacles: 'Number of obstacles'
@@ -54,7 +54,7 @@ class Configuration extends Phaser.Scene {
     this.addRow(2, 'MUTATION RATE', content.mutation, GLOBALS.MUTATION_RATE,0.05,0.05,1,'MUTATION_RATE', g);
     this.addRow(3,'ELITISM',content.elitism, GLOBALS.ELITISM_PERCENT, 0.05,0.05,0.95,'ELITISM_PERCENT',g);
     this.addRow(4,'START HIDDEN NEURONS',content.hidden, GLOBALS.START_HIDDEN_SIZE,1,0,1000,'START_HIDDEN_SIZE',g);
-    this.addRow(5,'TIME SCALE',content.time,GLOBALS.SIMULATION_SPEED,1,1,20,'SIMULATION_SPEED',g);
+    this.addRow(5,'TIME SCALE',content.time,GLOBALS.SIMULATION_SPEED,1,1,5,'SIMULATION_SPEED',g);
     this.addRow(6,'RADIUS DETECTION',content.radius, GLOBALS.DETECTION_RADIUS,10,80,8000,'DETECTION_RADIUS',g);
     this.addRow(7,'OBSTACLES',content.radius, GLOBALS.OBSTACLES_AMOUNT,1,1,500, 'OBSTACLES_AMOUNT',g);
 
