@@ -134,7 +134,6 @@ class ButtonGenerator extends Phaser.GameObjects.Image {
         }
       });
       if (this.callback) {
-        console.log('callback');
         this.callback(this.object[this.property]);
       }
     }
@@ -142,6 +141,10 @@ class ButtonGenerator extends Phaser.GameObjects.Image {
 
   increase() {
     this.object[this.property] += this.step;
+    // If the number have decimals
+    if(Math.round(this.object[this.property]) != this.object[this.property]){
+      this.object[this.property] = Math.round(this.object[this.property] * 100) / 100;
+    }
     this.object[this.property] =
       this.object[this.property] > this.limit ? this.limit : this.object[this.property];
     if (this.callback) {
@@ -151,6 +154,10 @@ class ButtonGenerator extends Phaser.GameObjects.Image {
 
   decrease() {
     this.object[this.property] -= this.step;
+    // If the number have decimals
+    if(Math.round(this.object[this.property]) != this.object[this.property]){
+      this.object[this.property] = Math.round(this.object[this.property] * 100) / 100;
+    }
     this.object[this.property] =
       this.object[this.property] < this.limit ? this.limit : this.object[this.property];
     if (this.callback) {
