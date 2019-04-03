@@ -9,7 +9,7 @@ var GLOBALS = {
   START_HIDDEN_SIZE: 2,
   MUTATION_AMOUNT: 1,
   // Simulation options
-  SIMULATION_SPEED: 1, // 1X 2X 3X 4X 5X ... 10X times faster
+  SIMULATION_SPEED: 1, // 1X 2X 3X 4X 5X times faster
   DETECTION_RADIUS: 300,
   OBSTACLES_AMOUNT: 12,
   BEST_GEN_STORE_NAME: 'bestNN',
@@ -23,9 +23,9 @@ var GLOBALS = {
   QUARTER_PI: Math.PI / 4,
   OCTAVE_PI: Math.PI / 8,
   // Phaser physics
-  ASTEROID_SPEED: 70, // px/sec
-  SHIP_SPEED: 120, // px/sec
-  SHIP_ANGULAR_SP: 300, // turning speed
+  ASTEROID_SPEED: 70*3, // px/sec
+  SHIP_SPEED: 120*3, // px/sec
+  SHIP_ANGULAR_SP: 540, // turning speed (grades/sec)
   // Configuration object used in custom class ButtonGenerator
   BUTTON_CONFIG: {
     fontKey: 'bmf',
