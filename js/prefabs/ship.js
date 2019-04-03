@@ -69,6 +69,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.body.setEnable(true);
     this.setActive(true);
     this.setVisible(true);
+    this.setTexture('ship');
     this.body.reset(newX, newY);
   }
 
