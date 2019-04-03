@@ -64,5 +64,6 @@ loadData('detection_radius', 'DETECTION_RADIUS');
 loadData('start_hidden_size', 'START_HIDDEN_SIZE');
 loadData('simulation_speed', 'SIMULATION_SPEED');
 loadData('obstacles_amount', 'OBSTACLES_AMOUNT');
+loadData('inputs_size', 'INPUTS_SIZE');
 
 
