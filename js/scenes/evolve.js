@@ -223,6 +223,10 @@ class Evolve extends Phaser.Scene {
   }
 
   selectShip(pointer,ship){
+    // fontKey is a property of button class
+    if(ship.hasOwnProperty('fontKey')){
+      return;
+    }
     ship.setTexture('selectedShip');
     this.saveNN(ship.brain, 'selectedNetwork');
   }
