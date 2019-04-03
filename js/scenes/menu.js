@@ -48,7 +48,7 @@ class Menu extends Phaser.Scene {
     // Labels
     const text1 = 'POPULATION\n' + 'Number of genomes \n' + 'Current generation \n' + 'Max Score ';
     const text2 = 'BEST GENOME ALL GENS\n' + 'Hidden neurons \n' + 'Score ';
-    const text3 = 'CURRENT GENOMES\n' + 'Hidden neurons \n' + 'Ranking';
+    const text3 = 'SELECTED GENOME\n' + 'Hidden neurons';
     const initialDataTxt1 = '\n' + '0\n' + '0\n' + '0';
     const initialDataTxt2 = '\n' + '0\n' + '0';
     const initialDataTxt3 = '\n' + '0\n';
@@ -58,7 +58,6 @@ class Menu extends Phaser.Scene {
     this.data_txt1 = this.add.bitmapText(t.data1X, t.data1Y, 'bmf', initialDataTxt1, 20);
     this.data_txt2 = this.add.bitmapText(t.data2X, t.data2Y, 'bmf', initialDataTxt2, 20);
     this.data_txt3 = this.add.bitmapText(t.data1X, t.data3Y, 'bmf', initialDataTxt3, 20);
-    this.data_ranking = this.add.bitmapText(t.data1X, t.data3Y, 'bmf', '\n\n1', 20);
 
     this.makeButtons();
     this.setButtonEvents();
@@ -71,10 +70,17 @@ class Menu extends Phaser.Scene {
       this.bt_test.disable();
       this.bt_save.disable();
       this.bt_saveBest.disable();
-      this.bt_saveCurrentGenome.disable();
       this.bt_resetGenome.disable();
+    }
+
+    if (!localStorage.hasOwnProperty('selectedNetwork')) {
+      this.bt_saveCurrentGenome.disable();
       this.bt_evolveCurrentGenome.disable();
       this.bt_testCurrent.disable();
+    } else {
+      this.bt_saveCurrentGenome.enable();
+      this.bt_evolveCurrentGenome.enable();
+      this.bt_testCurrent.enable();
     }
   }
 
@@ -198,51 +204,7 @@ class Menu extends Phaser.Scene {
         )
       )
       .setOrigin(1, 0);
-
-    this.makeAddButton(
-      t.bt_testCurrent.x - 2 * t.bt_testCurrent.width,
-      t.data3Y,
-      1,
-      5000,
-      'selectedGenome',
-      t.data_ranking,
-      '>',
-      'increase'
-    );
-    this.makeAddButton(
-      t.bt_testCurrent.x - 3 * t.bt_testCurrent.width,
-      t.data3Y,
-      1,
-      1,
-      'selectedGenome',
-      t.data_ranking,
-      '<',
-      'decrease'
-    );
   }
-
-  makeAddButton(x, y, step, limit, property, label, caption, control) {
-    const t = this;
-    let ButtonConfig = {
-      fontKey: 'bmf',
-      fontSize: 20,
-      textColor: '0xffffee',
-      buttonColor: '0xffffff',
-      control: control,
-      object: t
-    };
-
-    let bt_genome_plus = this.add.existing(new ButtonGenerator(this, x, y, caption, ButtonConfig)).setOrigin(1, 0);
-    bt_genome_plus.step = step;
-    bt_genome_plus.limit = limit;
-    bt_genome_plus.property = property;
-    bt_genome_plus.callback = function(value) {
-      label.setText(`\n\n${value}`);
-      localStorage.setItem('selectedIndex', value);
-    }.bind(this);
-  }
-
-  makeMinusButton() {}
 
   setButtonEvents() {
     const t = this;
@@ -271,7 +233,7 @@ class Menu extends Phaser.Scene {
       function() {
         this.clean();
         localStorage.setItem('selectedIndex', t.selectedGenome);
-        this.scene.start('test', { network: LOADED_POPULATION[1][t.selectedGenome - 1] });
+        this.scene.start('test', { network: t.getSelected() });
       },
       t
     );
@@ -292,7 +254,7 @@ class Menu extends Phaser.Scene {
     this.bt_evolveCurrentGenome.on(
       'pointerup',
       function() {
-        let NN = neataptic.Network.fromJSON(LOADED_POPULATION[1][t.selectedGenome - 1]);
+        let NN = neataptic.Network.fromJSON(t.getSelected());
         LOADED_POPULATION = null;
         this.clean();
         this.scene.start('evolve', { network: NN });
@@ -334,7 +296,7 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        this.saveElement(LOADED_POPULATION[1][t.selectedGenome - 1], 'genome.JSON');
+        this.saveElement(t.getSelected(), 'genome.JSON');
       },
       t
     );
@@ -388,6 +350,11 @@ class Menu extends Phaser.Scene {
     reader.readAsText(files[0]);
   }
 
+  getSelected() {
+    var selectedNetwork = JSON.parse(localStorage.getItem('selectedNetwork'));
+    return selectedNetwork;
+  }
+
   saveElement(element, fileName) {
     const blob = new Blob([ JSON.stringify(element) ], {
       type: 'text/plain'
@@ -411,22 +378,23 @@ class Menu extends Phaser.Scene {
 
     this.data_txt2.setText(`\n${bestHiddenNeurons}\n${maxScore}`);
     this.data_txt3.setText(`\n${selectedHiddenNeurons}`);
-    this.data_ranking.setText(`\n\n${this.selectedGenome}`);
 
     this.bt_evolveLoaded.enable();
     this.bt_save.enable();
-    if(localStorage.hasOwnProperty(GLOBALS.BEST_GEN_STORE_NAME)){
-    this.bt_saveBest.enable();
+    if (localStorage.hasOwnProperty(GLOBALS.BEST_GEN_STORE_NAME)) {
+      this.bt_saveBest.enable();
     }
-    this.bt_saveCurrentGenome.enable();
 
     if (LOADED_POPULATION[2]) {
       this.bt_evolveFromBest.enable();
       this.bt_test.enable();
       this.bt_resetGenome.enable();
     }
-    this.bt_evolveCurrentGenome.enable();
-    this.bt_testCurrent.enable();
+    if (localStorage.hasOwnProperty('selectedNetwork')) {
+      this.bt_evolveCurrentGenome.enable();
+      this.bt_testCurrent.enable();
+      this.bt_saveCurrentGenome.enable();
+    }
   }
 
   clean() {
