@@ -23,9 +23,9 @@ var GLOBALS = {
   QUARTER_PI: Math.PI / 4,
   OCTAVE_PI: Math.PI / 8,
   // Phaser physics
-  ASTEROID_SPEED: 70*3, // px/sec
-  SHIP_SPEED: 120*3, // px/sec
-  SHIP_ANGULAR_SP: 540, // turning speed (grades/sec)
+  ASTEROID_SPEED: 70*2, // px/sec
+  SHIP_SPEED: 120*2, // px/sec
+  SHIP_ANGULAR_SP: 720, // turning speed (grades/sec)
   // Configuration object used in custom class ButtonGenerator
   BUTTON_CONFIG: {
     fontKey: 'bmf',
