@@ -23,6 +23,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.setOrigin(0.5);
     this.body.setMaxVelocity(this.realSpeed);
     this.body.setCircle(bodyRadius, -bodyRadius + 0.5 * this.width, -bodyRadius + 0.5 * this.height);
+    this.setInteractive();
     this.reset();
   }
   
