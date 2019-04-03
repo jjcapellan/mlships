@@ -104,6 +104,9 @@ class Evolve extends Phaser.Scene {
 
     // Time event to update score
     this.time.addEvent({ delay: 1000, callback: t.updateScore, callbackScope: t, loop: true, timeScale: GLOBALS.SIMULATION_SPEED });
+
+    // Input event
+    this.input.on('gameobjectdown', this.selectShip, this);
   }
 
   update(time, delta) {
@@ -159,7 +162,7 @@ class Evolve extends Phaser.Scene {
       if(shipScore > t.iaManager.maxScore){ // latest is the best (score == seconds active)
         t.iaManager.maxScore = shipScore;
         localStorage.setItem('maxScore', shipScore);
-        t.saveNN(ship.brain);
+        t.saveNN(ship.brain, GLOBALS.BEST_GEN_STORE_NAME);
         t.maxScore_txt.setText(`${t.iaManager.maxScore}`); 
       }
       // Gets average score
@@ -219,6 +222,11 @@ class Evolve extends Phaser.Scene {
     this.gen_txt.setText(`${this.iaManager.neat.generation}`);
   }
 
+  selectShip(pointer,ship){
+    ship.setTexture('selectedShip');
+    this.saveNN(ship.brain, 'selectedNetwork');
+  }
+
   updatePopulation(){
     LOADED_POPULATION = [];
     // Best Genome
@@ -240,8 +248,8 @@ class Evolve extends Phaser.Scene {
 
   }  
 
-  saveNN(network) {
+  saveNN(network, key) {
     let jsonNN = network.toJSON();
-    localStorage.setItem(GLOBALS.BEST_GEN_STORE_NAME, JSON.stringify(jsonNN));
+    localStorage.setItem(key, JSON.stringify(jsonNN));
   }
 }
