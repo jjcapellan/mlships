@@ -12,7 +12,7 @@ class IAmanager {
     this.population = population;
     if(!network){
       console.log('no network');
-      this.network = new Architect.Random(6, GLOBALS.START_HIDDEN_SIZE, 2);
+      this.network = new Architect.Random(GLOBALS.INPUTS_SIZE, GLOBALS.START_HIDDEN_SIZE, 2);
     }
     
     this.init();
