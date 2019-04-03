@@ -89,13 +89,12 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.body.setEnable(true);
     this.setActive(true);
     this.setVisible(true);
-    this.setTexture('ship');
     this.body.reset(newX, newY);
   }
 
   /**
    * Makes the array with the inputs. The arround space to the ship is divided in zones. Each zone represents a sensor.
-   * The sensors sets the value of its input.
+   * The sensors sets the value of its inputs.
    * If a sensor is active, then returns the normalized distance to the obstacle, else 1 (DETECTION_RADIUS normalized).
    * @return {numer[]} Inputs for the network. Array of numbers between 0 and 1.
    * @memberof Ship

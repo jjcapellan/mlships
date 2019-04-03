@@ -99,7 +99,7 @@ class Evolve extends Phaser.Scene {
     // Pause button
     this.bt_pause = this.add
       .existing(new ButtonGenerator(this, 700 - 20, 40, 'II', GLOBALS.BUTTON_CONFIG))
-      .setOrigin(1,0);
+      .setOrigin(1, 0);
     this.bt_pause.on(
       'pointerup',
       function() {
@@ -130,6 +130,10 @@ class Evolve extends Phaser.Scene {
     this.maxScore_txt = this.add
       .bitmapText(t.dataMargins.maxX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.maxScore}`, 16)
       .setOrigin(0.5, 0);
+    this.selected_txt = this.add
+      .bitmapText(this.game.config.width / 2, this.game.config.height / 2, 'bmf', 'NEURAL NETWORK SELECTED', 26)
+      .setOrigin(0.5)
+      .setVisible(false);
 
     // Time event to update score
     this.time.addEvent({
@@ -270,6 +274,11 @@ class Evolve extends Phaser.Scene {
     }
     ship.setTexture('selectedShip');
     this.saveNN(ship.brain, 'selectedNetwork');
+    this.selected_txt.setVisible(true);
+    setTimeout(function(){
+      this.selected_txt.setVisible(false);
+      ship.setTexture('ship');
+    }.bind(this), 1500);
   }
 
   updatePopulation() {
