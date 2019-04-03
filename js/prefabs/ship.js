@@ -9,8 +9,10 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.realSpeed = GLOBALS.SHIP_SPEED * GLOBALS.SIMULATION_SPEED;
     this.realAngularSpeed = GLOBALS.SHIP_ANGULAR_SP * GLOBALS.SIMULATION_SPEED;
     // inputs and outputs of the neural network
-    this.inputs;
-    this.outputs;
+    this.inputs = [];
+    this.outputs = [];
+    // sensors angles
+    this.sensorAngles = [];
     // possible actions
     this.actions = {
       left: false,
@@ -24,9 +26,10 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.body.setMaxVelocity(this.realSpeed);
     this.body.setCircle(bodyRadius, -bodyRadius + 0.5 * this.width, -bodyRadius + 0.5 * this.height);
     this.setInteractive();
+    this.initAngles(GLOBALS.INPUTS_SIZE - 1);
     this.reset();
   }
-  
+
   setBrain(brain) {
     // neural network
     this.brain = brain;
@@ -35,6 +38,25 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
   setScore(score) {
     this.brain.score = score;
+  }
+
+  initArray(length) {
+    let array = [];
+    //[1,1,...,1]
+    for (let i = 0; i < length; i++) {
+      array.push(1);
+    }
+    return array;
+  }
+
+  initAngles(length) {
+    let angle = 0;
+    let sensorStep = Phaser.Math.PI2 / GLOBALS.INPUTS_SIZE;
+    for (let i = 0; i < length; i++) {
+      angle += sensorStep;
+      this.sensorAngles.push(angle);
+    }
+    this.sensorAngles.push(Phaser.Math.PI2);
   }
 
   update() {
@@ -53,10 +75,8 @@ class Ship extends Phaser.Physics.Arcade.Image {
     } else {
       this.body.setAngularVelocity(0);
     }
-
     // Constant velocity
     this.scene.physics.velocityFromRotation(this.rotation, this.realSpeed, this.body.velocity);
-
     this.scene.physics.world.wrap(this);
   }
 
@@ -74,16 +94,16 @@ class Ship extends Phaser.Physics.Arcade.Image {
   }
 
   /**
-   * Makes the array with the inputs:
-   * 6 sensors: front, front/right, front/left, back, back/right, back/left
+   * Makes the array with the inputs. The arround space to the ship is divided in zones. Each zone represents a sensor.
+   * The sensors sets the value of its input.
    * If a sensor is active, then returns the normalized distance to the obstacle, else 1 (DETECTION_RADIUS normalized).
    * @return {numer[]} Inputs for the network. Array of numbers between 0 and 1.
    * @memberof Ship
    */
   captureData() {
     let t = this;
-    // Initial value of sensors
-    let inputs = [ 1, 1, 1, 1, 1, 1 ];
+    // Initial value of sensors [1,1,1, ...,1]
+    let inputs = this.initArray(GLOBALS.INPUTS_SIZE);
 
     let shipAngle = this.rotation; // In radians. Valid because in this case angle of velocity = this.rotation
 
@@ -119,64 +139,15 @@ class Ship extends Phaser.Physics.Arcade.Image {
 
       distance = this.normalizePixels(distance, GLOBALS.DETECTION_RADIUS, 0);
 
-      if (angleShipAsteroid < Math.PI) {
-        // F - F/R
-        if(angleShipAsteroid < GLOBALS.HALF_PI){
-          if(angleShipAsteroid < GLOBALS.SIXTH_PI){
-            // Sensor Front
-        if (distance < inputs[0]) {
-          inputs[0] = distance;
-        }
-          } else {
-            // Sensor Front/Right
-        if (distance < inputs[1]) {
-          inputs[1] = distance;
-        }
+      let angles = this.sensorAngles.length;
+      for (let i = 0; i < angles; i++) {
+        if (angleShipAsteroid < this.sensorAngles[i]) {
+          if (distance < inputs[i]) {
+            inputs[i] = distance;
+            break;
           }
-          // B - B/R
-        } else {
-          if(angleShipAsteroid < GLOBALS.SIXTH_PI5){
-            // Sensor Back/Right
-            if (distance < inputs[4]) {
-              inputs[4] = distance;
-            }
-          } else {
-            // Sensor Back
-            if (distance < inputs[3]) {
-              inputs[3] = distance;
-            }
-          }
-        } // end if else (angleShipAsteroid < GLOBALS.HALF_PI)
-        
-      } else {
-        // B - B/L
-        if(angleShipAsteroid < GLOBALS.HALF_PI3){
-          if(angleShipAsteroid < GLOBALS.SIXTH_PI7){
-            // Sensor Back
-            if (distance < inputs[3]) {
-              inputs[3] = distance;
-            }
-          } else {
-            // Sensor Back/Left
-            if (distance < inputs[5]) {
-              inputs[5] = distance;
-            }
-          }
-          // F - F/L
-        } else {
-          if(angleShipAsteroid < GLOBALS.SIXTH_PI11){
-            // Sensor Front/Left
-        if (distance < inputs[2]) {
-          inputs[2] = distance;
         }
-          } else {
-            // Sensor Front
-        if (distance < inputs[0]) {
-          inputs[0] = distance;
-        }
-          }
-        } // end if else (angleShipAsteroid < GLOBALS.HALF_PI3)
-      } // end if else (angleShipAsteroid < Math.PI)
+      }
     } // end for
 
     return inputs;
