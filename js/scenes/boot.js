@@ -20,6 +20,17 @@ class Boot extends Phaser.Scene {
     graphics.fillPath();
     graphics.generateTexture('ship', 30, 20);
 
+    // Selected ship
+    graphics.clear();
+    graphics.fillStyle(0xffffff, 1);
+    graphics.beginPath();
+    graphics.moveTo(0, 0);
+    graphics.lineTo(30, 10);
+    graphics.lineTo(0, 20);
+    graphics.lineTo(0, 0);
+    graphics.fillPath();
+    graphics.generateTexture('selectedShip', 30, 20);
+
     // Generates "asteroid" texture(30*30)
     graphics.clear();
     graphics.fillStyle(0xff0000, 1);
