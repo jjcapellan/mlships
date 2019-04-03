@@ -103,7 +103,7 @@ class Evolve extends Phaser.Scene {
     this.maxScore_txt = this.add.bitmapText(t.dataMargins.maxX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.maxScore}`, 16).setOrigin(0.5,0);
 
     // Time event to update score
-    this.time.addEvent({ delay: 1000, callback: t.updateScore, callbackScope: t, loop: true });
+    this.time.addEvent({ delay: 1000, callback: t.updateScore, callbackScope: t, loop: true, timeScale: GLOBALS.SIMULATION_SPEED });
   }
 
   update(time, delta) {
@@ -142,7 +142,7 @@ class Evolve extends Phaser.Scene {
 
   collision(ship, asteroid) {
     let t = this;
-    let shipScore = this.score * GLOBALS.SIMULATION_SPEED;
+    let shipScore = this.score;
     if (isNaN(shipScore)) {
       shipScore = 0;
     }
@@ -181,7 +181,7 @@ class Evolve extends Phaser.Scene {
 
   updateScore(){
     this.score++; 
-    this.score_txt.setText(`${this.score * GLOBALS.SIMULATION_SPEED}`);
+    this.score_txt.setText(`${this.score}`);
   }
 
   getAverage(){

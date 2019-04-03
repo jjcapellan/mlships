@@ -83,18 +83,14 @@ class Test extends Phaser.Scene {
         this.scene.start('menu');
       },
       t
-    );
+    ); 
 
     
-
-    // Start evaluation timestamp
-    this.startTime = performance.now();
-
     // Time event to show inputs/outputs of this neural network
     this.time.addEvent({ delay: 1000, callback: t.showNN, callbackScope: t, loop: true });
 
     // Time event to update score
-    this.time.addEvent({ delay: 2000, callback: t.updateScore, callbackScope: t, loop: true });
+    this.time.addEvent({ delay: 1000, callback: t.updateScore, callbackScope: t, loop: true, timeScale: GLOBALS.SIMULATION_SPEED });
   }
 
   update(time, delta) {
@@ -126,8 +122,7 @@ class Test extends Phaser.Scene {
 
   collision(ship, asteroid) {
     let t = this;
-    let collisionTime = performance.now();
-    let shipScore = Math.round((collisionTime - this.startTime) / 1000) * GLOBALS.SIMULATION_SPEED;
+    let shipScore = this.score;
     if (isNaN(shipScore)) {
       shipScore = 0;
     }
@@ -141,15 +136,13 @@ class Test extends Phaser.Scene {
   } // end collision()
 
   updateScore(){
-    this.score += GLOBALS.SIMULATION_SPEED * 2; // timer updates each 2 seconds
+    this.score++;
     this.score_txt.setText(`${this.score}`);
   }
 
   reset() {
     this.score = 0;
     this.score_txt.setText(`${this.score}`);
-    // Resets timer
-    this.startTime = performance.now();
 
     // Resets asteroids
     this.asteroids.children.iterate(function(asteroid) {
