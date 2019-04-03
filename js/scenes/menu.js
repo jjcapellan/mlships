@@ -17,12 +17,6 @@ class Menu extends Phaser.Scene {
     this.data2Y = 0;
     this.data3Y = 0;
     this.lineHeight = 0;
-
-    // Ranking position of the selected genome of current generation
-    this.selectedGenome = parseInt(localStorage.getItem('selectedIndex'));
-    if (!this.selectedGenome) {
-      this.selectedGenome = 1;
-    }
   }
 
   create() {
@@ -51,7 +45,9 @@ class Menu extends Phaser.Scene {
     const text3 = 'SELECTED GENOME\n' + 'Hidden neurons';
     const initialDataTxt1 = '\n' + '0\n' + '0\n' + '0';
     const initialDataTxt2 = '\n' + '0\n' + '0';
-    const initialDataTxt3 = '\n' + '0\n';
+    const initialDataTxt3 = localStorage.hasOwnProperty('selectedNetwork')
+      ? `\n${JSON.parse(localStorage.getItem('selectedNetwork')).nodes.length - GLOBALS.INPUTS_SIZE}`
+      : '\n0';
     this.secondLineY = this.setLabels(t.marginX, t.marginY + 2 * t.lineHeight + t.paddingY, text1, text2, text3, g);
 
     // Data labels
@@ -344,7 +340,6 @@ class Menu extends Phaser.Scene {
       const txtPopulation = this.result;
       //array --> [Ngeneration, neuralNetwork[], maxScore, bestGenome]
       LOADED_POPULATION = JSON.parse(txtPopulation);
-      t.selectedGenome = 1;
       t.showPopulationData();
     };
     reader.readAsText(files[0]);
@@ -374,7 +369,9 @@ class Menu extends Phaser.Scene {
     this.data_txt1.setText(`\n${populationSize}\n${generation}\n${maxScore}`);
 
     let bestHiddenNeurons = LOADED_POPULATION[3].nodes.length - GLOBALS.INPUTS_SIZE;
-    let selectedHiddenNeurons = LOADED_POPULATION[1][this.selectedGenome - 1].nodes.length - GLOBALS.INPUTS_SIZE;
+    let selectedHiddenNeurons = localStorage.hasOwnProperty('selectedNetwork')
+      ? JSON.parse(localStorage.getItem('selectedNetwork')).nodes.length - GLOBALS.INPUTS_SIZE
+      : 0;
 
     this.data_txt2.setText(`\n${bestHiddenNeurons}\n${maxScore}`);
     this.data_txt3.setText(`\n${selectedHiddenNeurons}`);
