@@ -8,7 +8,7 @@ class Evolve extends Phaser.Scene {
     if (data.network) {
       console.log('Using loaded network');
       this.iaManager = new IAmanager(this, data.network);
-    } else if(data.population){
+    } else if (data.population) {
       console.log('Using loaded population');
       this.iaManager = new IAmanager(this, null, data.population);
     } else {
@@ -16,7 +16,7 @@ class Evolve extends Phaser.Scene {
       this.iaManager = new IAmanager(this);
     }
     // Checks max score
-    if(LOADED_POPULATION){
+    if (LOADED_POPULATION) {
       this.iaManager.maxScore = parseInt(LOADED_POPULATION[2]);
     }
     // Sets score
@@ -30,6 +30,7 @@ class Evolve extends Phaser.Scene {
     this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
 
     this.popSize = this.iaManager.neat.population.length;
+    this.isPaused = false;
 
     // Format
     this.marginX = 50;
@@ -95,15 +96,49 @@ class Evolve extends Phaser.Scene {
       t
     );
 
+    // Pause button
+    this.bt_pause = this.add
+      .existing(new ButtonGenerator(this, 700 - 20, 40, 'II', GLOBALS.BUTTON_CONFIG))
+      .setOrigin(1,0);
+    this.bt_pause.on(
+      'pointerup',
+      function() {
+        if (!this.isPaused) {
+          this.time.paused = true;
+          this.physics.pause();
+          this.isPaused = true;
+        } else {
+          this.time.paused = false;
+          this.physics.resume();
+          this.isPaused = false;
+        }
+      },
+      t
+    );
+
     // Labels
     this.dataMargins = this.setLabels();
-    this.gen_txt = this.add.bitmapText(t.dataMargins.genX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.neat.generation}`, 16).setOrigin(0.5,0);
-    this.score_txt = this.add.bitmapText(t.dataMargins.scoreX, t.dataMargins.dataLabelsY, 'bmf', `0`, 16).setOrigin(0.5,0);
-    this.timeScale_txt = this.add.bitmapText(t.dataMargins.timeX, t.dataMargins.dataLabelsY, 'bmf', `${GLOBALS.SIMULATION_SPEED}X`, 16).setOrigin(0.5,0);
-    this.maxScore_txt = this.add.bitmapText(t.dataMargins.maxX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.maxScore}`, 16).setOrigin(0.5,0);
+    this.gen_txt = this.add
+      .bitmapText(t.dataMargins.genX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.neat.generation}`, 16)
+      .setOrigin(0.5, 0);
+    this.score_txt = this.add
+      .bitmapText(t.dataMargins.scoreX, t.dataMargins.dataLabelsY, 'bmf', `0`, 16)
+      .setOrigin(0.5, 0);
+    this.timeScale_txt = this.add
+      .bitmapText(t.dataMargins.timeX, t.dataMargins.dataLabelsY, 'bmf', `${GLOBALS.SIMULATION_SPEED}X`, 16)
+      .setOrigin(0.5, 0);
+    this.maxScore_txt = this.add
+      .bitmapText(t.dataMargins.maxX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.maxScore}`, 16)
+      .setOrigin(0.5, 0);
 
     // Time event to update score
-    this.time.addEvent({ delay: 1000, callback: t.updateScore, callbackScope: t, loop: true, timeScale: GLOBALS.SIMULATION_SPEED });
+    this.time.addEvent({
+      delay: 1000,
+      callback: t.updateScore,
+      callbackScope: t,
+      loop: true,
+      timeScale: GLOBALS.SIMULATION_SPEED
+    });
 
     // Input event
     this.input.on('gameobjectdown', this.selectShip, this);
@@ -128,19 +163,25 @@ class Evolve extends Phaser.Scene {
     });
   }
 
-  setLabels(){
+  setLabels() {
     const t = this;
-    let bmt1 = this.add.bitmapText(this.marginX, this.marginY,'bmf',`GENERATION`,16).setOrigin(0.5,0);
+    let bmt1 = this.add.bitmapText(this.marginX, this.marginY, 'bmf', `GENERATION`, 16).setOrigin(0.5, 0);
     bmt1.x = bmt1.x + bmt1.width / 2;
-    let bmt2 = this.add.bitmapText( (bmt1.x + bmt1.width/2) + this.padding, this.marginY,'bmf',`SCORE`,16).setOrigin(0.5,0);
+    let bmt2 = this.add
+      .bitmapText(bmt1.x + bmt1.width / 2 + this.padding, this.marginY, 'bmf', `SCORE`, 16)
+      .setOrigin(0.5, 0);
     bmt2.x = bmt2.x + bmt2.width / 2;
-    let bmt4 = this.add.bitmapText( (bmt2.x + bmt2.width/2) + this.padding, this.marginY,'bmf',`TIME SCALE`,16).setOrigin(0.5,0);
+    let bmt4 = this.add
+      .bitmapText(bmt2.x + bmt2.width / 2 + this.padding, this.marginY, 'bmf', `TIME SCALE`, 16)
+      .setOrigin(0.5, 0);
     bmt4.x = bmt4.x + bmt4.width / 2;
-    let bmt3 = this.add.bitmapText((bmt4.x + bmt4.width/2) + this.padding, this.marginY,'bmf',`MAX SCORE`,16).setOrigin(0.5,0);
+    let bmt3 = this.add
+      .bitmapText(bmt4.x + bmt4.width / 2 + this.padding, this.marginY, 'bmf', `MAX SCORE`, 16)
+      .setOrigin(0.5, 0);
     bmt3.x = bmt3.x + bmt3.width / 2;
     let dataLabelsY = bmt1.y + bmt1.height + this.paddingY;
 
-    return {genX: bmt1.x, scoreX: bmt2.x, timeX: bmt4.x, maxX: bmt3.x, dataLabelsY: dataLabelsY};
+    return { genX: bmt1.x, scoreX: bmt2.x, timeX: bmt4.x, maxX: bmt3.x, dataLabelsY: dataLabelsY };
   }
 
   collision(ship, asteroid) {
@@ -150,7 +191,6 @@ class Evolve extends Phaser.Scene {
       shipScore = 0;
     }
     ship.setScore(shipScore);
-    
 
     ship.setActive(false);
     ship.setVisible(false);
@@ -159,21 +199,22 @@ class Evolve extends Phaser.Scene {
 
     if (this.ships.countActive() == 0) {
       // Checks for new Top Max Score
-      if(shipScore > t.iaManager.maxScore){ // latest is the best (score == seconds active)
+      if (shipScore > t.iaManager.maxScore) {
+        // latest is the best (score == seconds active)
         t.iaManager.maxScore = shipScore;
         localStorage.setItem('maxScore', shipScore);
         t.saveNN(ship.brain, GLOBALS.BEST_GEN_STORE_NAME);
-        t.maxScore_txt.setText(`${t.iaManager.maxScore}`); 
+        t.maxScore_txt.setText(`${t.iaManager.maxScore}`);
       }
       // Gets average score
       let averageScore = this.getAverage();
       // Evolve population
       this.iaManager.neat.evolve().then((fittest) => {
-        t.iaManager.actualMaxScore = shipScore;    
+        t.iaManager.actualMaxScore = shipScore;
 
         console.log(
-          `Prev Generation: ${t.iaManager.neat.generation - 1} Average: ${averageScore} Max: ${shipScore} Top max: ${t.iaManager
-            .maxScore}`
+          `Prev Generation: ${t.iaManager.neat.generation - 1} Average: ${averageScore} Max: ${shipScore} Top max: ${t
+            .iaManager.maxScore}`
         );
         t.updatePopulation();
         t.iaManager.neat.mutate();
@@ -182,17 +223,17 @@ class Evolve extends Phaser.Scene {
     }
   } // end collision()
 
-  updateScore(){
-    this.score++; 
+  updateScore() {
+    this.score++;
     this.score_txt.setText(`${this.score}`);
   }
 
-  getAverage(){
+  getAverage() {
     let scoreSum = 0;
 
-    this.ships.children.iterate(function(ship){
+    this.ships.children.iterate(function(ship) {
       scoreSum += ship.brain.score;
-    },this);
+    }, this);
 
     return Math.round(scoreSum / this.popSize);
   }
@@ -222,21 +263,21 @@ class Evolve extends Phaser.Scene {
     this.gen_txt.setText(`${this.iaManager.neat.generation}`);
   }
 
-  selectShip(pointer,ship){
+  selectShip(pointer, ship) {
     // fontKey is a property of button class
-    if(ship.hasOwnProperty('fontKey')){
+    if (ship.hasOwnProperty('fontKey')) {
       return;
     }
     ship.setTexture('selectedShip');
     this.saveNN(ship.brain, 'selectedNetwork');
   }
 
-  updatePopulation(){
+  updatePopulation() {
     LOADED_POPULATION = [];
     // Best Genome
     let BestGenomeJSON = JSON.parse(localStorage.getItem(GLOBALS.BEST_GEN_STORE_NAME));
 
-    // Networks array 
+    // Networks array
     let populationJSON = this.iaManager.neat.export();
 
     // Generation
@@ -249,8 +290,7 @@ class Evolve extends Phaser.Scene {
     LOADED_POPULATION.push(populationJSON);
     LOADED_POPULATION.push(maxScore);
     LOADED_POPULATION.push(BestGenomeJSON);
-
-  }  
+  }
 
   saveNN(network, key) {
     let jsonNN = network.toJSON();
