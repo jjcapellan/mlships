@@ -18,8 +18,11 @@ class IAmanager {
     this.init();
   }
 
+  
+
   init() {
     let t = this;
+    Methods.selection.TOP.percentage = 0.1;
     this.neat = new neataptic.Neat(6, 2, null, {
       mutation: [
         Methods.mutation.ADD_NODE,
@@ -37,6 +40,7 @@ class IAmanager {
         Methods.mutation.SUB_BACK_CONN
       ],
       popsize: t.size,
+      selection: Methods.selection.TOP,
       mutationRate: GLOBALS.MUTATION_RATE,
       mutationAmount: GLOBALS.MUTATION_AMOUNT,
       equal: true,
