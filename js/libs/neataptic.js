@@ -1,3 +1,8 @@
+/**
+ * Little portions of this Neatapyic code modified by Juan José Capellán.
+ */
+
+
 /*!
  * The MIT License (MIT)
  * 
@@ -2904,7 +2909,7 @@ Neat.prototype = {
       }
       copy.score = undefined;
       this.population.push(copy);
-    }
+    }    
   },
 
   /**
@@ -3080,6 +3085,17 @@ Neat.prototype = {
 
         var index = Math.floor(Math.pow(Math.random(), this.selection.power) * this.population.length);
         return this.population[index];
+      /* Begin code modification */
+      case selection.TOP:
+      if(this.population.length > 3){
+        if (this.population[0].score < this.population[1].score || this.population[1].score < this.population[2].score || this.population[2].score < this.population[3].score){
+          this.sort();
+        }
+      }
+      var maxIndex = Math.floor(this.population.length * this.selection.percentage);
+      var selectedIndex = Math.floor(Math.random()*maxIndex);
+      return this.population[selectedIndex];
+      /* End code modification */
       case selection.FITNESS_PROPORTIONATE:
         // As negative fitnesses are possible
         // https://stackoverflow.com/questions/16186686/genetic-algorithm-handling-negative-fitness-values
@@ -3338,7 +3354,11 @@ var selection = {
     name: 'TOURNAMENT',
     size: 5,
     probability: 0.5
-  }
+  }/* Begin code modification */,
+  TOP: {
+    name: 'TOP',
+    percentage: 0.3
+  }/* End code modification */
 };
 
 /* Export */
