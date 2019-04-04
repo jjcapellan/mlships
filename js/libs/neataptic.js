@@ -2863,8 +2863,11 @@ function Neat (input, output, fitness, options) {
   this.popsize = options.popsize || 50;
   this.elitism = options.elitism || 0;
   this.provenance = options.provenance || 0;
+  /*cm*/
+  this.randomGenomes = options.randomGenomes || 0;
+  /*/cm*/
   this.mutationRate = options.mutationRate || 0.3;
-  this.mutationAmount = options.mutationAmount || 1;
+  this.mutationAmount = options.mutationAmount || 1;  
 
   this.fitnessPopulation = options.fitnessPopulation || false;
 
@@ -2941,8 +2944,15 @@ Neat.prototype = {
       newPopulation.push(Network.fromJSON(this.template.toJSON()));
     }
 
+    /*cm*/
+    // Random genomes
+    for(i = 0; i < this.randomGenomes; i++){
+      newPopulation.push(new Network(this.input, this.output));
+    }
+    /*/cm*/
+
     // Breed the next individuals
-    for (i = 0; i < this.popsize - this.elitism - this.provenance; i++) {
+    for (i = 0; i < this.popsize - this.elitism - this.provenance /*cm*/- this.randomGenomes/*/cm*/; i++) {
       newPopulation.push(this.getOffspring());
     }
 
@@ -3085,7 +3095,7 @@ Neat.prototype = {
 
         var index = Math.floor(Math.pow(Math.random(), this.selection.power) * this.population.length);
         return this.population[index];
-      /* Begin code modification */
+      /*cm*/
       case selection.TOP:
       if(this.population.length > 3){
         if (this.population[0].score < this.population[1].score || this.population[1].score < this.population[2].score || this.population[2].score < this.population[3].score){
@@ -3095,7 +3105,7 @@ Neat.prototype = {
       var maxIndex = Math.floor(this.population.length * this.selection.percentage);
       var selectedIndex = Math.floor(Math.random()*maxIndex);
       return this.population[selectedIndex];
-      /* End code modification */
+      /*/cm*/
       case selection.FITNESS_PROPORTIONATE:
         // As negative fitnesses are possible
         // https://stackoverflow.com/questions/16186686/genetic-algorithm-handling-negative-fitness-values
@@ -3354,11 +3364,11 @@ var selection = {
     name: 'TOURNAMENT',
     size: 5,
     probability: 0.5
-  }/* Begin code modification */,
+  }/*cm*/,
   TOP: {
     name: 'TOP',
     percentage: 0.3
-  }/* End code modification */
+  }/*/cm*/
 };
 
 /* Export */
