@@ -243,7 +243,7 @@ class Menu extends Phaser.Scene {
         this.setInputs();
         LOADED_POPULATION = null;
         this.clean();
-        this.scene.start('evolve', { network: NN });
+        this.scene.start('evolve', { network: NN, population: null });
       },
       t
     );
@@ -254,7 +254,7 @@ class Menu extends Phaser.Scene {
         let NN = neataptic.Network.fromJSON(t.getSelected());
         LOADED_POPULATION = null;
         this.clean();
-        this.scene.start('evolve', { network: NN });
+        this.scene.start('evolve', { network: NN, population: null });
       },
       t
     );
@@ -264,8 +264,8 @@ class Menu extends Phaser.Scene {
       function() {
         LOADED_POPULATION = null;
         console.log('bt_evolve');
-        this.clean();        
-        this.scene.start('evolve');
+        this.clean();
+        this.scene.start('evolve', {});
       },
       t
     );
@@ -274,8 +274,8 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        this.setInputs();    
-        this.scene.start('evolve', { population: LOADED_POPULATION });
+        this.setInputs();
+        this.scene.start('evolve', { network: null, population: LOADED_POPULATION });
       },
       t
     );
@@ -366,7 +366,7 @@ class Menu extends Phaser.Scene {
     anchor.click();
   }
 
-  setInputs(){
+  setInputs() {
     GLOBALS.INPUTS_SIZE = LOADED_POPULATION[3].input;
   }
 
