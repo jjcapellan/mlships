@@ -11,17 +11,6 @@ class Boot extends Phaser.Scene {
     // Generates "ship" texture(30*20)
     let graphics = this.add.graphics();
     graphics.setVisible(false);
-    graphics.fillStyle(0x00ff00, 1);
-    graphics.beginPath();
-    graphics.moveTo(0, 0);
-    graphics.lineTo(30, 10);
-    graphics.lineTo(0, 20);
-    graphics.lineTo(0, 0);
-    graphics.fillPath();
-    graphics.generateTexture('ship', 30, 20);
-
-    // Selected ship
-    graphics.clear();
     graphics.fillStyle(0xffffff, 1);
     graphics.beginPath();
     graphics.moveTo(0, 0);
@@ -29,7 +18,7 @@ class Boot extends Phaser.Scene {
     graphics.lineTo(0, 20);
     graphics.lineTo(0, 0);
     graphics.fillPath();
-    graphics.generateTexture('selectedShip', 30, 20);
+    graphics.generateTexture('ship', 30, 20);
 
     // Generates "asteroid" texture(30*30)
     graphics.clear();

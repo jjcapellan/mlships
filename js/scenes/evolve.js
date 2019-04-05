@@ -41,7 +41,7 @@ class Evolve extends Phaser.Scene {
   }
 
   create() {
-    let t = this;
+    let t = this;    
 
     //// Rectangles to spawn the asteroids
     this.innerRectangle = new Phaser.Geom.Rectangle(0, 0, this.game.config.width, this.game.config.height);
@@ -66,10 +66,13 @@ class Evolve extends Phaser.Scene {
       repeat: this.iaManager.neat.population.length - 1,
       runChildUpdate: true
     });
+    let color = new Phaser.Display.Color();
     for (let i = 0; i < this.ships.getChildren().length; i++) {
       let ship = this.ships.getChildren()[i];
+      let shipColor = color.random(100,255).color;
       ship.init();
       ship.setBrain(this.iaManager.neat.population[i]);
+      ship.setTint(shipColor);
     }
 
     //// Asteorids
@@ -272,12 +275,10 @@ class Evolve extends Phaser.Scene {
     if (ship.hasOwnProperty('fontKey')) {
       return;
     }
-    ship.setTexture('selectedShip');
     this.saveNN(ship.brain, 'selectedNetwork');
     this.selected_txt.setVisible(true);
     setTimeout(function(){
       this.selected_txt.setVisible(false);
-      ship.setTexture('ship');
     }.bind(this), 1500);
   }
 

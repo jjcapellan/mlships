@@ -5,6 +5,7 @@ class Ship extends Phaser.Physics.Arcade.Image {
     scene.physics.world.enable(this);
     this.x = this.scene.game.config.width / 2;
     this.y = this.scene.game.config.height / 2;
+    this.tintFill = true;
     // physics properties adjusted to the time scale
     this.realSpeed = GLOBALS.SHIP_SPEED * GLOBALS.SIMULATION_SPEED;
     this.realAngularSpeed = GLOBALS.SHIP_ANGULAR_SP * GLOBALS.SIMULATION_SPEED;
