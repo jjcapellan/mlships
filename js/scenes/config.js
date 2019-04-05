@@ -73,7 +73,7 @@ class Configuration extends Phaser.Scene {
 
     ///// Next rows
     this.addRow(2, 'MUTATION RATE', content.mutation, GLOBALS.MUTATION_RATE, 0.05, 0.05, 1, 'MUTATION_RATE', g);
-    this.addRow(3, 'ELITISM', content.elitism, GLOBALS.ELITISM_PERCENT, 0.05, 0.05, 0.95, 'ELITISM_PERCENT', g);
+    this.addRow(3, 'ELITISM', content.elitism, GLOBALS.ELITISM_PERCENT, 0.05, 0, 0.95, 'ELITISM_PERCENT', g);
     this.addRow(
       4,
       'START HIDDEN NEURONS',
