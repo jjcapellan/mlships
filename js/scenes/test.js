@@ -154,11 +154,12 @@ class Test extends Phaser.Scene {
   }
 
   showNN() {
-    let o1 = this.ship.outputs[0].toFixed(3);
-    let o2 = this.ship.outputs[1].toFixed(3);
+    let o1 = this.ship.outputs[0];
+    let o2 = this.ship.outputs[1];
+    let str = this.arrayToString(this.ship.inputs);
 
     this.info_txt.setText(
-      `Inputs-> ${this.arrayToString(this.ship.inputs)}\nOutputs-> L: ${o1}  R: ${o2}`
+      `Inputs-> ${str}\nOutputs-> L: ${o1}  R: ${o2}`
     );
   }
 
