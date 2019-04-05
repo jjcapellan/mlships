@@ -2949,9 +2949,11 @@ Neat.prototype = {
     }
 
     /*cm*/
-    // Random genomes
+    // Offspring of random genomes and existing genomes
     for(i = 0; i < this.randomGenomes; i++){
-      newPopulation.push(neataptic.architect.Random(this.input, this.startHiddenNodes, this.output));
+      var parent1 = neataptic.architect.Random(this.input, this.startHiddenNodes, this.output);
+      var parent2 = this.getParent();
+      newPopulation.push(Network.crossOver(parent1, parent2, this.equal));
     }
     /*/cm*/
 
