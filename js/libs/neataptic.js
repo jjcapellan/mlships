@@ -2865,6 +2865,7 @@ function Neat (input, output, fitness, options) {
   this.provenance = options.provenance || 0;
   /*cm*/
   this.randomGenomes = options.randomGenomes || 0;
+  this.startHiddenNodes = options.startHiddenNodes || 0;
   /*/cm*/
   this.mutationRate = options.mutationRate || 0.3;
   this.mutationAmount = options.mutationAmount || 1;  
@@ -2908,7 +2909,10 @@ Neat.prototype = {
       if (this.template) {        
         copy = Network.fromJSON(network.toJSON());
       } else {
-        copy = new Network(this.input, this.output);
+        //copy = new Network(this.input, this.output);
+        /*cm*/
+        copy = neataptic.architect.Random(this.input, this.startHiddenNodes, this.output);
+        /*/cm*/
       }
       copy.score = undefined;
       this.population.push(copy);
@@ -2947,7 +2951,7 @@ Neat.prototype = {
     /*cm*/
     // Random genomes
     for(i = 0; i < this.randomGenomes; i++){
-      newPopulation.push(new Network(this.input, this.output));
+      newPopulation.push(neataptic.architect.Random(this.input, this.startHiddenNodes, this.output));
     }
     /*/cm*/
 
