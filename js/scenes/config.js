@@ -5,9 +5,11 @@ class Configuration extends Phaser.Scene {
 
   init() {
     this.marginX = 50;
-    this.marginY = 30;
+    this.buttonsMarginY = 30;
+    this.marginY = this.game.config.height + this.buttonsMarginY;
     this.paddingY = 16;
     this.centerX = this.game.config.width / 2;
+    this.maxScroll = 900; // change on last row
   }
 
   create() {
@@ -92,6 +94,29 @@ class Configuration extends Phaser.Scene {
 
     //// Add footer buttons
     this.setButtons();
+
+    //// Camera to make the vertical scroll
+    let optionsScroll = this.cameras.add(
+      0,
+      0,
+      this.game.config.width,
+      this.game.config.height - this.marginY - this.paddingY - 60
+    );
+    optionsScroll.setBackgroundColor(0x000000);
+    optionsScroll.transparent = false;
+    optionsScroll.scrollY = this.game.config.height;
+
+    this.input.on(
+      'pointermove',
+      function(pointer) {
+        if (pointer.primaryDown) {
+          optionsScroll.scrollY -= pointer.position.y - pointer.prevPosition.y;
+          optionsScroll.scrollY = Math.max(this.game.config.height, optionsScroll.scrollY);
+          optionsScroll.scrollY = Math.min(this.maxScroll, optionsScroll.scrollY);
+        }
+      },
+      this
+    );
   }
 
   addPlusButton(x, y, step, limit, property, label) {
@@ -169,18 +194,17 @@ class Configuration extends Phaser.Scene {
 
   setButtons() {
     const t = this;
+
     // Restore button
-    this.bt_restore = this.add
-      .existing(
-        new ButtonGenerator(
-          this,
-          this.marginX,
-          this.game.config.height - this.marginY,
-          'DEFAULTS',
-          GLOBALS.BUTTON_CONFIG
-        )
+    this.bt_restore = this.add.existing(
+      new ButtonGenerator(
+        this,
+        this.marginX,
+        this.game.config.height - this.buttonsMarginY,
+        'DEFAULTS',
+        GLOBALS.BUTTON_CONFIG
       )
-      .setOrigin(0.5);
+    );
     this.bt_restore
       .on(
         'pointerup',
@@ -197,7 +221,7 @@ class Configuration extends Phaser.Scene {
         new ButtonGenerator(
           this,
           this.game.config.width - this.marginX,
-          this.game.config.height - this.marginY,
+          this.game.config.height - this.buttonsMarginY,
           'BACK',
           GLOBALS.BUTTON_CONFIG
         )
@@ -216,7 +240,13 @@ class Configuration extends Phaser.Scene {
     // Save button
     this.bt_save = this.add
       .existing(
-        new ButtonGenerator(this, this.centerX, this.game.config.height - this.marginY, 'SAVE', GLOBALS.BUTTON_CONFIG)
+        new ButtonGenerator(
+          this,
+          this.centerX,
+          this.game.config.height - this.buttonsMarginY,
+          'SAVE',
+          GLOBALS.BUTTON_CONFIG
+        )
       )
       .setOrigin(0.5);
     this.bt_save
