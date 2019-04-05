@@ -9,12 +9,7 @@ class IAmanager {
     this.scene = scene;
     this.network = network;
     this.size = GLOBALS.POPULATION_AMOUNT;
-    this.population = population;
-    if(!network){
-      console.log('no network');
-      this.network = new Architect.Random(GLOBALS.INPUTS_SIZE, GLOBALS.START_HIDDEN_SIZE, 2);
-    }
-    
+    this.population = population;    
     this.init();
   }
 
@@ -22,8 +17,8 @@ class IAmanager {
 
   init() {
     let t = this;
-    Methods.selection.TOP.percentage = 0.1;
-    this.neat = new neataptic.Neat(6, 2, null, {
+    Methods.selection.TOP.percentage = 0.3;
+    this.neat = new neataptic.Neat(GLOBALS.INPUTS_SIZE, 2, null, {
       mutation: [
         Methods.mutation.ADD_NODE,
         Methods.mutation.SUB_NODE,
@@ -41,6 +36,7 @@ class IAmanager {
       ],
       popsize: t.size,
       selection: Methods.selection.TOP,
+      randomGenomes: 10,
       mutationRate: GLOBALS.MUTATION_RATE,
       mutationAmount: GLOBALS.MUTATION_AMOUNT,
       equal: true,
