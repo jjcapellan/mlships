@@ -17,7 +17,7 @@ class IAmanager {
 
   init() {
     let t = this;
-    Methods.selection.TOP.percentage = 0.3;
+    Methods.selection.TOP.percentage = GLOBALS.TOP_PERCENTAGE;
     this.neat = new neataptic.Neat(GLOBALS.INPUTS_SIZE, 2, null, {
       mutation: [
         Methods.mutation.ADD_NODE,
@@ -36,12 +36,12 @@ class IAmanager {
       ],
       popsize: t.size,
       selection: Methods.selection.TOP,
-      randomGenomes: 10,
+      randomGenomes: Math.floor(GLOBALS.RANDOM_PERCENT * t.size),
       mutationRate: GLOBALS.MUTATION_RATE,
       mutationAmount: GLOBALS.MUTATION_AMOUNT,
       equal: true,
-      provenance: Math.round(GLOBALS.PROVENANCE_PERCENT * t.size),
-      elitism: Math.round(GLOBALS.ELITISM_PERCENT * t.size),
+      provenance: Math.floor(GLOBALS.PROVENANCE_PERCENT * t.size),
+      elitism: Math.floor(GLOBALS.ELITISM_PERCENT * t.size),
       network: t.network
     });
 

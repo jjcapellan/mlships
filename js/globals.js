@@ -4,14 +4,16 @@ var GLOBALS = {
   OUTPUTS_SIZE: 2,
   POPULATION_AMOUNT: 50,
   MUTATION_RATE: 0.3,
-  ELITISM_PERCENT: 0.2,
+  ELITISM_PERCENT: 0.1,
+  TOP_PERCENTAGE: 0.3,
+  RANDOM_PERCENT: 0.2, 
   PROVENANCE_PERCENT: 0,
   START_HIDDEN_SIZE: 2,
   MUTATION_AMOUNT: 1,
   // Simulation options
   SIMULATION_SPEED: 1, // 1X 2X 3X 4X 5X times faster
-  DETECTION_RADIUS: 300,
-  OBSTACLES_AMOUNT: 12,
+  DETECTION_RADIUS: 250,
+  OBSTACLES_AMOUNT: 8,
   BEST_GEN_STORE_NAME: 'bestNN',
   // Mathematical constants
   HALF_PI: Math.PI / 2,
@@ -65,5 +67,7 @@ loadData('start_hidden_size', 'START_HIDDEN_SIZE');
 loadData('simulation_speed', 'SIMULATION_SPEED');
 loadData('obstacles_amount', 'OBSTACLES_AMOUNT');
 loadData('inputs_size', 'INPUTS_SIZE');
+loadFloatData('top_percentage', 'TOP_PERCENTAGE');
+loadFloatData('random_percent', 'RANDOM_PERCENT');
 
 

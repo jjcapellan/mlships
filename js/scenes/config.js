@@ -23,12 +23,17 @@ class Configuration extends Phaser.Scene {
     let content = {
       population: 'Number of genomes to evaluate in each generation.',
       radius: 'Maximum distance perceived by each individual.',
-      hidden: 'More does not allways means better results.',
-      time: '(1x - 5x) High values could affect performance.',
+      hidden: 'They increase the abstraction capacity of the neural network.\n'+
+      'More does not allways means better results.',
+      time: '(1x - 5x) High values could affect to simulation accuracy.',
       mutation: '% of the population that will randomly mutate.',
       elitism: '% of best genomes that will be preserved to next generation.',
       obstacles: 'Number of obstacles',
-      sensors: 'Areas around the ship where the data is collected.'
+      sensors: 'Areas around the ship where the data is collected.',
+      topPercentage: '% of the population that is selected to be parents after\n'+
+      'ordering them by score from best to worst.',
+      randomGenomes: '% of the future population which will be the result of the\n'+
+      'crossing of existing genomes with new random genomes.'
     };
 
     let bmf = this.add.bitmapText(0, 0, 'bmf', 'A', 20);
@@ -87,10 +92,12 @@ class Configuration extends Phaser.Scene {
       'START_HIDDEN_SIZE',
       g
     );
-    this.addRow(5, 'TIME SCALE', content.time, GLOBALS.SIMULATION_SPEED, 1, 1, 5, 'SIMULATION_SPEED', g);
-    this.addRow(6, 'RADIUS DETECTION', content.radius, GLOBALS.DETECTION_RADIUS, 10, 80, 8000, 'DETECTION_RADIUS', g);
-    this.addRow(7, 'OBSTACLES', content.radius, GLOBALS.OBSTACLES_AMOUNT, 1, 1, 500, 'OBSTACLES_AMOUNT', g);
-    this.addRow(8, 'SENSORS', content.sensors, GLOBALS.INPUTS_SIZE, 1, 2, 100, 'INPUTS_SIZE', g);
+    this.addRow(6, 'TOP PERCENTAGE', content.topPercentage, GLOBALS.TOP_PERCENTAGE, 0.05, 0.05, 0.9, 'TOP_PERCENTAGE', g);
+    this.addRow(8, 'RANDOM PARENTS', content.randomGenomes, GLOBALS.RANDOM_PERCENT, 0.05, 0, 1, 'RANDOM_PERCENT', g);
+    this.addRow(10, 'TIME SCALE', content.time, GLOBALS.SIMULATION_SPEED, 1, 1, 5, 'SIMULATION_SPEED', g);
+    this.addRow(11, 'RADIUS DETECTION', content.radius, GLOBALS.DETECTION_RADIUS, 10, 80, 8000, 'DETECTION_RADIUS', g);
+    this.addRow(12, 'OBSTACLES', content.obstacles, GLOBALS.OBSTACLES_AMOUNT, 1, 1, 500, 'OBSTACLES_AMOUNT', g);
+    this.addRow(13, 'SENSORS', content.sensors, GLOBALS.INPUTS_SIZE, 1, 2, 100, 'INPUTS_SIZE', g);
 
     //// Add footer buttons
     this.setButtons();
@@ -100,7 +107,7 @@ class Configuration extends Phaser.Scene {
       0,
       0,
       this.game.config.width,
-      this.game.config.height - this.marginY - this.paddingY - 60
+      this.game.config.height - 90// - this.buttonMarginY - this.paddingY - 60
     );
     optionsScroll.setBackgroundColor(0x000000);
     optionsScroll.transparent = false;
@@ -261,6 +268,8 @@ class Configuration extends Phaser.Scene {
           this.saveData('simulation_speed', 'SIMULATION_SPEED');
           this.saveData('obstacles_amount', 'OBSTACLES_AMOUNT');
           this.saveData('inputs_size', 'INPUTS_SIZE');
+          this.saveData('top_percentage', 'TOP_PERCENTAGE');
+          this.saveData('random_percent', 'RANDOM_PERCENT');
           this.clean(); // Clean all custom buttons
           this.scene.start('menu');
         },
