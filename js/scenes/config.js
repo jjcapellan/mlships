@@ -259,15 +259,7 @@ class Configuration extends Phaser.Scene {
       .on(
         'pointerup',
         function() {
-          this.saveData('population_amount', 'POPULATION_AMOUNT');
-          this.saveData('mutation_rate', 'MUTATION_RATE');
-          this.saveData('elitism_percent', 'ELITISM_PERCENT');
-          this.saveData('detection_radius', 'DETECTION_RADIUS');
-          this.saveData('start_hidden_size', 'START_HIDDEN_SIZE');
-          this.saveData('obstacles_amount', 'OBSTACLES_AMOUNT');
-          this.saveData('inputs_size', 'INPUTS_SIZE');
-          this.saveData('top_percentage', 'TOP_PERCENTAGE');
-          this.saveData('random_percent', 'RANDOM_PERCENT');
+          this.saveJSONtoStorage(makeConfigObj(), 'configObj');
           this.clean(); // Clean all custom buttons
           this.scene.start('menu');
         },
@@ -281,8 +273,29 @@ class Configuration extends Phaser.Scene {
     this.scene.restart();
   }
 
-  saveData(key, property) {
-    localStorage.setItem(key, GLOBALS[property]);
+  makeConfigObj(){
+    let obj = {
+      POPULATION_AMOUNT: GLOBALS.POPULATION_AMOUNT,
+      MUTATION_RATE: GLOBALS.MUTATION_RATE,
+      MUTATION_AMOUNT: GLOBALS.MUTATION_AMOUNT,
+      ELITISM_PERCENT: GLOBALS.ELITISM_PERCENT,
+      START_HIDDEN_SIZE: GLOBALS.START_HIDDEN_SIZE,
+      TOP_PERCENTAGE: GLOBALS.TOP_PERCENTAGE,
+      RANDOM_PERCENT: GLOBALS.RANDOM_PERCENT,
+      EQUAL: GLOBALS.EQUAL,
+      OBSTACLES_AMOUNT: GLOBALS.OBSTACLES_AMOUNT,
+      DETECTION_RADIUS: GLOBALS.DETECTION_RADIUS,
+      INPUTS_SIZE: GLOBALS.INPUTS_SIZE,
+      OBSTACLE_SPEED: GLOBALS.ASTEROID_SPEED,
+      SHIP_SPEED: GLOBALS.SHIP_SPEED,
+      SHIP_ANGULAR_SP: GLOBALS.SHIP_ANGULAR_SP
+    };
+
+    return obj;
+  }
+
+  saveJSONtoStorage(element, key){
+    localStorage.setItem(key, JSON.stringify(element));
   }
 
   clean() {

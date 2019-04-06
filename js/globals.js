@@ -6,17 +6,18 @@ var GLOBALS = {
   MUTATION_RATE: 0.3,
   ELITISM_PERCENT: 0.1,
   TOP_PERCENTAGE: 0.3,
-  RANDOM_PERCENT: 0.2, 
+  RANDOM_PERCENT: 0.2,
   PROVENANCE_PERCENT: 0,
   START_HIDDEN_SIZE: 2,
   MUTATION_AMOUNT: 1,
+  EQUAL: 1, // boolean 0 or 1
   // Simulation options
   DETECTION_RADIUS: 250,
   OBSTACLES_AMOUNT: 12,
   BEST_GEN_STORE_NAME: 'bestNN',
   // Mathematical constants
   HALF_PI: Math.PI / 2,
-  HALF_PI3: (Math.PI/2) * 3,
+  HALF_PI3: Math.PI / 2 * 3,
   SIXTH_PI: Math.PI / 6,
   SIXTH_PI5: 5 * (Math.PI / 6),
   SIXTH_PI7: 7 * (Math.PI / 6),
@@ -24,8 +25,8 @@ var GLOBALS = {
   QUARTER_PI: Math.PI / 4,
   OCTAVE_PI: Math.PI / 8,
   // Phaser physics
-  ASTEROID_SPEED: 70*2, // px/sec
-  SHIP_SPEED: 120*2, // px/sec
+  ASTEROID_SPEED: 70 * 2, // px/sec
+  SHIP_SPEED: 120 * 2, // px/sec
   SHIP_ANGULAR_SP: 720, // turning speed (grades/sec)
   // Configuration object used in custom class ButtonGenerator
   BUTTON_CONFIG: {
@@ -35,37 +36,32 @@ var GLOBALS = {
     buttonColor: '0xffffff'
   },
   // INFO
-  NN_VERSION: '1' // Must change if network number of inputs or outputs changes. 
+  NN_VERSION: '1' // Must change if network number of inputs or outputs changes.
 };
 
 var GLOBALS_BACKUP = JSON.parse(JSON.stringify(GLOBALS));
 
 var LOADED_POPULATION = null;
 
-function loadData(key, property) {
+function loadJSONfromStorage(key) {
   if (localStorage.hasOwnProperty(key)) {
-    GLOBALS[property] = parseInt(localStorage.getItem(key));
-  } else {
-    localStorage.setItem(key, GLOBALS[property]);
+    let obj = JSON.parse(localStorage.getItem(key));
+    return obj;
+  }
+  return null;
+}
+
+function objToObj(sourceObj, targetObj) {
+  Object.keys(sourceObj).forEach(function(key) {
+    targetObj[key] = sourceObj[key];
+  });
+}
+
+function initData() {
+  let obj = loadJSONfromStorage('configObj');
+  if (obj) {
+    objToObj(obj, GLOBALS);
   }
 }
 
-function loadFloatData(key,property){
-  if (localStorage.hasOwnProperty(key)) {
-    GLOBALS[property] = parseFloat(localStorage.getItem(key));
-  } else {
-    localStorage.setItem(key, GLOBALS[property]);
-  }
-}
-
-loadData('population_amount', 'POPULATION_AMOUNT');
-loadFloatData('mutation_rate','MUTATION_RATE');
-loadFloatData('elitism_percent','ELITISM_PERCENT');
-loadData('detection_radius', 'DETECTION_RADIUS');
-loadData('start_hidden_size', 'START_HIDDEN_SIZE');
-loadData('obstacles_amount', 'OBSTACLES_AMOUNT');
-loadData('inputs_size', 'INPUTS_SIZE');
-loadFloatData('top_percentage', 'TOP_PERCENTAGE');
-loadFloatData('random_percent', 'RANDOM_PERCENT');
-
-
+initData();
