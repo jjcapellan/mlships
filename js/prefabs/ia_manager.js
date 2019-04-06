@@ -9,7 +9,14 @@ class IAmanager {
     this.scene = scene;
     this.network = network;
     this.size = GLOBALS.POPULATION_AMOUNT;
-    this.population = population;    
+    this.population = population;
+    this.inputsSize = GLOBALS.INPUTS_SIZE;
+    if(this.network){
+      this.inputsSize = this.network.input;
+    } else if (this.population){
+      this.inputsSize = this.population[0].input;
+    }
+    console.log(this.inputsSize);
     this.init();
   }
 
@@ -18,7 +25,7 @@ class IAmanager {
   init() {
     let t = this;
     Methods.selection.TOP.percentage = GLOBALS.TOP_PERCENTAGE;
-    this.neat = new neataptic.Neat(GLOBALS.INPUTS_SIZE, 2, null, {
+    this.neat = new neataptic.Neat(this.inputsSize, 2, null, {
       mutation: [
         Methods.mutation.ADD_NODE,
         Methods.mutation.SUB_NODE,
