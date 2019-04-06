@@ -263,7 +263,7 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         LOADED_POPULATION = null;
-        console.log('bt_evolve');
+        this.saveJSONtoStorage(this.makeLearnConditionsObj(),'learnConditions');
         this.clean();
         this.scene.start('evolve', {});
       },
@@ -335,6 +335,19 @@ class Menu extends Phaser.Scene {
     );
   } // end setButtonsEvents()
 
+  makeLearnConditionsObj(){
+    let obj = {
+      OBSTACLES_AMOUNT: GLOBALS.OBSTACLES_AMOUNT,
+      DETECTION_RADIUS: GLOBALS.DETECTION_RADIUS,
+      INPUTS_SIZE: GLOBALS.INPUTS_SIZE,
+      OBSTACLE_SPEED: GLOBALS.ASTEROID_SPEED,
+      SHIP_SPEED: GLOBALS.SHIP_SPEED,
+      SHIP_ANGULAR_SP: GLOBALS.SHIP_ANGULAR_SP
+    };
+
+    return obj;    
+  }
+
   loadPopulation(event) {
     const t = this;
     const files = event.target.files;
@@ -364,6 +377,10 @@ class Menu extends Phaser.Scene {
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
     anchor.dataset.downloadurl = [ 'text/plain', anchor.download, anchor.href ].join(':');
     anchor.click();
+  }
+
+  saveJSONtoStorage(element, key){
+    localStorage.setItem(key, JSON.stringify(element));
   }
 
   setInputs() {
