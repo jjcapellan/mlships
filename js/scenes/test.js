@@ -8,9 +8,19 @@ class Test extends Phaser.Scene {
     // Imports the neural network    
     this.brain = neataptic.Network.fromJSON(data.network);
     // Sets score
-    this.score = 0;
+    this.score = 0;    
 
-    this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
+    this.obstaclesAmount = data.conditions.OBSTACLES_AMOUNT;
+    this.detectionRadius = data.conditions.DETECTION_RADIUS;
+    this.shipSpeed = data.conditions.SHIP_SPEED;
+    this.shipAngularSpeed = data.conditions.SHIP_ANGULAR_SP;
+    this.obstacleSpeed = data.conditions.OBSTACLE_SPEED;
+    this.sensorsAmount = data.conditions.INPUTS_SIZE;
+    console.log(data.conditions);
+
+    this.conditions = data.conditions;
+
+    this.spawn_margin = this.detectionRadius + 60;
 
     // Format
     this.marginX = 50;
@@ -57,6 +67,9 @@ class Test extends Phaser.Scene {
       this.ship = this.add.existing(new Ship(t, 400, 400, 'ship'));
       this.ship.init();
       this.ship.setBrain(this.brain);
+      this.ship.setSpeed(this.shipSpeed);
+      this.ship.setAngularSpeed(this.shipAngularSpeed);
+      this.ship.setInputsAmount(this.sensorsAmount);
     }
 
     //// Asteroids
@@ -64,9 +77,10 @@ class Test extends Phaser.Scene {
     this.asteroids.createMultiple({
       classType: Asteroid,
       key: 'asteroid',
-      repeat: GLOBALS.OBSTACLES_AMOUNT - 1
+      repeat: this.obstaclesAmount - 1
     });
     this.asteroids.children.iterate(function(asteroid) {
+      asteroid.setSpeed(this.obstacleSpeed);
       asteroid.init(t.innerRectangle, t.outerRectangle, t.targetRectangle);
     }, t);
 

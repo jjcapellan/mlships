@@ -46,14 +46,17 @@ class IAmanager {
     });
 
     if(this.population){
-      this.neat.import(t.population[1]);
-      this.neat.generation = parseInt(this.population[0]);
-    }
+      this.neat.import(t.population);
+    }   
 
     
 
     this.maxScore = 0; // Max score of all generations
     this.actualMaxScore = 0; // Max score of last generation
   } // end init()
+
+  setGeneration(value){
+    this.neat.generation = value;
+  }
 
 }

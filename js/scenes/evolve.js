@@ -11,21 +11,30 @@ class Evolve extends Phaser.Scene {
     } else if (data.population) {
       console.log('Using loaded population');
       this.iaManager = new IAmanager(this, null, data.population);
+      this.iaManager.setGeneration(LOADED_POPULATION.generation);
     } else {
       console.log('Using new random population');
       this.iaManager = new IAmanager(this);
     }
     // Checks max score
     if (LOADED_POPULATION) {
-      this.iaManager.maxScore = parseInt(LOADED_POPULATION[2]);
+      this.iaManager.maxScore = LOADED_POPULATION.maxScore;
     }
+
+    // Simulation conditions
+    this.obstaclesAmount = data.conditions.OBSTACLES_AMOUNT;
+    this.detectionRadius = data.conditions.DETECTION_RADIUS;
+    this.shipSpeed = data.conditions.SHIP_SPEED;
+    this.shipAngularSpeed = data.conditions.SHIP_ANGULAR_SP;
+    this.obstacleSpeed = data.conditions.OBSTACLE_SPEED;
+    this.sensorsAmount = data.conditions.INPUTS_SIZE;
+
+    this.conditions = data.conditions;
+
     // Sets score
     this.score = 0;
 
-    // DOM element to save population
-    this.el_inputFile = document.getElementById('inputFile');
-
-    this.spawn_margin = GLOBALS.DETECTION_RADIUS + 60;
+    this.spawn_margin = this.detectionRadius + 60;
 
     this.popSize = this.iaManager.neat.population.length;
     this.isPaused = false;
@@ -36,6 +45,8 @@ class Evolve extends Phaser.Scene {
     this.padding = 26;
     this.paddingY = 6;
     this.dataMargins;
+
+    this.time.paused = false;
   }
 
   create() {
@@ -71,6 +82,9 @@ class Evolve extends Phaser.Scene {
       ship.init();
       ship.setBrain(this.iaManager.neat.population[i]);
       ship.setTint(shipColor);
+      ship.setSpeed(this.shipSpeed);
+      ship.setAngularSpeed(this.shipAngularSpeed);
+      ship.setInputsAmount(this.sensorsAmount);
     }
 
     //// Asteorids
@@ -78,10 +92,11 @@ class Evolve extends Phaser.Scene {
     this.asteroids.createMultiple({
       classType: Asteroid,
       key: 'asteroid',
-      repeat: GLOBALS.OBSTACLES_AMOUNT - 1
+      repeat: this.obstaclesAmount - 1
     });
     this.asteroids.children.iterate(function(asteroid) {
-      asteroid.init(t.innerRectangle, t.outerRectangle, t.targetRectangle);
+      asteroid.setSpeed(this.obstacleSpeed);
+      asteroid.init(t.innerRectangle, t.outerRectangle, t.targetRectangle);      
     }, t);
 
     // Collider
@@ -92,6 +107,9 @@ class Evolve extends Phaser.Scene {
     this.bt_back.on(
       'pointerup',
       function() {
+        if(LOADED_POPULATION){
+          LOADED_POPULATION.learningConditions = this.conditions;
+        }
         this.scene.start('menu');
       },
       t
@@ -144,6 +162,7 @@ class Evolve extends Phaser.Scene {
       loop: true,
       timeScale: 1
     });
+    
 
     // Input event
     this.input.on('gameobjectdown', this.selectShip, this);
@@ -281,7 +300,7 @@ class Evolve extends Phaser.Scene {
   }
 
   updatePopulation() {
-    LOADED_POPULATION = [];
+    LOADED_POPULATION = {};
     // Best Genome
     let BestGenomeJSON = JSON.parse(localStorage.getItem(GLOBALS.BEST_GEN_STORE_NAME));
 
@@ -294,10 +313,10 @@ class Evolve extends Phaser.Scene {
     // Max Score
     let maxScore = this.iaManager.maxScore;
 
-    LOADED_POPULATION.push(generation);
-    LOADED_POPULATION.push(populationJSON);
-    LOADED_POPULATION.push(maxScore);
-    LOADED_POPULATION.push(BestGenomeJSON);
+    LOADED_POPULATION.bestGenome = BestGenomeJSON;
+    LOADED_POPULATION.population = populationJSON;
+    LOADED_POPULATION.generation = generation;
+    LOADED_POPULATION.maxScore = maxScore;
   }
 
   saveNN(network, key) {

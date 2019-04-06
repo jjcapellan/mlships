@@ -219,8 +219,9 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        this.setInputs();
-        this.scene.start('test', { network: LOADED_POPULATION[3] });
+        //this.setInputs();
+        let conditions = LOADED_POPULATION.learningConditions;
+        this.scene.start('test', { network: LOADED_POPULATION.bestGenome, conditions: conditions });
       },
       t
     );
@@ -229,7 +230,8 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        this.scene.start('test', { network: t.getSelected() });
+        let conditions = LOADED_POPULATION.learningConditions;
+        this.scene.start('test', { network: t.getSelected(), conditions: conditions });
       },
       t
     );
@@ -239,11 +241,13 @@ class Menu extends Phaser.Scene {
     this.bt_evolveFromBest.on(
       'pointerup',
       function() {
-        let NN = neataptic.Network.fromJSON(LOADED_POPULATION[3]);
-        this.setInputs();
+        let NN = neataptic.Network.fromJSON(LOADED_POPULATION.bestGenome);
+        //this.setInputs();
+        let conditions = LOADED_POPULATION.learningConditions;
+        this.cleanStoredGens();
         LOADED_POPULATION = null;
         this.clean();
-        this.scene.start('evolve', { network: NN, population: null });
+        this.scene.start('evolve', { network: NN, population: null, conditions: conditions });
       },
       t
     );
@@ -252,9 +256,11 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         let NN = neataptic.Network.fromJSON(t.getSelected());
+        let conditions = LOADED_POPULATION.learningConditions;
+        this.cleanStoredGens();
         LOADED_POPULATION = null;
         this.clean();
-        this.scene.start('evolve', { network: NN, population: null });
+        this.scene.start('evolve', { network: NN, population: null, conditions: conditions });
       },
       t
     );
@@ -263,9 +269,9 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         LOADED_POPULATION = null;
-        this.saveJSONtoStorage(this.makeLearnConditionsObj(),'learnConditions');
+        let conditions = this.makeLearnConditionsObj();
         this.clean();
-        this.scene.start('evolve', {});
+        this.scene.start('evolve', { conditions: conditions });
       },
       t
     );
@@ -274,8 +280,12 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        this.setInputs();
-        this.scene.start('evolve', { network: null, population: LOADED_POPULATION });
+        //this.setInputs();
+        this.scene.start('evolve', {
+          network: null,
+          population: LOADED_POPULATION.population,
+          conditions: LOADED_POPULATION.learningConditions
+        });
       },
       t
     );
@@ -304,7 +314,7 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        this.saveElement(LOADED_POPULATION[3], 'bestGenome.JSON');
+        this.saveElement(LOADED_POPULATION.bestGenome, 'bestGenome.JSON');
       },
       t
     );
@@ -323,7 +333,8 @@ class Menu extends Phaser.Scene {
     this.bt_resetGenome.on(
       'pointerup',
       function() {
-        LOADED_POPULATION[2] = 0;
+        LOADED_POPULATION.bestGenome = null;
+        LOADED_POPULATION.maxScore = 0;
         localStorage.removeItem('maxScore');
         localStorage.removeItem(GLOBALS.BEST_GEN_STORE_NAME);
         t.showPopulationData();
@@ -335,7 +346,7 @@ class Menu extends Phaser.Scene {
     );
   } // end setButtonsEvents()
 
-  makeLearnConditionsObj(){
+  makeLearnConditionsObj() {
     let obj = {
       OBSTACLES_AMOUNT: GLOBALS.OBSTACLES_AMOUNT,
       DETECTION_RADIUS: GLOBALS.DETECTION_RADIUS,
@@ -345,25 +356,28 @@ class Menu extends Phaser.Scene {
       SHIP_ANGULAR_SP: GLOBALS.SHIP_ANGULAR_SP
     };
 
-    return obj;    
+    return obj;
   }
 
   loadPopulation(event) {
     const t = this;
-    const files = event.target.files;
-    const reader = new FileReader();
+    let files = event.target.files;
+    let reader = new FileReader();
     reader.onload = function() {
-      const txtPopulation = this.result;
-      //array --> [Ngeneration, neuralNetwork[], maxScore, bestGenome]
+      let txtPopulation = this.result;
+      // JSON
       LOADED_POPULATION = JSON.parse(txtPopulation);
+      t.cleanStoredGens();
+      console.log(LOADED_POPULATION);
       t.showPopulationData();
+      // This allow "change" event if same file is selected a second time
+      event.target.value = null;
     };
     reader.readAsText(files[0]);
   }
 
   getSelected() {
     var selectedNetwork = JSON.parse(localStorage.getItem('selectedNetwork'));
-    GLOBALS.INPUTS_SIZE = selectedNetwork.input;
     return selectedNetwork;
   }
 
@@ -379,23 +393,26 @@ class Menu extends Phaser.Scene {
     anchor.click();
   }
 
-  saveJSONtoStorage(element, key){
+  saveJSONtoStorage(element, key) {
     localStorage.setItem(key, JSON.stringify(element));
   }
 
-  setInputs() {
+  /*setInputs() {
     GLOBALS.INPUTS_SIZE = LOADED_POPULATION[3].input;
-  }
+  }*/
 
   showPopulationData() {
-    let populationSize = LOADED_POPULATION[1].length;
-    let generation = LOADED_POPULATION[0];
-    let maxScore = LOADED_POPULATION[2];
+    let populationSize = LOADED_POPULATION.population.length;
+    let generation = LOADED_POPULATION.generation;
+    let maxScore = LOADED_POPULATION.maxScore;
     this.data_txt1.setText(`\n${populationSize}\n${generation}\n${maxScore}`);
 
-    let bestHiddenNeurons = LOADED_POPULATION[3].nodes.length - GLOBALS.INPUTS_SIZE;
+    let bestHiddenNeurons = LOADED_POPULATION.bestGenome
+      ? LOADED_POPULATION.bestGenome.nodes.length - LOADED_POPULATION.bestGenome.input - LOADED_POPULATION.bestGenome.output
+      : 0;
     let selectedHiddenNeurons = localStorage.hasOwnProperty('selectedNetwork')
-      ? JSON.parse(localStorage.getItem('selectedNetwork')).nodes.length - GLOBALS.INPUTS_SIZE
+      ? JSON.parse(localStorage.getItem('selectedNetwork')).nodes.length -
+        LOADED_POPULATION.learningConditions.INPUTS_SIZE
       : 0;
 
     this.data_txt2.setText(`\n${bestHiddenNeurons}\n${maxScore}`);
@@ -403,11 +420,11 @@ class Menu extends Phaser.Scene {
 
     this.bt_evolveLoaded.enable();
     this.bt_save.enable();
-    if (localStorage.hasOwnProperty(GLOBALS.BEST_GEN_STORE_NAME)) {
+    if (LOADED_POPULATION.bestGenome) {
       this.bt_saveBest.enable();
     }
 
-    if (LOADED_POPULATION[2]) {
+    if (LOADED_POPULATION.bestGenome) {
       this.bt_evolveFromBest.enable();
       this.bt_test.enable();
       this.bt_resetGenome.enable();
@@ -417,6 +434,11 @@ class Menu extends Phaser.Scene {
       this.bt_testCurrent.enable();
       this.bt_saveCurrentGenome.enable();
     }
+  }
+
+  cleanStoredGens() {
+    localStorage.removeItem('selectedNetwork');
+    localStorage.removeItem(GLOBALS.BEST_GEN_STORE_NAME);
   }
 
   clean() {

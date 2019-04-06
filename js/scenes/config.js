@@ -28,24 +28,25 @@ class Configuration extends Phaser.Scene {
         'this number will change in some genomes.',
       time: '(1x - 5x) High values could affect to simulation accuracy.',
       mutation: '% of the population that will randomly mutate.',
-      mutationAmount: 'If mutation occurs , sets the amount of times the mutation\n'
-      +'will be applied to the network.',
+      mutationAmount:
+        'If mutation occurs , sets the amount of times the mutation\n' + 'will be applied to the network.',
       elitism: '% of best genomes that will be preserved to next generation.',
       obstacles: 'Number of obstacles',
-      sensors: 'Number of sensors. A sensor is a controled area. Each sensor\n'+
-      'provides data to an input. The angle of vision of each sensor\n'+ 
-      'will be 360 / number of sensors.',
+      sensors:
+        'Number of sensors. A sensor is a controled area. Each sensor\n' +
+        'provides data to an input. The angle of vision of each sensor\n' +
+        'will be 360 / number of sensors.',
       topPercentage:
         '% of the population that is selected to be parents after\n' + 'ordering them by score from best to worst.',
       randomGenomes:
         '% of the future population which will be the result of the\n' +
         'crossing of existing genomes with new random genomes.',
-      equal: 'If set to 1, all genomes will be viewed equal during crossover.\n'+
-      'This stimulates more diverse network architectures.',
-      agentSpeed: 'Speed in pixels/second. High speeds require increasing fps of\n'+
-      'the physics engine to avoid tunneling.',
-      angularSpeed: 'Speed in degrees/second, with which the ship will rotate.\n'+
-      'E.g. 360 = 1 turn per second',
+      equal:
+        'If set to 1, all genomes will be viewed equal during crossover.\n' +
+        'This stimulates more diverse network architectures.',
+      agentSpeed:
+        'Speed in pixels/second. High speeds require increasing fps of\n' + 'the physics engine to avoid tunneling.',
+      angularSpeed: 'Speed in degrees/second, with which the ship will rotate.\n' + 'E.g. 360 = 1 turn per second',
       obstacleSpeed: 'Speed in pixels/second of the obstacles'
     };
 
@@ -60,7 +61,7 @@ class Configuration extends Phaser.Scene {
     this.addRow('MUTATION AMOUNT', content.mutationAmount, GLOBALS.MUTATION_AMOUNT, 1, 1, 100, 'MUTATION_AMOUNT', g);
     this.addRow('HIDDEN NEURONS', content.hidden, GLOBALS.START_HIDDEN_SIZE, 1, 0, 1000, 'START_HIDDEN_SIZE', g);
     this.addTitle('SELECTION SETTINGS', g);
-    this.addRow('ELITISM', content.elitism, GLOBALS.ELITISM_PERCENT, 0.05, 0, 0.95, 'ELITISM_PERCENT', g);    
+    this.addRow('ELITISM', content.elitism, GLOBALS.ELITISM_PERCENT, 0.05, 0, 0.95, 'ELITISM_PERCENT', g);
     this.addRow('TOP PERCENTAGE', content.topPercentage, GLOBALS.TOP_PERCENTAGE, 0.05, 0.05, 0.9, 'TOP_PERCENTAGE', g);
     this.addRow('RANDOM PARENTS', content.randomGenomes, GLOBALS.RANDOM_PERCENT, 0.05, 0, 1, 'RANDOM_PERCENT', g);
     this.addRow('EQUAL', content.equal, GLOBALS.EQUAL, 1, 0, 1, 'EQUAL', g);
@@ -71,8 +72,7 @@ class Configuration extends Phaser.Scene {
     this.addRow('SHIP ANGULAR SPEED', content.angularSpeed, GLOBALS.SHIP_ANGULAR_SP, 5, 5, 8000, 'SHIP_ANGULAR_SP', g);
     this.addTitle('OBSTACLES SETTINGS', g);
     this.addRow('OBSTACLES AMOUNT', content.obstacles, GLOBALS.OBSTACLES_AMOUNT, 1, 1, 500, 'OBSTACLES_AMOUNT', g);
-    this.addRow('OBSTACLES SPEED', content.obstacleSpeed, GLOBALS.ASTEROID_SPEED, 10, 10, 1000, 'ASTEROID_SPEED', g);   
-    
+    this.addRow('OBSTACLES SPEED', content.obstacleSpeed, GLOBALS.ASTEROID_SPEED, 10, 10, 1000, 'ASTEROID_SPEED', g);
 
     //// Add footer buttons
     this.setButtons();
@@ -92,7 +92,6 @@ class Configuration extends Phaser.Scene {
 
     // Vertical limit for scroll
     this.maxScroll = this.actualBottomRow - 500;
-
 
     // Pointer event to activate the vertical scroll
     this.input.on(
@@ -188,7 +187,7 @@ class Configuration extends Phaser.Scene {
     this.configProperties.push(property);
   }
 
-  addTitle(title, g){
+  addTitle(title, g) {
     const t = this;
     let x = this.marginX;
     // Title
@@ -272,7 +271,7 @@ class Configuration extends Phaser.Scene {
       .setOrigin(0.5, 1);
   }
 
-  wheelHandler(event){
+  wheelHandler(event) {
     this.camera.scrollY += event.deltaY / 2;
     this.camera.scrollY = Math.max(this.game.config.height, this.camera.scrollY);
     this.camera.scrollY = Math.min(this.maxScroll, this.camera.scrollY);
@@ -285,9 +284,9 @@ class Configuration extends Phaser.Scene {
 
   makeConfigObj() {
     let obj = {};
-    for(let i=0, j = this.configProperties.length; i < j; i++){
+    for (let i = 0, j = this.configProperties.length; i < j; i++) {
       let propertyName = this.configProperties[i];
-      obj[propertyName]= GLOBALS[propertyName];
+      obj[propertyName] = GLOBALS[propertyName];
     }
     return obj;
   }
