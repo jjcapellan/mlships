@@ -94,10 +94,9 @@ class Configuration extends Phaser.Scene {
     );
     this.addRow(6, 'TOP PERCENTAGE', content.topPercentage, GLOBALS.TOP_PERCENTAGE, 0.05, 0.05, 0.9, 'TOP_PERCENTAGE', g);
     this.addRow(8, 'RANDOM PARENTS', content.randomGenomes, GLOBALS.RANDOM_PERCENT, 0.05, 0, 1, 'RANDOM_PERCENT', g);
-    this.addRow(10, 'TIME SCALE', content.time, GLOBALS.SIMULATION_SPEED, 1, 1, 5, 'SIMULATION_SPEED', g);
-    this.addRow(11, 'RADIUS DETECTION', content.radius, GLOBALS.DETECTION_RADIUS, 10, 80, 8000, 'DETECTION_RADIUS', g);
-    this.addRow(12, 'OBSTACLES', content.obstacles, GLOBALS.OBSTACLES_AMOUNT, 1, 1, 500, 'OBSTACLES_AMOUNT', g);
-    this.addRow(13, 'SENSORS', content.sensors, GLOBALS.INPUTS_SIZE, 1, 2, 100, 'INPUTS_SIZE', g);
+    this.addRow(10, 'RADIUS DETECTION', content.radius, GLOBALS.DETECTION_RADIUS, 10, 80, 8000, 'DETECTION_RADIUS', g);
+    this.addRow(11, 'OBSTACLES', content.obstacles, GLOBALS.OBSTACLES_AMOUNT, 1, 1, 500, 'OBSTACLES_AMOUNT', g);
+    this.addRow(12, 'SENSORS', content.sensors, GLOBALS.INPUTS_SIZE, 1, 2, 100, 'INPUTS_SIZE', g);
 
     //// Add footer buttons
     this.setButtons();
@@ -265,7 +264,6 @@ class Configuration extends Phaser.Scene {
           this.saveData('elitism_percent', 'ELITISM_PERCENT');
           this.saveData('detection_radius', 'DETECTION_RADIUS');
           this.saveData('start_hidden_size', 'START_HIDDEN_SIZE');
-          this.saveData('simulation_speed', 'SIMULATION_SPEED');
           this.saveData('obstacles_amount', 'OBSTACLES_AMOUNT');
           this.saveData('inputs_size', 'INPUTS_SIZE');
           this.saveData('top_percentage', 'TOP_PERCENTAGE');

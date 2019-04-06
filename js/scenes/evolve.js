@@ -21,8 +21,6 @@ class Evolve extends Phaser.Scene {
     }
     // Sets score
     this.score = 0;
-    // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
-    this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
 
     // DOM element to save population
     this.el_inputFile = document.getElementById('inputFile');
@@ -128,7 +126,7 @@ class Evolve extends Phaser.Scene {
       .bitmapText(t.dataMargins.scoreX, t.dataMargins.dataLabelsY, 'bmf', `0`, 16)
       .setOrigin(0.5, 0);
     this.timeScale_txt = this.add
-      .bitmapText(t.dataMargins.timeX, t.dataMargins.dataLabelsY, 'bmf', `${GLOBALS.SIMULATION_SPEED}X`, 16)
+      .bitmapText(t.dataMargins.timeX, t.dataMargins.dataLabelsY, 'bmf', `${1}X`, 16)
       .setOrigin(0.5, 0);
     this.maxScore_txt = this.add
       .bitmapText(t.dataMargins.maxX, t.dataMargins.dataLabelsY, 'bmf', `${this.iaManager.maxScore}`, 16)
@@ -144,7 +142,7 @@ class Evolve extends Phaser.Scene {
       callback: t.updateScore,
       callbackScope: t,
       loop: true,
-      timeScale: GLOBALS.SIMULATION_SPEED
+      timeScale: 1
     });
 
     // Input event

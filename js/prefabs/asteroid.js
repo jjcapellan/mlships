@@ -2,7 +2,7 @@ class Asteroid extends Phaser.Physics.Arcade.Image {
   constructor(scene, x, y, texture, frame) {
     super(scene, x, y, texture, frame);
     this.scene = scene;
-    this.realSpeed = GLOBALS.ASTEROID_SPEED * GLOBALS.SIMULATION_SPEED;
+    this.realSpeed = GLOBALS.ASTEROID_SPEED;
 
     this.x = 0;
     this.y = 0;

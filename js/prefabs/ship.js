@@ -7,8 +7,8 @@ class Ship extends Phaser.Physics.Arcade.Image {
     this.y = this.scene.game.config.height / 2;
     this.tintFill = true;
     // physics properties adjusted to the time scale
-    this.realSpeed = GLOBALS.SHIP_SPEED * GLOBALS.SIMULATION_SPEED;
-    this.realAngularSpeed = GLOBALS.SHIP_ANGULAR_SP * GLOBALS.SIMULATION_SPEED;
+    this.realSpeed = GLOBALS.SHIP_SPEED;
+    this.realAngularSpeed = GLOBALS.SHIP_ANGULAR_SP;
     // inputs and outputs of the neural network
     this.inputs = [];
     this.outputs = [];

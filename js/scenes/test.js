@@ -7,8 +7,6 @@ class Test extends Phaser.Scene {
     this.maxScore = 0;
     // Imports the neural network    
     this.brain = neataptic.Network.fromJSON(data.network);
-    // Adjust physics FPS to simulation speed (1X, 2x, 3x, 4x)
-    this.physics.world.setFPS(60 * GLOBALS.SIMULATION_SPEED);
     // Sets score
     this.score = 0;
 
@@ -28,7 +26,7 @@ class Test extends Phaser.Scene {
     // Labels
     this.dataMargins = this.setLabels();
     this.score_txt = this.add.bitmapText(t.dataMargins.scoreX, t.dataMargins.dataLabelsY, 'bmf', `0`, 16).setOrigin(0.5,0);
-    this.timeScale_txt = this.add.bitmapText(t.dataMargins.timeX, t.dataMargins.dataLabelsY, 'bmf', `${GLOBALS.SIMULATION_SPEED}X`, 16).setOrigin(0.5,0);
+    this.timeScale_txt = this.add.bitmapText(t.dataMargins.timeX, t.dataMargins.dataLabelsY, 'bmf', `1X`, 16).setOrigin(0.5,0);
     this.maxScore_txt = this.add.bitmapText(t.dataMargins.maxX, t.dataMargins.dataLabelsY, 'bmf', `${this.maxScore}`, 16).setOrigin(0.5,0);
 
     this.info_txt = this.add.bitmapText(
@@ -90,7 +88,7 @@ class Test extends Phaser.Scene {
     this.time.addEvent({ delay: 1000, callback: t.showNN, callbackScope: t, loop: true });
 
     // Time event to update score
-    this.time.addEvent({ delay: 1000, callback: t.updateScore, callbackScope: t, loop: true, timeScale: GLOBALS.SIMULATION_SPEED });
+    this.time.addEvent({ delay: 1000, callback: t.updateScore, callbackScope: t, loop: true, timeScale: 1 });
   }
 
   update(time, delta) {

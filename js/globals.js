@@ -11,7 +11,6 @@ var GLOBALS = {
   START_HIDDEN_SIZE: 2,
   MUTATION_AMOUNT: 1,
   // Simulation options
-  SIMULATION_SPEED: 1, // 1X 2X 3X 4X 5X times faster
   DETECTION_RADIUS: 250,
   OBSTACLES_AMOUNT: 12,
   BEST_GEN_STORE_NAME: 'bestNN',
@@ -64,7 +63,6 @@ loadFloatData('mutation_rate','MUTATION_RATE');
 loadFloatData('elitism_percent','ELITISM_PERCENT');
 loadData('detection_radius', 'DETECTION_RADIUS');
 loadData('start_hidden_size', 'START_HIDDEN_SIZE');
-loadData('simulation_speed', 'SIMULATION_SPEED');
 loadData('obstacles_amount', 'OBSTACLES_AMOUNT');
 loadData('inputs_size', 'INPUTS_SIZE');
 loadFloatData('top_percentage', 'TOP_PERCENTAGE');
