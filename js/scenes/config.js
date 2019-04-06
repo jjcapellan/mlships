@@ -10,6 +10,8 @@ class Configuration extends Phaser.Scene {
     this.paddingY = 16;
     this.centerX = this.game.config.width / 2;
     this.maxScroll = 900; // change on last row
+    this.actualBottomRow = this.marginY;
+    this.configProperties = [];
   }
 
   create() {
@@ -23,80 +25,55 @@ class Configuration extends Phaser.Scene {
     let content = {
       population: 'Number of genomes to evaluate in each generation.',
       radius: 'Maximum distance perceived by each individual.',
-      hidden: 'They increase the abstraction capacity of the neural network.\n'+
-      'More does not allways means better results.',
+      hidden:
+        'They increase the abstraction capacity of the neural network.\n' +
+        'More does not allways means better results. During evolution\n' +
+        'this number will change in some genomes.',
       time: '(1x - 5x) High values could affect to simulation accuracy.',
       mutation: '% of the population that will randomly mutate.',
+      mutationAmount: 'If mutation occurs , sets the amount of times the mutation\n'
+      +'will be applied to the network.',
       elitism: '% of best genomes that will be preserved to next generation.',
       obstacles: 'Number of obstacles',
-      sensors: 'Areas around the ship where the data is collected.',
-      topPercentage: '% of the population that is selected to be parents after\n'+
-      'ordering them by score from best to worst.',
-      randomGenomes: '% of the future population which will be the result of the\n'+
-      'crossing of existing genomes with new random genomes.'
+      sensors: 'Number of sensors. A sensor is a contoled area. Each sensor\n'+
+      'provides data to an input. The angle of vision of each sensor\n'+ 
+      'will be 360 / number of sensors.',
+      topPercentage:
+        '% of the population that is selected to be parents after\n' + 'ordering them by score from best to worst.',
+      randomGenomes:
+        '% of the future population which will be the result of the\n' +
+        'crossing of existing genomes with new random genomes.',
+      equal: 'If set to 1, all genomes will be viewed equal during crossover.\n'+
+      'This stimulates more diverse network architectures.',
+      agentSpeed: 'Speed in pixels/second. High speeds require increasing fps of\n'+
+      'the physics engine to avoid tunneling.',
+      angularSpeed: 'Speed in degrees/second, with which the ship will rotate.\n'+
+      'E.g. 360 = 1 turn per second',
+      obstacleSpeed: 'Speed in pixels/second of the obstacles'
     };
 
     let bmf = this.add.bitmapText(0, 0, 'bmf', 'A', 20);
     this.letterWidth = bmf.width;
     bmf.destroy();
 
-    //// First Row 1
-    // Title
-    let pop_txt = this.add.bitmapText(marginX, marginTop, 'bmf', 'POPULATION', 20);
-    // Observations
-    let popObs_txt = this.add.bitmapText(marginX, pop_txt.y + pop_txt.height, 'bmf', content.population, 16);
-    // Line
-    g.lineBetween(marginX, popObs_txt.y + popObs_txt.height, gameWidth - marginX, popObs_txt.y + popObs_txt.height);
-    // Dta label
-    let popLabel = this.add
-      .bitmapText(
-        this.game.config.width - marginX,
-        popObs_txt.y + popObs_txt.height - 4,
-        'bmf',
-        `${GLOBALS.POPULATION_AMOUNT}`,
-        20
-      )
-      .setOrigin(1, 1);
-    // Minus button
-    this.addMinusButton(
-      this.game.config.width - marginX - 8 * this.letterWidth,
-      popLabel.y,
-      5,
-      5,
-      'POPULATION_AMOUNT',
-      popLabel
-    ).setOrigin(1);
-    // Plus button
-    this.addPlusButton(
-      this.game.config.width - marginX - 5 * this.letterWidth,
-      popLabel.y,
-      5,
-      10000,
-      'POPULATION_AMOUNT',
-      popLabel
-    ).setOrigin(1);
-    // Height of first row
-    this.rowHeight = popObs_txt.y + popObs_txt.height - pop_txt.y + this.paddingY;
+    ///// Rows
+    this.addRow('POPULATION', content.population, GLOBALS.POPULATION_AMOUNT, 5, 5, 10000, 'POPULATION_AMOUNT', g);
+    this.addRow('MUTATION RATE', content.mutation, GLOBALS.MUTATION_RATE, 0.05, 0.05, 1, 'MUTATION_RATE', g);
+    this.addRow('MUTATION AMOUNT', content.mutationAmount, GLOBALS.MUTATION_AMOUNT, 1, 1, 100, 'MUTATION_AMOUNT', g);
+    this.addRow('HIDDEN NEURONS', content.hidden, GLOBALS.START_HIDDEN_SIZE, 1, 0, 1000, 'START_HIDDEN_SIZE', g);
+    this.addRow('ELITISM', content.elitism, GLOBALS.ELITISM_PERCENT, 0.05, 0, 0.95, 'ELITISM_PERCENT', g);    
+    this.addRow('TOP PERCENTAGE', content.topPercentage, GLOBALS.TOP_PERCENTAGE, 0.05, 0.05, 0.9, 'TOP_PERCENTAGE', g);
+    this.addRow('RANDOM PARENTS', content.randomGenomes, GLOBALS.RANDOM_PERCENT, 0.05, 0, 1, 'RANDOM_PERCENT', g);
+    this.addRow('EQUAL', content.equal, GLOBALS.EQUAL, 1, 0, 1, 'EQUAL', g);
+    this.addRow('SENSORS', content.sensors, GLOBALS.INPUTS_SIZE, 1, 2, 100, 'INPUTS_SIZE', g);
+    this.addRow('RADIUS DETECTION', content.radius, GLOBALS.DETECTION_RADIUS, 10, 80, 8000, 'DETECTION_RADIUS', g);
+    this.addRow('SHIP SPEED', content.agentSpeed, GLOBALS.SHIP_SPEED, 10, 10, 1000, 'SHIP_SPEED', g);
+    this.addRow('SHIP ANGULAR SPEED', content.angularSpeed, GLOBALS.SHIP_ANGULAR_SP, 5, 5, 8000, 'SHIP_ANGULAR_SP', g);
+    this.addRow('OBSTACLES AMOUNT', content.obstacles, GLOBALS.OBSTACLES_AMOUNT, 1, 1, 500, 'OBSTACLES_AMOUNT', g);
+    this.addRow('OBSTACLES SPEED', content.obstacleSpeed, GLOBALS.ASTEROID_SPEED, 10, 10, 1000, 'ASTEROID_SPEED', g);
 
-    ///// Next rows
-    this.addRow(2, 'MUTATION RATE', content.mutation, GLOBALS.MUTATION_RATE, 0.05, 0.05, 1, 'MUTATION_RATE', g);
-    this.addRow(3, 'ELITISM', content.elitism, GLOBALS.ELITISM_PERCENT, 0.05, 0, 0.95, 'ELITISM_PERCENT', g);
-    this.addRow(
-      4,
-      'START HIDDEN NEURONS',
-      content.hidden,
-      GLOBALS.START_HIDDEN_SIZE,
-      1,
-      0,
-      1000,
-      'START_HIDDEN_SIZE',
-      g
-    );
-    this.addRow(6, 'TOP PERCENTAGE', content.topPercentage, GLOBALS.TOP_PERCENTAGE, 0.05, 0.05, 0.9, 'TOP_PERCENTAGE', g);
-    this.addRow(8, 'RANDOM PARENTS', content.randomGenomes, GLOBALS.RANDOM_PERCENT, 0.05, 0, 1, 'RANDOM_PERCENT', g);
-    this.addRow(10, 'RADIUS DETECTION', content.radius, GLOBALS.DETECTION_RADIUS, 10, 80, 8000, 'DETECTION_RADIUS', g);
-    this.addRow(11, 'OBSTACLES', content.obstacles, GLOBALS.OBSTACLES_AMOUNT, 1, 1, 500, 'OBSTACLES_AMOUNT', g);
-    this.addRow(12, 'SENSORS', content.sensors, GLOBALS.INPUTS_SIZE, 1, 2, 100, 'INPUTS_SIZE', g);
+    this.maxScroll = this.actualBottomRow;
+    
 
     //// Add footer buttons
     this.setButtons();
@@ -106,7 +83,7 @@ class Configuration extends Phaser.Scene {
       0,
       0,
       this.game.config.width,
-      this.game.config.height - 90// - this.buttonMarginY - this.paddingY - 60
+      this.game.config.height - 90 // - this.buttonMarginY - this.paddingY - 60
     );
     optionsScroll.setBackgroundColor(0x000000);
     optionsScroll.transparent = false;
@@ -165,11 +142,11 @@ class Configuration extends Phaser.Scene {
     return button;
   }
 
-  addRow(rowNumber, title, content, label, step, min, max, property, g) {
+  addRow(title, content, label, step, min, max, property, g) {
     const t = this;
     let x = this.marginX;
     // Header
-    let bmf1 = this.add.bitmapText(x, (rowNumber - 1) * this.rowHeight + this.marginY, 'bmf', title, 20);
+    let bmf1 = this.add.bitmapText(x, this.actualBottomRow, 'bmf', title, 20);
     // Observations
     let bmf2 = this.add.bitmapText(x, bmf1.height + bmf1.y, 'bmf', content, 16);
     // Line
@@ -196,6 +173,11 @@ class Configuration extends Phaser.Scene {
       property,
       dataLabel
     ).setOrigin(1, 1);
+
+    let bottom = bmf2.height + bmf2.y + this.paddingY;
+
+    this.actualBottomRow = bottom;
+    this.configProperties.push(property);
   }
 
   setButtons() {
@@ -259,7 +241,7 @@ class Configuration extends Phaser.Scene {
       .on(
         'pointerup',
         function() {
-          this.saveJSONtoStorage(makeConfigObj(), 'configObj');
+          this.saveJSONtoStorage(this.makeConfigObj(), 'configObj');
           this.clean(); // Clean all custom buttons
           this.scene.start('menu');
         },
@@ -273,28 +255,18 @@ class Configuration extends Phaser.Scene {
     this.scene.restart();
   }
 
-  makeConfigObj(){
-    let obj = {
-      POPULATION_AMOUNT: GLOBALS.POPULATION_AMOUNT,
-      MUTATION_RATE: GLOBALS.MUTATION_RATE,
-      MUTATION_AMOUNT: GLOBALS.MUTATION_AMOUNT,
-      ELITISM_PERCENT: GLOBALS.ELITISM_PERCENT,
-      START_HIDDEN_SIZE: GLOBALS.START_HIDDEN_SIZE,
-      TOP_PERCENTAGE: GLOBALS.TOP_PERCENTAGE,
-      RANDOM_PERCENT: GLOBALS.RANDOM_PERCENT,
-      EQUAL: GLOBALS.EQUAL,
-      OBSTACLES_AMOUNT: GLOBALS.OBSTACLES_AMOUNT,
-      DETECTION_RADIUS: GLOBALS.DETECTION_RADIUS,
-      INPUTS_SIZE: GLOBALS.INPUTS_SIZE,
-      OBSTACLE_SPEED: GLOBALS.ASTEROID_SPEED,
-      SHIP_SPEED: GLOBALS.SHIP_SPEED,
-      SHIP_ANGULAR_SP: GLOBALS.SHIP_ANGULAR_SP
-    };
+  makeConfigObj() {
+
+    let obj = {};
+    for(let i=0, j = this.configProperties.length; i < j; i++){
+      let propertyName = this.configProperties[i];
+      obj[propertyName]= GLOBALS[propertyName];
+    }
 
     return obj;
   }
 
-  saveJSONtoStorage(element, key){
+  saveJSONtoStorage(element, key) {
     localStorage.setItem(key, JSON.stringify(element));
   }
 
