@@ -1,6 +1,6 @@
 var GLOBALS = {
   // NEAT algorithm default parameters
-  INPUTS_SIZE: 6,
+  INPUTS_SIZE: 8,
   OUTPUTS_SIZE: 2,
   POPULATION_AMOUNT: 50,
   MUTATION_RATE: 0.3,
@@ -13,7 +13,7 @@ var GLOBALS = {
   // Simulation options
   SIMULATION_SPEED: 1, // 1X 2X 3X 4X 5X times faster
   DETECTION_RADIUS: 250,
-  OBSTACLES_AMOUNT: 8,
+  OBSTACLES_AMOUNT: 12,
   BEST_GEN_STORE_NAME: 'bestNN',
   // Mathematical constants
   HALF_PI: Math.PI / 2,
