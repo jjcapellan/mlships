@@ -35,7 +35,15 @@ class Menu extends Phaser.Scene {
       'Obstacle speed'
     ];
     const labelsBestGenome = [ 'Hidden neurons', 'Score' ];
-    const labelsSelectedGenome = [ 'Hidden neurons' ];
+    const labelsSelectedGenome = [ 
+      'Hidden neurons',
+      'Number of sensors',
+      'Detection radius',
+      'Number of obstacles',
+      'Ship speed',
+      'Ship angular speed',
+      'Obstacle speed'
+     ];
 
     // Row objects
     this.rowPopulation = new MenuRow(
@@ -53,7 +61,7 @@ class Menu extends Phaser.Scene {
       this,
       'SELECTED GENOME',
       labelsSelectedGenome,
-      [ 0 ],
+      [ 0, 0, 0, 0, 0, 0, 0 ],
       this.getSelectedGenomeButtons(),
       g
     );
@@ -343,26 +351,48 @@ class Menu extends Phaser.Scene {
     let shipAngular = p.learningConditions.SHIP_ANGULAR_SP;
     let obstacleSpeed = p.learningConditions.OBSTACLE_SPEED;
 
-    this.rowPopulation.setData(0, populationSize);
-    this.rowPopulation.setData(1, generation);
-    this.rowPopulation.setData(2, maxScore);
-    this.rowPopulation.setData(3, sensors);
-    this.rowPopulation.setData(4, detectionRadius);
-    this.rowPopulation.setData(5, obstacles);
-    this.rowPopulation.setData(6, shipSpeed);
-    this.rowPopulation.setData(7, shipAngular);
-    this.rowPopulation.setData(8, obstacleSpeed);
+    this.updateRow(
+      this.rowPopulation,
+      [
+        populationSize,
+        generation,
+        maxScore,
+        sensors,
+        detectionRadius,
+        obstacles,
+        shipSpeed,
+        shipAngular,
+        obstacleSpeed
+      ] )
 
     let bestHiddenNeurons = p.bestGenome ? p.bestGenome.genome.nodes.length - p.bestGenome.genome.input - p.bestGenome.genome.output : 0;
     let selectedHiddenNeurons = 0;
     if(localStorage.hasOwnProperty('selectedNetwork')){
       let genObj = JSON.parse(localStorage.getItem('selectedNetwork'));
+      let conditions = genObj.conditions;
       selectedHiddenNeurons = genObj.genome.nodes.length - genObj.genome.input - genObj.genome.output;
+    sensors = conditions.INPUTS_SIZE;
+    detectionRadius = conditions.DETECTION_RADIUS;
+    obstacles = conditions.OBSTACLES_AMOUNT;
+    shipSpeed = conditions.SHIP_SPEED;
+    shipAngular = conditions.SHIP_ANGULAR_SP;
+    obstacleSpeed = conditions.OBSTACLE_SPEED;
     }
+
+    this.updateRow(
+      this.rowSelectedGenome,
+      [
+        selectedHiddenNeurons,
+        sensors,
+        detectionRadius,
+        obstacles,
+        shipSpeed,
+        shipAngular,
+        obstacleSpeed
+      ] );
 
     this.rowBestGenome.setData(0, bestHiddenNeurons);
     this.rowBestGenome.setData(1, maxScore);
-    this.rowSelectedGenome.setData(0, selectedHiddenNeurons);
 
     this.bt_evolveLoaded.enable();
     this.bt_save.enable();
@@ -381,6 +411,12 @@ class Menu extends Phaser.Scene {
       this.bt_saveCurrentGenome.enable();
     }
   } // end showPopulationData()
+
+  updateRow(rowObj, data){
+    for(let i=0, j=data.length; i<j;i++){
+      rowObj.setData(i,data[i]);
+    }
+  }
 
   cleanStoredGens() {
     localStorage.removeItem('selectedNetwork');
