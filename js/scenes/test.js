@@ -16,7 +16,6 @@ class Test extends Phaser.Scene {
     this.shipAngularSpeed = data.conditions.SHIP_ANGULAR_SP;
     this.obstacleSpeed = data.conditions.OBSTACLE_SPEED;
     this.sensorsAmount = data.conditions.INPUTS_SIZE;
-    console.log(data.conditions);
 
     this.conditions = data.conditions;
 
