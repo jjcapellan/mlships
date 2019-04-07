@@ -142,8 +142,8 @@ class Menu extends Phaser.Scene {
     this.bt_evolveFromBest.on(
       'pointerup',
       function() {
-        let NN = neataptic.Network.fromJSON(LOADED_POPULATION.bestGenome);
-        let conditions = LOADED_POPULATION.learningConditions;
+        let NN = neataptic.Network.fromJSON(LOADED_POPULATION.bestGenome.genome);
+        let conditions = LOADED_POPULATION.bestGenome.conditions;
         this.cleanStoredGens();
         LOADED_POPULATION = null;
         this.clean();
@@ -158,8 +158,8 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        let conditions = LOADED_POPULATION.learningConditions;
-        this.scene.start('test', { network: LOADED_POPULATION.bestGenome, conditions: conditions });
+        let conditions = LOADED_POPULATION.bestGenome.conditions;
+        this.scene.start('test', { network: LOADED_POPULATION.bestGenome.genome, conditions: conditions });
       },
       t
     );
@@ -202,8 +202,9 @@ class Menu extends Phaser.Scene {
     this.bt_evolveCurrentGenome.on(
       'pointerup',
       function() {
-        let NN = neataptic.Network.fromJSON(t.getSelected());
-        let conditions = LOADED_POPULATION.learningConditions;
+        let genomeObj = t.getSelected();
+        let NN = neataptic.Network.fromJSON(genomeObj.genome);
+        let conditions = genomeObj.conditions;
         this.cleanStoredGens();
         LOADED_POPULATION = null;
         this.clean();
@@ -218,8 +219,9 @@ class Menu extends Phaser.Scene {
       'pointerup',
       function() {
         this.clean();
-        let conditions = LOADED_POPULATION.learningConditions;
-        this.scene.start('test', { network: t.getSelected(), conditions: conditions });
+        let genomeObj = t.getSelected();
+        let conditions = genomeObj.conditions;
+        this.scene.start('test', { network: genomeObj.genome, conditions: conditions });
       },
       t
     );
@@ -351,10 +353,12 @@ class Menu extends Phaser.Scene {
     this.rowPopulation.setData(7, shipAngular);
     this.rowPopulation.setData(8, obstacleSpeed);
 
-    let bestHiddenNeurons = p.bestGenome ? p.bestGenome.nodes.length - p.bestGenome.input - p.bestGenome.output : 0;
-    let selectedHiddenNeurons = localStorage.hasOwnProperty('selectedNetwork')
-      ? JSON.parse(localStorage.getItem('selectedNetwork')).nodes.length - p.learningConditions.INPUTS_SIZE - 2
-      : 0;
+    let bestHiddenNeurons = p.bestGenome ? p.bestGenome.genome.nodes.length - p.bestGenome.genome.input - p.bestGenome.genome.output : 0;
+    let selectedHiddenNeurons = 0;
+    if(localStorage.hasOwnProperty('selectedNetwork')){
+      let genObj = JSON.parse(localStorage.getItem('selectedNetwork'));
+      selectedHiddenNeurons = genObj.genome.nodes.length - genObj.genome.input - genObj.genome.output;
+    }
 
     this.rowBestGenome.setData(0, bestHiddenNeurons);
     this.rowBestGenome.setData(1, maxScore);

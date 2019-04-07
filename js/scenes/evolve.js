@@ -237,7 +237,7 @@ class Evolve extends Phaser.Scene {
         t.iaManager.actualMaxScore = shipScore;
 
         console.log(
-          `Prev Generation: ${t.iaManager.neat.generation - 1} Average: ${averageScore} Max: ${shipScore} Top max: ${t
+          `Generation: ${t.iaManager.neat.generation - 1} Average: ${averageScore} Max: ${shipScore} Top max: ${t
             .iaManager.maxScore}`
         );
         t.updatePopulation();
@@ -321,6 +321,11 @@ class Evolve extends Phaser.Scene {
 
   saveNN(network, key) {
     let jsonNN = network.toJSON();
-    localStorage.setItem(key, JSON.stringify(jsonNN));
+    let conditions = this.conditions;
+    let obj = {
+      genome: jsonNN,
+      conditions: conditions
+    }
+    localStorage.setItem(key, JSON.stringify(obj));
   }
 }
