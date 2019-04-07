@@ -34,13 +34,8 @@ class Menu extends Phaser.Scene {
       'Ship angular speed',
       'Obstacle speed'
     ];
-    const labelsBestGenome = [
-      'Hidden neurons',
-      'Score'
-    ];
-    const labelsSelectedGenome = [
-      'Hidden neurons'
-    ];
+    const labelsBestGenome = [ 'Hidden neurons', 'Score' ];
+    const labelsSelectedGenome = [ 'Hidden neurons' ];
 
     // Row objects
     this.rowPopulation = new MenuRow(
@@ -52,14 +47,7 @@ class Menu extends Phaser.Scene {
       g
     );
 
-    this.rowBestGenome = new MenuRow(
-      this,
-      'BEST GENOME',
-      labelsBestGenome,
-      [ 0, 0 ],
-      this.getBestGenomeButtons(),
-      g
-    );
+    this.rowBestGenome = new MenuRow(this, 'BEST GENOME', labelsBestGenome, [ 0, 0 ], this.getBestGenomeButtons(), g);
 
     this.rowSelectedGenome = new MenuRow(
       this,
@@ -71,10 +59,18 @@ class Menu extends Phaser.Scene {
     );
 
     this.updateUI();
-    
+
+    // Vertical scroll
+    let lowerLimit = this.actualBottomRow - this.game.config.height;
+    let scroll = new Scroll(this, this.cameras.main, 0, lowerLimit, true, true, {wheelFactor: 0.2});
+
+    // Free resources of Scroll object
+    this.events.on('shutdown', function(){
+      scroll.dispose();
+    }, this);
   }
 
-  updateUI(){
+  updateUI() {
     if (LOADED_POPULATION) {
       this.showPopulationData();
     } else {
@@ -138,7 +134,7 @@ class Menu extends Phaser.Scene {
     return [ this.bt_evolveLoaded, this.bt_save, this.bt_load ];
   } // end getPopulationButtons()
 
-  getBestGenomeButtons(){
+  getBestGenomeButtons() {
     const t = this;
     const buttonConfig = GLOBALS.BUTTON_CONFIG;
     // Button: Evolve best genome
@@ -195,11 +191,10 @@ class Menu extends Phaser.Scene {
       t
     );
 
-    return [this.bt_evolveFromBest, this.bt_saveBest, this.bt_test, this.bt_resetGenome];
-
+    return [ this.bt_evolveFromBest, this.bt_saveBest, this.bt_test, this.bt_resetGenome ];
   } // end getBestGenomeButtons()
 
-  getSelectedGenomeButtons(){
+  getSelectedGenomeButtons() {
     const t = this;
     const buttonConfig = GLOBALS.BUTTON_CONFIG;
     // Button: Evolve selected genome
@@ -240,7 +235,7 @@ class Menu extends Phaser.Scene {
       t
     );
 
-    return [this.bt_evolveCurrentGenome, this.bt_saveCurrentGenome, this.bt_testCurrent];
+    return [ this.bt_evolveCurrentGenome, this.bt_saveCurrentGenome, this.bt_testCurrent ];
   } // end getSelectedGenomeButtons()
 
   makeDefaultButtons() {
@@ -251,29 +246,37 @@ class Menu extends Phaser.Scene {
     this.bt_config = this.add
       .existing(new ButtonGenerator(this, t.marginX, t.marginY, 'CONFIG', buttonConfig))
       .setOrigin(0);
-      this.bt_config.on(
-        'pointerup',
-        function() {
-          this.clean();
-          this.scene.start('configuration');
-        },
-        t
-      );
+    this.bt_config.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.scene.start('configuration');
+      },
+      t
+    );
 
     // Button: Evolve New Population
     this.bt_evolve = this.add
-      .existing(new ButtonGenerator(t, t.marginX, t.marginY + this.bt_config.height + this.paddingY, 'EVOLVE NEW POPULATION', buttonConfig))
+      .existing(
+        new ButtonGenerator(
+          t,
+          t.marginX,
+          t.marginY + this.bt_config.height + this.paddingY,
+          'EVOLVE NEW POPULATION',
+          buttonConfig
+        )
+      )
       .setOrigin(0);
-      this.bt_evolve.on(
-        'pointerup',
-        function() {
-          LOADED_POPULATION = null;
-          let conditions = this.makeLearnConditionsObj();
-          this.clean();
-          this.scene.start('evolve', { conditions: conditions });
-        },
-        t
-      );
+    this.bt_evolve.on(
+      'pointerup',
+      function() {
+        LOADED_POPULATION = null;
+        let conditions = this.makeLearnConditionsObj();
+        this.clean();
+        this.scene.start('evolve', { conditions: conditions });
+      },
+      t
+    );
   } // end makeDefaultButtons
 
   makeLearnConditionsObj() {
@@ -338,29 +341,24 @@ class Menu extends Phaser.Scene {
     let shipAngular = p.learningConditions.SHIP_ANGULAR_SP;
     let obstacleSpeed = p.learningConditions.OBSTACLE_SPEED;
 
-    this.rowPopulation.setData(0,populationSize);
-    this.rowPopulation.setData(1,generation);
-    this.rowPopulation.setData(2,maxScore);
-    this.rowPopulation.setData(3,sensors);
-    this.rowPopulation.setData(4,detectionRadius);
-    this.rowPopulation.setData(5,obstacles);
-    this.rowPopulation.setData(6,shipSpeed);
-    this.rowPopulation.setData(7,shipAngular);
-    this.rowPopulation.setData(8,obstacleSpeed);
+    this.rowPopulation.setData(0, populationSize);
+    this.rowPopulation.setData(1, generation);
+    this.rowPopulation.setData(2, maxScore);
+    this.rowPopulation.setData(3, sensors);
+    this.rowPopulation.setData(4, detectionRadius);
+    this.rowPopulation.setData(5, obstacles);
+    this.rowPopulation.setData(6, shipSpeed);
+    this.rowPopulation.setData(7, shipAngular);
+    this.rowPopulation.setData(8, obstacleSpeed);
 
-    let bestHiddenNeurons = p.bestGenome
-      ? p.bestGenome.nodes.length -
-        p.bestGenome.input -
-        p.bestGenome.output
-      : 0;
+    let bestHiddenNeurons = p.bestGenome ? p.bestGenome.nodes.length - p.bestGenome.input - p.bestGenome.output : 0;
     let selectedHiddenNeurons = localStorage.hasOwnProperty('selectedNetwork')
-      ? JSON.parse(localStorage.getItem('selectedNetwork')).nodes.length -
-        p.learningConditions.INPUTS_SIZE - 2
+      ? JSON.parse(localStorage.getItem('selectedNetwork')).nodes.length - p.learningConditions.INPUTS_SIZE - 2
       : 0;
 
-    this.rowBestGenome.setData(0,bestHiddenNeurons);
-    this.rowBestGenome.setData(1,maxScore);
-    this.rowSelectedGenome.setData(0,selectedHiddenNeurons);
+    this.rowBestGenome.setData(0, bestHiddenNeurons);
+    this.rowBestGenome.setData(1, maxScore);
+    this.rowSelectedGenome.setData(0, selectedHiddenNeurons);
 
     this.bt_evolveLoaded.enable();
     this.bt_save.enable();

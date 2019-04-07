@@ -15,7 +15,6 @@ class Configuration extends Phaser.Scene {
   }
 
   create() {
-    const t = this;
     const g = this.add.graphics();
     g.lineStyle(2, 0xffffff, 0.9);
 
@@ -90,23 +89,20 @@ class Configuration extends Phaser.Scene {
     camera.transparent = false;
     camera.scrollY = this.game.config.height;
 
-    // Vertical limit for scroll
-    this.maxScroll = this.actualBottomRow - 500;
+    // Limits of scroll
+    let lowerLimit = this.actualBottomRow - 500;
+    let upperLimit = this.game.config.height;
 
-    // Pointer event to activate the vertical scroll
-    this.input.on(
-      'pointermove',
-      function(pointer) {
-        if (pointer.primaryDown) {
-          camera.scrollY -= pointer.position.y - pointer.prevPosition.y;
-          camera.scrollY = Math.max(this.game.config.height, camera.scrollY);
-          camera.scrollY = Math.min(this.maxScroll, camera.scrollY);
-        }
+    let scroll = new Scroll(this, camera, upperLimit, lowerLimit, true, true, { wheelFactor: 0.2 });
+
+    // Free resources of Scroll object
+    this.events.on(
+      'shutdown',
+      function() {
+        scroll.dispose();
       },
       this
     );
-
-    window.addEventListener('wheel', this.wheelHandler.bind(t));
   }
 
   addPlusButton(x, y, step, limit, property, label) {
@@ -269,12 +265,6 @@ class Configuration extends Phaser.Scene {
         t
       )
       .setOrigin(0.5, 1);
-  }
-
-  wheelHandler(event) {
-    this.camera.scrollY += event.deltaY / 2;
-    this.camera.scrollY = Math.max(this.game.config.height, this.camera.scrollY);
-    this.camera.scrollY = Math.min(this.maxScroll, this.camera.scrollY);
   }
 
   restore() {
