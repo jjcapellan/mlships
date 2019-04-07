@@ -333,7 +333,7 @@ class Menu extends Phaser.Scene {
         t.cleanStoredGens();
         t.showPopulationData();
       } else {
-        localStorage.setItem('selectedGenome', txtPopulation);
+        localStorage.setItem('selectedNetwork', txtPopulation);
         t.showSelectedGenomeData();
       }
 
