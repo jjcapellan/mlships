@@ -322,7 +322,7 @@ class Menu extends Phaser.Scene {
     // Load button
     this.bt_load.on(
       'pointerup',
-      function() {
+      function(event) {
         this.clean();
         this.el_inputFile.click();
       },
@@ -368,7 +368,6 @@ class Menu extends Phaser.Scene {
       // JSON
       LOADED_POPULATION = JSON.parse(txtPopulation);
       t.cleanStoredGens();
-      console.log(LOADED_POPULATION);
       t.showPopulationData();
       // This allow "change" event if same file is selected a second time
       event.target.value = null;
@@ -396,10 +395,6 @@ class Menu extends Phaser.Scene {
   saveJSONtoStorage(element, key) {
     localStorage.setItem(key, JSON.stringify(element));
   }
-
-  /*setInputs() {
-    GLOBALS.INPUTS_SIZE = LOADED_POPULATION[3].input;
-  }*/
 
   showPopulationData() {
     let populationSize = LOADED_POPULATION.population.length;

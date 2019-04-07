@@ -16,7 +16,6 @@ class IAmanager {
     } else if (this.population){
       this.inputsSize = this.population[0].input;
     }
-    console.log(this.inputsSize);
     this.init();
   }
 
