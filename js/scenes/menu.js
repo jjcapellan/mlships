@@ -11,53 +11,70 @@ class Menu extends Phaser.Scene {
     this.marginX = 50;
     this.marginY = 50;
     this.paddingY = 16;
-    this.data1X = 0;
-    this.data2X = 0;
-    this.data1Y = 0;
-    this.data2Y = 0;
-    this.data3Y = 0;
-    this.lineHeight = 0;
+    this.actualBottomRow;
   }
 
   create() {
     const t = this;
-    const buttonConfig = GLOBALS.BUTTON_CONFIG;
-
-    // Button: Config
-    this.bt_config = this.add
-      .existing(new ButtonGenerator(this, t.marginX, t.marginY, 'CONFIG', buttonConfig))
-      .setOrigin(0);
-    this.lineHeight = this.bt_config.height + this.paddingY;
-
-    // Lines
+    this.makeDefaultButtons();
+    // Top limit of info rows
+    this.actualBottomRow = this.bt_evolve.y + this.bt_evolve.height + this.paddingY;
+    // Graphics object to make lines
     const g = this.add.graphics();
     g.lineStyle(2, 0xffffff, 0.9);
-    g.lineBetween(
-      t.marginX,
-      t.marginY + 2 * t.lineHeight,
-      t.game.config.width - t.marginX,
-      t.marginY + 2 * t.lineHeight
+    // Labels of info rows
+    const labelsPopulation = [
+      'Number of genomes',
+      'Current generation',
+      'Max score',
+      'Number of sensors',
+      'Detection radius',
+      'Number of obstacles',
+      'Ship speed',
+      'Ship angular speed',
+      'Obstacle speed'
+    ];
+    const labelsBestGenome = [
+      'Hidden neurons',
+      'Score'
+    ];
+    const labelsSelectedGenome = [
+      'Hidden neurons'
+    ];
+
+    // Row objects
+    this.rowPopulation = new MenuRow(
+      this,
+      'POPULATION',
+      labelsPopulation,
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      this.getPopulationButtons(),
+      g
     );
 
-    // Labels
-    const text1 = 'POPULATION\n' + 'Number of genomes \n' + 'Current generation \n' + 'Max Score ';
-    const text2 = 'BEST GENOME ALL GENS\n' + 'Hidden neurons \n' + 'Score ';
-    const text3 = 'SELECTED GENOME\n' + 'Hidden neurons';
-    const initialDataTxt1 = '\n' + '0\n' + '0\n' + '0';
-    const initialDataTxt2 = '\n' + '0\n' + '0';
-    const initialDataTxt3 = localStorage.hasOwnProperty('selectedNetwork')
-      ? `\n${JSON.parse(localStorage.getItem('selectedNetwork')).nodes.length - GLOBALS.INPUTS_SIZE}`
-      : '\n0';
-    this.secondLineY = this.setLabels(t.marginX, t.marginY + 2 * t.lineHeight + t.paddingY, text1, text2, text3, g);
+    this.rowBestGenome = new MenuRow(
+      this,
+      'BEST GENOME',
+      labelsBestGenome,
+      [ 0, 0 ],
+      this.getBestGenomeButtons(),
+      g
+    );
 
-    // Data labels
-    this.data_txt1 = this.add.bitmapText(t.data1X, t.data1Y, 'bmf', initialDataTxt1, 20);
-    this.data_txt2 = this.add.bitmapText(t.data2X, t.data2Y, 'bmf', initialDataTxt2, 20);
-    this.data_txt3 = this.add.bitmapText(t.data1X, t.data3Y, 'bmf', initialDataTxt3, 20);
+    this.rowSelectedGenome = new MenuRow(
+      this,
+      'SELECTED GENOME',
+      labelsSelectedGenome,
+      [ 0 ],
+      this.getSelectedGenomeButtons(),
+      g
+    );
 
-    this.makeButtons();
-    this.setButtonEvents();
+    this.updateUI();
+    
+  }
 
+  updateUI(){
     if (LOADED_POPULATION) {
       this.showPopulationData();
     } else {
@@ -80,207 +97,15 @@ class Menu extends Phaser.Scene {
     }
   }
 
-  setLabels(originX, originY, text1, text2, text3, graphics) {
-    let bmt1 = this.add.bitmapText(originX, originY, 'bmf', text1, 20);
-    let bmt2 = this.add.bitmapText(originX, originY + bmt1.height + 2 * this.paddingY, 'bmf', text2, 20);
-    let lineY = originY + this.paddingY + bmt1.height;
-    const padding3Y = 30;
-
-    graphics.lineBetween(this.marginX, lineY, this.game.config.width - this.marginX, lineY);
-
-    this.data1X = originX + bmt1.width + this.paddingY;
-    this.data2X = this.data1X;
-    this.data1Y = originY;
-    this.data2Y = originY + bmt1.height + 2 * this.paddingY;
-    this.data3Y = this.data2Y + bmt2.height + 2 * this.paddingY + padding3Y;
-
-    let lineY2 = this.data3Y - this.paddingY;
-    graphics.lineBetween(this.marginX, lineY2, this.game.config.width - this.marginX, lineY2);
-
-    this.add.bitmapText(originX, this.data3Y, 'bmf', text3, 20);
-
-    return lineY;
-  }
-
-  makeButtons() {
+  getPopulationButtons() {
     const t = this;
     const buttonConfig = GLOBALS.BUTTON_CONFIG;
-
-    // Button: Evolve New Population
-    this.bt_evolve = this.add
-      .existing(new ButtonGenerator(t, t.marginX, t.marginY + t.lineHeight, 'EVOLVE NEW POPULATION', buttonConfig))
-      .setOrigin(0);
-
-    //// Population buttons /////////////////////
     // Button: Evolve Loaded Population
-    this.bt_evolveLoaded = this.add
-      .existing(new ButtonGenerator(t, t.game.config.width - t.marginX, t.data1Y, 'EVOLVE', buttonConfig))
-      .setOrigin(1, 0);
-
-    // Button: Save Population
-    this.bt_save = this.add
-      .existing(
-        new ButtonGenerator(
-          t,
-          t.bt_evolveLoaded.x - t.bt_evolveLoaded.width - t.paddingY,
-          t.data1Y,
-          'SAVE',
-          buttonConfig
-        )
-      )
-      .setOrigin(1, 0);
-    // Button: Load Population
-    this.bt_load = this.add
-      .existing(new ButtonGenerator(t, t.bt_save.x - t.bt_save.width - t.paddingY, t.data1Y, 'LOAD', buttonConfig))
-      .setOrigin(1, 0);
-
-    //// Best genome buttons /////////////////////
-    // Button: Evolve Best Genome
-    this.bt_evolveFromBest = this.add
-      .existing(new ButtonGenerator(t, t.game.config.width - t.marginX, t.data2Y, 'EVOLVE', buttonConfig))
-      .setOrigin(1, 0);
-
-    // Button: Test Best Genome
-    this.bt_test = this.add
-      .existing(
-        new ButtonGenerator(
-          t,
-          t.bt_evolveFromBest.x - t.bt_evolveFromBest.width - t.paddingY,
-          t.data2Y,
-          'TEST',
-          buttonConfig
-        )
-      )
-      .setOrigin(1, 0);
-
-    // Button: Reset Genome
-    this.bt_resetGenome = this.add
-      .existing(new ButtonGenerator(t, t.bt_test.x - t.bt_test.width - t.paddingY, t.data2Y, 'RESET', buttonConfig))
-      .setOrigin(1, 0);
-    this.bt_saveBest = this.add
-      .existing(
-        new ButtonGenerator(
-          t,
-          t.game.config.width - t.marginX,
-          t.bt_evolveFromBest.y + t.bt_evolveFromBest.height + t.paddingY,
-          'SAVE',
-          buttonConfig
-        )
-      )
-      .setOrigin(1, 0);
-
-    //// Genomes buttons //////////////////////////////
-    // Button: Evolve Current Genome
-    this.bt_evolveCurrentGenome = this.add
-      .existing(new ButtonGenerator(t, t.game.config.width - t.marginX, t.data3Y, 'EVOLVE', buttonConfig))
-      .setOrigin(1, 0);
-
-    // Button: Test Current Genome
-    this.bt_testCurrent = this.add
-      .existing(
-        new ButtonGenerator(
-          t,
-          t.game.config.width - t.marginX - t.bt_evolveFromBest.width - t.paddingY,
-          t.data3Y,
-          'TEST',
-          buttonConfig
-        )
-      )
-      .setOrigin(1, 0);
-
-    // Button: Save current Genome
-    this.bt_saveCurrentGenome = this.add
-      .existing(
-        new ButtonGenerator(
-          t,
-          t.game.config.width - t.marginX,
-          t.bt_evolveCurrentGenome.height + t.data3Y + t.paddingY,
-          'SAVE',
-          buttonConfig
-        )
-      )
-      .setOrigin(1, 0);
-  }
-
-  setButtonEvents() {
-    const t = this;
-    this.bt_config.on(
-      'pointerup',
-      function() {
-        this.clean();
-        this.scene.start('configuration');
-      },
-      t
-    );
-
-    // Test buttons
-
-    this.bt_test.on(
-      'pointerup',
-      function() {
-        this.clean();
-        //this.setInputs();
-        let conditions = LOADED_POPULATION.learningConditions;
-        this.scene.start('test', { network: LOADED_POPULATION.bestGenome, conditions: conditions });
-      },
-      t
-    );
-
-    this.bt_testCurrent.on(
-      'pointerup',
-      function() {
-        this.clean();
-        let conditions = LOADED_POPULATION.learningConditions;
-        this.scene.start('test', { network: t.getSelected(), conditions: conditions });
-      },
-      t
-    );
-
-    // Evolve buttons
-
-    this.bt_evolveFromBest.on(
-      'pointerup',
-      function() {
-        let NN = neataptic.Network.fromJSON(LOADED_POPULATION.bestGenome);
-        //this.setInputs();
-        let conditions = LOADED_POPULATION.learningConditions;
-        this.cleanStoredGens();
-        LOADED_POPULATION = null;
-        this.clean();
-        this.scene.start('evolve', { network: NN, population: null, conditions: conditions });
-      },
-      t
-    );
-
-    this.bt_evolveCurrentGenome.on(
-      'pointerup',
-      function() {
-        let NN = neataptic.Network.fromJSON(t.getSelected());
-        let conditions = LOADED_POPULATION.learningConditions;
-        this.cleanStoredGens();
-        LOADED_POPULATION = null;
-        this.clean();
-        this.scene.start('evolve', { network: NN, population: null, conditions: conditions });
-      },
-      t
-    );
-
-    this.bt_evolve.on(
-      'pointerup',
-      function() {
-        LOADED_POPULATION = null;
-        let conditions = this.makeLearnConditionsObj();
-        this.clean();
-        this.scene.start('evolve', { conditions: conditions });
-      },
-      t
-    );
-
+    this.bt_evolveLoaded = this.add.existing(new ButtonGenerator(t, 0, 0, 'EVOLVE', buttonConfig));
     this.bt_evolveLoaded.on(
       'pointerup',
       function() {
         this.clean();
-        //this.setInputs();
         this.scene.start('evolve', {
           network: null,
           population: LOADED_POPULATION.population,
@@ -289,9 +114,8 @@ class Menu extends Phaser.Scene {
       },
       t
     );
-
-    // Save buttons
-
+    // Button: Save Population
+    this.bt_save = this.add.existing(new ButtonGenerator(t, 0, 0, 'SAVE', buttonConfig));
     this.bt_save.on(
       'pointerup',
       function() {
@@ -300,26 +124,8 @@ class Menu extends Phaser.Scene {
       },
       t
     );
-
-    this.bt_saveCurrentGenome.on(
-      'pointerup',
-      function() {
-        this.clean();
-        this.saveElement(t.getSelected(), 'genome.JSON');
-      },
-      t
-    );
-
-    this.bt_saveBest.on(
-      'pointerup',
-      function() {
-        this.clean();
-        this.saveElement(LOADED_POPULATION.bestGenome, 'bestGenome.JSON');
-      },
-      t
-    );
-
-    // Load button
+    // Button: Load Population
+    this.bt_load = this.add.existing(new ButtonGenerator(t, 0, 0, 'LOAD', buttonConfig));
     this.bt_load.on(
       'pointerup',
       function(event) {
@@ -329,7 +135,41 @@ class Menu extends Phaser.Scene {
       t
     );
 
-    // Reset best genome button
+    return [ this.bt_evolveLoaded, this.bt_save, this.bt_load ];
+  } // end getPopulationButtons()
+
+  getBestGenomeButtons(){
+    const t = this;
+    const buttonConfig = GLOBALS.BUTTON_CONFIG;
+    // Button: Evolve best genome
+    this.bt_evolveFromBest = this.add.existing(new ButtonGenerator(t, 0, 0, 'EVOLVE', buttonConfig));
+    this.bt_evolveFromBest.on(
+      'pointerup',
+      function() {
+        let NN = neataptic.Network.fromJSON(LOADED_POPULATION.bestGenome);
+        let conditions = LOADED_POPULATION.learningConditions;
+        this.cleanStoredGens();
+        LOADED_POPULATION = null;
+        this.clean();
+        this.scene.start('evolve', { network: NN, population: null, conditions: conditions });
+      },
+      t
+    );
+
+    // Button: Test best genome
+    this.bt_test = this.add.existing(new ButtonGenerator(t, 0, 0, 'TEST', buttonConfig));
+    this.bt_test.on(
+      'pointerup',
+      function() {
+        this.clean();
+        let conditions = LOADED_POPULATION.learningConditions;
+        this.scene.start('test', { network: LOADED_POPULATION.bestGenome, conditions: conditions });
+      },
+      t
+    );
+
+    // Button: Reset best genome
+    this.bt_resetGenome = this.add.existing(new ButtonGenerator(t, 0, 0, 'RESET', buttonConfig));
     this.bt_resetGenome.on(
       'pointerup',
       function() {
@@ -344,7 +184,97 @@ class Menu extends Phaser.Scene {
       },
       t
     );
-  } // end setButtonsEvents()
+    // Button: Save best genome
+    this.bt_saveBest = this.add.existing(new ButtonGenerator(t, 0, 0, 'SAVE', buttonConfig));
+    this.bt_saveBest.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.saveElement(LOADED_POPULATION.bestGenome, 'bestGenome.JSON');
+      },
+      t
+    );
+
+    return [this.bt_evolveFromBest, this.bt_saveBest, this.bt_test, this.bt_resetGenome];
+
+  } // end getBestGenomeButtons()
+
+  getSelectedGenomeButtons(){
+    const t = this;
+    const buttonConfig = GLOBALS.BUTTON_CONFIG;
+    // Button: Evolve selected genome
+    this.bt_evolveCurrentGenome = this.add.existing(new ButtonGenerator(t, 0, 0, 'EVOLVE', buttonConfig));
+    this.bt_evolveCurrentGenome.on(
+      'pointerup',
+      function() {
+        let NN = neataptic.Network.fromJSON(t.getSelected());
+        let conditions = LOADED_POPULATION.learningConditions;
+        this.cleanStoredGens();
+        LOADED_POPULATION = null;
+        this.clean();
+        this.scene.start('evolve', { network: NN, population: null, conditions: conditions });
+      },
+      t
+    );
+
+    // Button: Test selected genome
+    this.bt_testCurrent = this.add.existing(new ButtonGenerator(t, 0, 0, 'TEST', buttonConfig));
+    this.bt_testCurrent.on(
+      'pointerup',
+      function() {
+        this.clean();
+        let conditions = LOADED_POPULATION.learningConditions;
+        this.scene.start('test', { network: t.getSelected(), conditions: conditions });
+      },
+      t
+    );
+
+    // Button: Save selected genome
+    this.bt_saveCurrentGenome = this.add.existing(new ButtonGenerator(t, 0, 0, 'SAVE', buttonConfig));
+    this.bt_saveCurrentGenome.on(
+      'pointerup',
+      function() {
+        this.clean();
+        this.saveElement(t.getSelected(), 'genome.JSON');
+      },
+      t
+    );
+
+    return [this.bt_evolveCurrentGenome, this.bt_saveCurrentGenome, this.bt_testCurrent];
+  } // end getSelectedGenomeButtons()
+
+  makeDefaultButtons() {
+    const t = this;
+    const buttonConfig = GLOBALS.BUTTON_CONFIG;
+
+    // Button: Config
+    this.bt_config = this.add
+      .existing(new ButtonGenerator(this, t.marginX, t.marginY, 'CONFIG', buttonConfig))
+      .setOrigin(0);
+      this.bt_config.on(
+        'pointerup',
+        function() {
+          this.clean();
+          this.scene.start('configuration');
+        },
+        t
+      );
+
+    // Button: Evolve New Population
+    this.bt_evolve = this.add
+      .existing(new ButtonGenerator(t, t.marginX, t.marginY + this.bt_config.height + this.paddingY, 'EVOLVE NEW POPULATION', buttonConfig))
+      .setOrigin(0);
+      this.bt_evolve.on(
+        'pointerup',
+        function() {
+          LOADED_POPULATION = null;
+          let conditions = this.makeLearnConditionsObj();
+          this.clean();
+          this.scene.start('evolve', { conditions: conditions });
+        },
+        t
+      );
+  } // end makeDefaultButtons
 
   makeLearnConditionsObj() {
     let obj = {
@@ -397,21 +327,40 @@ class Menu extends Phaser.Scene {
   }
 
   showPopulationData() {
-    let populationSize = LOADED_POPULATION.population.length;
-    let generation = LOADED_POPULATION.generation;
-    let maxScore = LOADED_POPULATION.maxScore;
-    this.data_txt1.setText(`\n${populationSize}\n${generation}\n${maxScore}`);
+    let p = LOADED_POPULATION;
+    let populationSize = p.population.length;
+    let generation = p.generation;
+    let maxScore = p.maxScore;
+    let sensors = p.learningConditions.INPUTS_SIZE;
+    let detectionRadius = p.learningConditions.DETECTION_RADIUS;
+    let obstacles = p.learningConditions.OBSTACLES_AMOUNT;
+    let shipSpeed = p.learningConditions.SHIP_SPEED;
+    let shipAngular = p.learningConditions.SHIP_ANGULAR_SP;
+    let obstacleSpeed = p.learningConditions.OBSTACLE_SPEED;
 
-    let bestHiddenNeurons = LOADED_POPULATION.bestGenome
-      ? LOADED_POPULATION.bestGenome.nodes.length - LOADED_POPULATION.bestGenome.input - LOADED_POPULATION.bestGenome.output
+    this.rowPopulation.setData(0,populationSize);
+    this.rowPopulation.setData(1,generation);
+    this.rowPopulation.setData(2,maxScore);
+    this.rowPopulation.setData(3,sensors);
+    this.rowPopulation.setData(4,detectionRadius);
+    this.rowPopulation.setData(5,obstacles);
+    this.rowPopulation.setData(6,shipSpeed);
+    this.rowPopulation.setData(7,shipAngular);
+    this.rowPopulation.setData(8,obstacleSpeed);
+
+    let bestHiddenNeurons = p.bestGenome
+      ? p.bestGenome.nodes.length -
+        p.bestGenome.input -
+        p.bestGenome.output
       : 0;
     let selectedHiddenNeurons = localStorage.hasOwnProperty('selectedNetwork')
       ? JSON.parse(localStorage.getItem('selectedNetwork')).nodes.length -
-        LOADED_POPULATION.learningConditions.INPUTS_SIZE
+        p.learningConditions.INPUTS_SIZE - 2
       : 0;
 
-    this.data_txt2.setText(`\n${bestHiddenNeurons}\n${maxScore}`);
-    this.data_txt3.setText(`\n${selectedHiddenNeurons}`);
+    this.rowBestGenome.setData(0,bestHiddenNeurons);
+    this.rowBestGenome.setData(1,maxScore);
+    this.rowSelectedGenome.setData(0,selectedHiddenNeurons);
 
     this.bt_evolveLoaded.enable();
     this.bt_save.enable();
@@ -429,7 +378,7 @@ class Menu extends Phaser.Scene {
       this.bt_testCurrent.enable();
       this.bt_saveCurrentGenome.enable();
     }
-  }
+  } // end showPopulationData()
 
   cleanStoredGens() {
     localStorage.removeItem('selectedNetwork');
