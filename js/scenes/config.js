@@ -9,7 +9,6 @@ class Configuration extends Phaser.Scene {
     this.marginY = this.game.config.height + this.buttonsMarginY;
     this.paddingY = 16;
     this.centerX = this.game.config.width / 2;
-    this.maxScroll = 900; // change on last row
     this.actualBottomRow = this.marginY;
     this.configProperties = [];
   }
@@ -90,16 +89,16 @@ class Configuration extends Phaser.Scene {
     camera.scrollY = this.game.config.height;
 
     // Limits of scroll
-    let lowerLimit = this.actualBottomRow - 500;
-    let upperLimit = this.game.config.height;
+    let bottom = this.actualBottomRow;
+    let top = this.game.config.height;
 
-    let scroll = new Scroll(this, camera, upperLimit, lowerLimit, true, true, { wheelFactor: 0.2 });
+    let scroll = new Scroll(this, camera, top, bottom, { wheel: true, wheelFactor: 0.2 });
 
     // Free resources of Scroll object
     this.events.on(
       'shutdown',
       function() {
-        scroll.dispose();
+        scroll.destroy();
       },
       this
     );

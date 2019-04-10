@@ -74,14 +74,15 @@ class Menu extends Phaser.Scene {
     this.updateUI();
 
     // Vertical scroll
-    let lowerLimit = this.actualBottomRow - this.game.config.height;
-    let scroll = new Scroll(this, this.cameras.main, 0, lowerLimit, true, true, { wheelFactor: 0.2 });
+    let bottom = this.actualBottomRow;
+    let top = 0;
+    let scroll = new Scroll(this, this.cameras.main, 0, bottom, { wheel: true, wheelFactor: 0.2 });
 
     // Free resources of Scroll object
     this.events.on(
       'shutdown',
       function() {
-        scroll.dispose();
+        scroll.destroy();
       },
       this
     );
